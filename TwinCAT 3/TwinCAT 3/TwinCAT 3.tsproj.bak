@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4018.0">
+	<Project ProjectGUID="{A5F77BEE-DB81-4156-964D-064D2E7D0374}" Target64Bit="true">
+		<System>
+			<Tasks>
+				<Task Id="2" Priority="20" CycleTime="100000" AmsPort="350">
+					<Name>PlcTask</Name>
+				</Task>
+			</Tasks>
+		</System>
+		<Plc>
+			<Project GUID="{2EB64C17-FD89-48AC-922E-0985F9888B05}" Name="SerialCommunication" PrjFilePath="SerialCommunication\SerialCommunication.plcProj" TmcFilePath="SerialCommunication\SerialCommunication.tmc" ReloadTmc="true" AmsPort="851" TargetArchiveSettings="#x0000" FileArchiveSettings="#x0000">
+				<Instance Id="#x01010010" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
+					<Name>SerialCommunication Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+				</Instance>
+			</Project>
+			<Project GUID="{8D406A80-2E75-466F-84CE-D02B49BECCA8}" Name="ServoMotion_Library" PrjFilePath="ServoMotion_Library\ServoMotion_Library.plcProj" TmcFilePath="ServoMotion_Library\ServoMotion_Library.tmc" ReloadTmc="true" AmsPort="852" TargetArchiveSettings="#x0002" FileArchiveSettings="#x0000">
+				<Instance Id="#x01010020" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
+					<Name>ServoMotion_Library Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+				</Instance>
+			</Project>
+			<Project GUID="{239EFFC8-E5C4-4FCA-90C6-85A2560AAB39}" Name="IO_DigiIO" PrjFilePath="IO_DigiIO\IO_DigiIO.plcProj" TmcFilePath="IO_DigiIO\IO_DigiIO.tmc" ReloadTmc="true" AmsPort="854" FileArchiveSettings="#x000e">
+				<Instance Id="#x01010040" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
+					<Name>IO_DigiIO Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+				</Instance>
+			</Project>
+		</Plc>
+	</Project>
+</TcSmProject>

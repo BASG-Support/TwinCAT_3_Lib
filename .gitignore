@@ -194,3 +194,22 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
+TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/CurrentConfig.xml
+TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_851.cid
+TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_851.occ
+TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_851.crc
+TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_852.app
+TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_852.occ
+TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_852_boot.tizip
+TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_853.autostart
+TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_853.cid
+TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_852.autostart
+TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_852.cid
+TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_851.app
+TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_851.autostart
+TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_851_boot.tizip
+TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_852.crc
+TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_853.app
+TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_853.crc
+TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_853_boot.tizip
+TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_853.occ

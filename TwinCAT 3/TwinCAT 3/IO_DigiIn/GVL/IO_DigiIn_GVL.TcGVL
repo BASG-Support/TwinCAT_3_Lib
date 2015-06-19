@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
+  <GVL Name="IO_DigiIn_GVL" Id="{318c7559-9c27-4473-9540-b6fd4a864af6}">
+    <Declaration><![CDATA[VAR_GLOBAL
+	Digital_Input	AT %I* : ARRAY[1..MAX_D_IN] OF BOOL;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
+  <POU Name="Serial_FastBackgroundTask" Id="{93ce215f-f599-408e-a93e-9c5038c622de}" SpecialFunc="None">
+    <Declaration><![CDATA[(*
+	2015-06-04:
+		This object is meant to be used in the fast PLC task. Only 1 instance is required.
+*)
+FUNCTION_BLOCK Serial_FastBackgroundTask
+VAR
+	fbSerialLineControl	: ARRAY[1..MAX_CHANNELS] OF SERIALLINECONTROL;
+END_VAR
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[;]]></ST>
+    </Implementation>
+    <Method Name="Update_Channel" Id="{eed82517-936b-4a0c-be1b-ed52a1f41aa0}">
+      <Declaration><![CDATA[(*
+	2015-06-04:
+		Use the Update_Channel(INT) method to allow TwinCAT to manage the serial communication to the EL60xx serial communication terminals.
+		Run the method ONCE every PLC scan cycle
+*)
+METHOD PUBLIC Update_Channel : SERIAL_FUNCTIONRESULT
+VAR_INPUT
+	CHANNEL : INT; 	(*The serial communication channel*)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF CHANNEL < 1 OR CHANNEL > MAX_CHANNELS THEN
+	Update_Channel := Serial_FunctionResult.COM_UNKNOWN_CHANNEL;
+ELSE
+	fbSerialLineControl[CHANNEL](
+		Mode:= SERIALLINEMODE_EL6_22B, 
+		pComIn:= ADR(SerialComBuffer[CHANNEL].rxElComBuffer), 
+		pComOut:= ADR(SerialComBuffer[Channel].txElComBuffer), 
+		SizeComIn:= SIZEOF(SerialComBuffer[Channel].rxElComBuffer), 
+		TxBuffer:= SerialComBuffer[Channel].txBuffer, 
+		RxBuffer:= SerialComBuffer[Channel].rxBuffer);
+	IF fbSerialLineControl[CHANNEL].Error THEN
+		Update_Channel := Serial_FunctionResult.COM_IO_CONTROL_ERROR;
+	ELSE
+		Update_Channel := Serial_FunctionResult.NO_ERROR;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

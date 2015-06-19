@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4018.0">
+	<Project ProjectGUID="{7CB8D0F0-6DB8-44FC-ACD9-20693C91D73A}" Target64Bit="true">
+		<Plc>
+			<Project GUID="{2EB64C17-FD89-48AC-922E-0985F9888B05}" Name="SerialCommunication" PrjFilePath="SerialCommunication\SerialCommunication.plcProj" TmcFilePath="SerialCommunication\SerialCommunication.tmc" ReloadTmc="true" AmsPort="851" TargetArchiveSettings="#x0000" FileArchiveSettings="#x0000">
+				<Instance Id="#x01010010" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
+					<Name>SerialCommunication Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+				</Instance>
+			</Project>
+			<Project GUID="{8D406A80-2E75-466F-84CE-D02B49BECCA8}" Name="ServoMotion_Library" PrjFilePath="ServoMotion_Library\ServoMotion_Library.plcProj" TmcFilePath="ServoMotion_Library\ServoMotion_Library.tmc" ReloadTmc="true" AmsPort="852" TargetArchiveSettings="#x0002" FileArchiveSettings="#x0000">
+				<Instance Id="#x01010020" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
+					<Name>ServoMotion_Library Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+				</Instance>
+			</Project>
+			<Project GUID="{72521961-00BD-491A-A956-AF6DC658A290}" Name="TT_Vision" PrjFilePath="TT_Vision\TT_Vision.plcproj" TmcFilePath="TT_Vision\TT_Vision.tmc" ReloadTmc="true" AmsPort="853" TargetArchiveSettings="#x0000" FileArchiveSettings="#x0000">
+				<Instance Id="#x01010030" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
+					<Name>TT_Vision Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+				</Instance>
+			</Project>
+		</Plc>
+	</Project>
+</TcSmProject>

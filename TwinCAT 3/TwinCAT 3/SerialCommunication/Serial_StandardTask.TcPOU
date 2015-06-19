@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
+  <POU Name="Serial_StandardTask" Id="{0e9f6b66-5ba1-45c4-9000-604dce6adced}" SpecialFunc="None">
+    <Declaration><![CDATA[(*
+	2015-06-04:
+		This is the standard object that should be instantiated in the machine/application code. Only 1 instance is required.
+		It is not required to constantly call up the instance during the runtime; simply use the methods.
+		The prefix and surfix for each channel can be set via the Global Variable 'SerialStringFormat[].Prefix' and 'SerialStringFormat[].Surfix' respectively.
+*)
+FUNCTION_BLOCK Serial_StandardTask
+VAR_OUTPUT
+END_VAR
+VAR
+	fbSendString 	: ARRAY[1..MAX_CHANNELS] OF SendString;		(*Standard function block from Beckhoff.*)
+	fbReceiveString : ARRAY[1..MAX_CHANNELS] OF ReceiveString;	(*Standard function block from Beckhoff. String default 80. for 255, use ReceiveString255.*)
+	SendDataBuffer	: ARRAY[1..MAX_CHANNELS] OF STRING;			(*Placeholder for formatting the string that is to be sent.*)
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[;]]></ST>
+    </Implementation>
+    <Method Name="ReadString80" Id="{599c74cc-629d-487b-9695-5c0ac7fadda1}">
+      <Declaration><![CDATA[(*
+	2015-06-04	:
+		The method ReadString80(INT,STRING_PTR) should be used to read a string with a length of up to 80 characters long. 
+*)
+METHOD PUBLIC ReadString80 : Serial_FunctionResult
+VAR_INPUT
+	CHANNEL 			: INT;					(*The serial communication channel*)
+	RECEIVED_DATA		: POINTER TO STRING;	(*The address of the variable to store the received string*)
+END_VAR
+VAR 
+	String_Data_Buffer 	: STRING;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF CHANNEL > MAX_CHANNELS OR CHANNEL < 1 THEN
+	ReadString80 := Serial_FunctionResult.COM_UNKNOWN_CHANNEL;
+ELSE
+	fbReceiveString[CHANNEL](
+		Prefix:= SerialStringFormat[CHANNEL].Prefix, 
+		Suffix:= SerialStringFormat[CHANNEL].Surfix, 
+		Timeout:= T#1S, 
+		ReceivedString:= String_Data_Buffer, 
+		RXbuffer:= SerialComBuffer[CHANNEL].rxBuffer );
+	IF fbReceiveString[CHANNEL].Error > 0 THEN
+		ReadString80 := Serial_FunctionResult.COM_RECEIVE_ERROR;
+	END_IF
+	IF fbReceiveString[CHANNEL].StringReceived THEN
+		RECEIVED_DATA^ := String_Data_Buffer;
+		ReadString80 := Serial_FunctionResult.NO_ERROR;
+	ELSIF fbReceiveString[CHANNEL].Busy THEN
+		ReadString80 := Serial_FunctionResult.BUSY;
+	ELSE
+		ReadString80 := Serial_FunctionResult.COM_NO_STRING_RECEIVED;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SendString80" Id="{8458000a-b8ff-4701-9433-b072917b432f}">
+      <Declaration><![CDATA[METHOD PUBLIC SendString80 : Serial_FunctionResult
+VAR_INPUT
+	CHANNEL	: INT;		(*The serial communication channel*)
+	DATA	: STRING;	(*The string data to be sent to via the channel. Do not include the prefix/surfix.*)
+END_VAR
+VAR
+	fbTRIG 	: F_TRIG;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF CHANNEL > MAX_CHANNELS OR CHANNEL < 1 THEN
+	SendString80 := Serial_FunctionResult.COM_UNKNOWN_CHANNEL;
+ELSE
+	SendDataBuffer[CHANNEL] := CONCAT(SerialStringFormat[CHANNEL].Prefix, CONCAT(DATA, SerialStringFormat[CHANNEL].Surfix));
+	fbSendString[CHANNEL](SendString:= SendDataBuffer[CHANNEL], TXbuffer:= SerialComBuffer[CHANNEL].txBuffer);
+	IF fbSendString[CHANNEL].Error > 0 THEN
+		SendString80 := Serial_FunctionResult.COM_SEND_ERROR;
+	END_IF
+	IF fbSendString[CHANNEL].Busy THEN
+		SendString80 := Serial_FunctionResult.BUSY;
+	ELSE
+		SendString80 := Serial_FunctionResult.NO_ERROR;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

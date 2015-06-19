@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
+  <GVL Name="IO_DigiIn_Parameters" Id="{67abd78c-e76e-4800-a1ed-c6e56f6fbbbc}" ParameterList="True">
+    <Declaration><![CDATA[VAR_GLOBAL CONSTANT
+	MAX_D_IN	: INT := 1;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>
