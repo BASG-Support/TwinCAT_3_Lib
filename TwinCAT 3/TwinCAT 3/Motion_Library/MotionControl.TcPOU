@@ -1,0 +1,465 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
+  <POU Name="MotionControl" Id="{55b379f4-f721-4632-9623-aca35a4ff0b7}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK MotionControl
+VAR_INPUT
+	HMI_MODE : BOOL;
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	fbPower 	: ARRAY [1..MAX_AXES] OF MC_POWER;
+	fbReset 	: ARRAY [1..MAX_AXES] OF MC_RESET;
+	fbHome		: ARRAY	[1..MAX_AXES] OF MC_HOME;
+	fbMoveA 	: ARRAY [1..MAX_AXES] OF MC_MOVEABSOLUTE;
+	fbMoveR 	: ARRAY [1..MAX_AXES] OF MC_MOVERELATIVE;
+	fbJog		: ARRAY [1..MAX_AXES] OF MC_JOG;
+	fbHalt	 	: ARRAY [1..MAX_AXES] OF MC_HALT;
+	i			: INT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF HMI_MODE THEN 
+	FOR i := 1 TO MAX_AXES BY 1 DO
+		ACT_UpdateStatus();
+		IF HmiToPlc[i].OFF THEN
+			ACT_Off();
+		ELSIF HmiToPlc[i].ON THEN 
+			ACT_On();
+		END_IF
+		IF NOT HmiToPlc[i].JOG_MODE THEN 
+			Jog_Stop(i);
+			IF HmiToPlc[i].HALT THEN 
+				ACT_Halt();
+			ELSIF HmiToPlc[i].MOVE_ABS THEN
+				ACT_MoveToPosition();
+			END_IF
+			IF HmiToPlc[i].MOVE_REL THEN
+				ACT_MoveByDistance();
+			END_IF
+		ELSE
+			ACT_Jog();
+		END_IF
+	END_FOR
+END_IF]]></ST>
+    </Implementation>
+    <Folder Name="HMI Actions" Id="{a81ee722-85c9-42c1-866f-016e6d583404}" />
+    <Action Name="ACT_On" Id="{055125fe-25ee-4a7a-b050-73eb03772677}" FolderPath="HMI Actions\">
+      <Implementation>
+        <ST><![CDATA[On(i, HmiToPlc[i].ON_FW, HmiToPlc[i].ON_BW, HmiToPlc[i].CONTROLLER_OVERRIDE);]]></ST>
+      </Implementation>
+    </Action>
+    <Method Name="Home" Id="{177da0d7-0e75-4752-b88f-e867267c266c}">
+      <Declaration><![CDATA[METHOD PUBLIC Home : Motion_FunctionResult
+VAR_INPUT
+	INDEX : INT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF INDEX > MAX_AXES OR INDEX < 1 THEN 
+	Home := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
+ELSE
+	fbHome[INDEX](
+		Axis:= AXIS[INDEX].AXIS, 
+		Execute:= TRUE, 
+		Position:= 0, 
+		HomingMode:= MC_DefaultHoming, 
+		bCalibrationCam:= AXIS[INDEX].HOME_CALIBRATION );
+	IF fbHome[INDEX].Error THEN
+		fbHome[INDEX](
+			Axis:= AXIS[INDEX].AXIS, 
+			Execute:= FALSE );
+		Home := Motion_FunctionResult.MOTION_ERROR;
+	ELSIF fbHome[INDEX].CommandAborted THEN
+		fbHome[INDEX](
+			Axis:= AXIS[INDEX].AXIS, 
+			Execute:= FALSE );
+		Home := Motion_FunctionResult.MOTION_COMMAND_ABORTED;
+	ELSIF fbHome[INDEX].Done THEN
+		fbHome[INDEX](
+			Axis:= AXIS[INDEX].AXIS, 
+			Execute:= FALSE );
+		Home := Motion_FunctionResult.MOTION_OK;
+	ELSE
+		Home := Motion_FunctionResult.MOTION_BUSY;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Jog_Stop" Id="{1f8fc547-a813-4b5f-93fa-9fae40058f6f}">
+      <Declaration><![CDATA[METHOD PUBLIC Jog_Stop : Motion_FunctionResult
+VAR_INPUT
+	INDEX : INT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbJog[INDEX](
+	Axis:= AXIS[INDEX].AXIS, 
+	JogForward:= FALSE, 
+	JogBackwards:= FALSE );
+IF fbJog[INDEX].Error THEN 
+	Jog_Stop := Motion_FunctionResult.MOTION_ERROR;
+ELSE
+	Jog_Stop := Motion_FunctionResult.MOTION_OK;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Off" Id="{2b7678fb-5114-4046-a0d3-11070b4fbd98}">
+      <Declaration><![CDATA[METHOD PUBLIC Off : Motion_FunctionResult
+VAR_INPUT
+	INDEX : INT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF INDEX > MAX_AXES OR INDEX < 1 THEN 
+	Off := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
+ELSE
+	fbPower[INDEX](
+		Axis:= AXIS[INDEX].AXIS, 
+		Enable:= FALSE, 
+		Enable_Positive:= FALSE, 
+		Enable_Negative:= FALSE, 
+		Override:= 0 );
+	IF fbPower[INDEX].Error THEN
+		Off := Motion_FunctionResult.MOTION_ERROR;
+	ELSIF NOT fbPower[INDEX].Status THEN
+		Off := Motion_FunctionResult.MOTION_OK;
+	ELSE
+		Off := Motion_FunctionResult.MOTION_BUSY;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Action Name="ACT_Halt" Id="{39e232ab-6ebc-4ec0-af7e-c3ba534cc123}" FolderPath="HMI Actions\">
+      <Implementation>
+        <ST><![CDATA[CASE Halt(i) OF 
+Motion_FunctionResult.MOTION_UNKNOWN_AXIS:
+	HmiToPlc[i].HALT := FALSE;
+Motion_FunctionResult.MOTION_ERROR:
+	HmiToPlc[i].HALT := FALSE;
+Motion_FunctionResult.MOTION_OK:
+	HmiToPlc[i].HALT := FALSE;
+Motion_FunctionResult.MOTION_COMMAND_ABORTED:
+	HmiToPlc[i].HALT := FALSE;
+Motion_FunctionResult.MOTION_BUSY:
+	;
+END_CASE]]></ST>
+      </Implementation>
+    </Action>
+    <Action Name="ACT_MoveToPosition" Id="{40847845-e28a-467f-8c2b-007d9c73cf9b}" FolderPath="HMI Actions\">
+      <Implementation>
+        <ST><![CDATA[CASE MoveToPosition(i,HmiToPlc[i].TARGET_POSITION,HmiToPlc[i].TARGET_VELOCITY,HmiToPlc[i].TARGET_ACCELERATION,HmiToPlc[i].TARGET_DECELERATION,HmiToPlc[i].TARGET_JERK) OF
+Motion_FunctionResult.MOTION_UNKNOWN_AXIS:
+	HmiToPlc[i].MOVE_ABS := FALSE;
+Motion_FunctionResult.MOTION_COMMAND_ABORTED: 
+	HmiToPlc[i].MOVE_ABS := FALSE;
+Motion_FunctionResult.MOTION_ERROR:
+	HmiToPlc[i].MOVE_ABS := FALSE;
+Motion_FunctionResult.MOTION_BUSY: 
+	;
+Motion_FunctionResult.MOTION_OK:
+	HmiToPlc[i].MOVE_ABS := FALSE;
+END_CASE]]></ST>
+      </Implementation>
+    </Action>
+    <Property Name="AXIS_COUNT" Id="{459cb5a1-6ab5-4653-9f1f-4943f3702408}">
+      <Declaration><![CDATA[PROPERTY PUBLIC AXIS_COUNT : INT]]></Declaration>
+      <Get Name="Get" Id="{9be2d030-51e7-4e34-80b7-5636315565bf}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AXIS_COUNT := MAX_AXES;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="MoveToPosition" Id="{4b4bad53-575d-4566-847b-5df400e707ed}">
+      <Declaration><![CDATA[METHOD PUBLIC MoveToPosition : Motion_FunctionResult
+VAR_INPUT
+	INDEX 			: INT;
+	POSITION		: LREAL;
+	VELOCITY		: LREAL;
+	ACCELERATION	: LREAL;
+	DECELERATION	: LREAL;
+	JERK			: LREAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF INDEX > MAX_AXES OR INDEX < 1 AND VELOCITY <= 0 THEN 
+	MoveToPosition := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
+ELSE
+	fbMoveA[INDEX](
+		Axis:= AXIS[INDEX].AXIS, 
+		Execute:= TRUE, 
+		Position:= POSITION, 
+		Velocity:= VELOCITY, 
+		Acceleration:= ACCELERATION, 
+		Deceleration:= DECELERATION, 
+		Jerk:= JERK );
+	IF fbMoveA[INDEX].Error THEN
+		fbMoveA[INDEX](
+			Axis:= AXIS[INDEX].AXIS, 
+			Execute:= FALSE );
+		MoveToPosition := Motion_FunctionResult.MOTION_ERROR;
+	ELSIF fbMoveA[INDEX].CommandAborted THEN
+		fbMoveA[INDEX](
+			Axis:= AXIS[INDEX].AXIS, 
+			Execute:= FALSE );
+		MoveToPosition := Motion_FunctionResult.MOTION_COMMAND_ABORTED;
+	ELSIF fbMoveA[INDEX].Done THEN
+		fbMoveA[INDEX](
+			Axis:= AXIS[INDEX].AXIS, 
+			Execute:= FALSE );
+		MoveToPosition := Motion_FunctionResult.MOTION_OK;
+	ELSE
+		MoveToPosition := Motion_FunctionResult.MOTION_BUSY;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Action Name="ACT_Off" Id="{5bdb5604-b204-4401-92fa-0d357435d921}" FolderPath="HMI Actions\">
+      <Implementation>
+        <ST><![CDATA[Off(i);]]></ST>
+      </Implementation>
+    </Action>
+    <Method Name="Halt" Id="{6989ff12-21aa-479d-ad23-23232d5ecada}">
+      <Declaration><![CDATA[METHOD PUBLIC Halt : Motion_FunctionResult
+VAR_INPUT
+	INDEX : INT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF INDEX > MAX_AXES OR INDEX < 1 THEN 
+	Halt := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
+ELSE
+	fbHalt[INDEX](
+		Axis:= AXIS[INDEX].AXIS, 
+		Execute:= TRUE );
+	fbMoveA[INDEX](
+		Axis:= AXIS[INDEX].AXIS, 
+		Execute:= FALSE );
+	fbMoveR[INDEX](
+		Axis:= AXIS[INDEX].AXIS, 
+		Execute:= FALSE );
+	IF fbHalt[INDEX].Error THEN
+		fbHalt[INDEX](
+			Axis:= AXIS[INDEX].AXIS, 
+			Execute:= FALSE );
+		Halt := Motion_FunctionResult.MOTION_ERROR;
+	ELSIF fbHalt[INDEX].CommandAborted THEN
+		fbHalt[INDEX](
+			Axis:= AXIS[INDEX].AXIS, 
+			Execute:= FALSE );
+		Halt := Motion_FunctionResult.MOTION_COMMAND_ABORTED;
+	ELSIF fbHalt[INDEX].Done THEN
+		fbHalt[INDEX](
+			Axis:= AXIS[INDEX].AXIS, 
+			Execute:= FALSE );
+		Halt := Motion_FunctionResult.MOTION_OK;
+	ELSE
+		Halt := Motion_FunctionResult.MOTION_BUSY;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Action Name="ACT_MoveByDistance" Id="{7d58b39d-b312-4669-b3d1-c2d6a9066f91}" FolderPath="HMI Actions\">
+      <Implementation>
+        <ST><![CDATA[CASE MoveByDistance(i,HmiToPlc[i].TARGET_POSITION,HmiToPlc[i].TARGET_VELOCITY,HmiToPlc[i].TARGET_ACCELERATION,HmiToPlc[i].TARGET_DECELERATION,HmiToPlc[i].TARGET_JERK) OF
+Motion_FunctionResult.MOTION_UNKNOWN_AXIS:
+	HmiToPlc[i].MOVE_REL := FALSE;
+Motion_FunctionResult.MOTION_COMMAND_ABORTED: 
+	HmiToPlc[i].MOVE_REL := FALSE;
+Motion_FunctionResult.MOTION_ERROR:
+	HmiToPlc[i].MOVE_REL := FALSE;
+Motion_FunctionResult.MOTION_BUSY: 
+	;
+Motion_FunctionResult.MOTION_OK:
+	HmiToPlc[i].MOVE_REL := FALSE;
+END_CASE
+			]]></ST>
+      </Implementation>
+    </Action>
+    <Method Name="Jog_Start" Id="{857d1325-691b-4e71-89f9-5cc1b73fa800}">
+      <Declaration><![CDATA[METHOD PUBLIC Jog_Start : Motion_FunctionResult
+VAR_INPUT
+	INDEX		: INT;
+	REVERSE		: BOOL := FALSE;
+	FAST_MODE	: BOOL := FALSE;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF FAST_MODE THEN 
+	fbJog[INDEX].Mode := MC_JOGMODE_STANDARD_FAST;
+ELSE
+	fbJog[INDEX].Mode := MC_JOGMODE_STANDARD_SLOW;
+END_IF
+
+fbJog[INDEX](
+	Axis:= AXIS[INDEX].AXIS, 
+	JogForward:= NOT REVERSE, 
+	JogBackwards:= REVERSE );
+IF fbJog[INDEX].Error THEN 
+	Jog_Start := Motion_FunctionResult.MOTION_ERROR;
+ELSIF AXIS[INDEX].AXIS.Status.Moving THEN 
+	Jog_Start := Motion_FunctionResult.MOTION_OK;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="AxisGroup_Count" Id="{9f93d7b8-c6c0-420b-b549-25dfd1d07367}">
+      <Declaration><![CDATA[PROPERTY AxisGroup_Count : INT]]></Declaration>
+      <Get Name="Get" Id="{6c4c1b83-d2cd-4270-b6f4-b61728b59c66}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AXISGROUP_Count := MAX_AXIS_GROUPS;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Action Name="ACT_Reset" Id="{a7a36296-4bd3-4c04-bfcc-ad271ca28fe6}" FolderPath="HMI Actions\">
+      <Implementation>
+        <ST><![CDATA[IF Reset(i) = Motion_FunctionResult.MOTION_OK THEN
+	HmiToPlc[i].RESET := FALSE;
+END_IF]]></ST>
+      </Implementation>
+    </Action>
+    <Method Name="MoveByDistance" Id="{b7b49934-4930-4ea2-b772-a6e74f151dd6}">
+      <Declaration><![CDATA[METHOD PUBLIC MoveByDistance : Motion_FunctionResult
+VAR_INPUT
+	INDEX 			: INT;
+	DISTANCE 		: LREAL;
+	VELOCITY 		: LREAL;
+	ACCELERATION 	: LREAL;
+	DECELERATION 	: LREAL;
+	JERK 			: LREAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF INDEX > MAX_AXES OR INDEX < 1 AND VELOCITY <= 0 THEN 
+	MoveByDistance := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
+ELSE
+	fbMoveR[INDEX](
+		Axis:= AXIS[INDEX].AXIS, 
+		Execute:= TRUE, 
+		Distance:= DISTANCE, 
+		Velocity:= VELOCITY, 
+		Acceleration:= ACCELERATION, 
+		Deceleration:= DECELERATION, 
+		Jerk:= JERK );
+	IF fbMoveR[INDEX].Error THEN
+		fbMoveR[INDEX](
+			Axis:= AXIS[INDEX].AXIS, 
+			Execute:= FALSE );
+		MoveByDistance := Motion_FunctionResult.MOTION_ERROR;
+	ELSIF fbMoveR[INDEX].CommandAborted THEN
+		fbMoveR[INDEX](
+			Axis:= AXIS[INDEX].AXIS, 
+			Execute:= FALSE );
+		MoveByDistance := Motion_FunctionResult.MOTION_COMMAND_ABORTED;
+	ELSIF fbMoveR[INDEX].Done THEN
+		fbMoveR[INDEX](
+			Axis:= AXIS[INDEX].AXIS, 
+			Execute:= FALSE );
+		MoveByDistance := Motion_FunctionResult.MOTION_OK;
+	ELSE
+		MoveByDistance := Motion_FunctionResult.MOTION_BUSY;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Action Name="ACT_Jog" Id="{cc0383b4-9148-4bf0-9c5a-f7313178b54b}" FolderPath="HMI Actions\">
+      <Implementation>
+        <ST><![CDATA[IF HmiToPlc[i].JOG_FW_FAST THEN
+	Jog_Start(i, FALSE, TRUE);
+ELSIF HmiToPlc[i].JOG_FW_SLOW THEN
+	Jog_Start(i, FALSE, FALSE);
+ELSIF HmiToPlc[i].JOG_BW_FAST THEN
+	Jog_Start(i, TRUE, TRUE);
+ELSIF HmiToPlc[i].JOG_BW_SLOW THEN
+	Jog_Start(i, TRUE, FALSE);
+ELSE
+	Jog_Stop(i);
+END_IF]]></ST>
+      </Implementation>
+    </Action>
+    <Method Name="On" Id="{d7c9e2a6-ab50-4fb9-bb77-ce0d39e7247b}">
+      <Declaration><![CDATA[METHOD On : Motion_FunctionResult
+VAR_INPUT
+	INDEX : INT;
+	ENABLE_FW 	: BOOL;
+	ENABLE_BW	: BOOL;
+	OVERRIDE	: LREAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF INDEX > MAX_AXES OR INDEX < 1 THEN 
+	Servo_On := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
+ELSE
+	fbPower[INDEX](
+		Axis:= AXIS[INDEX].AXIS, 
+		Enable:= TRUE, 
+		Enable_Positive:= ENABLE_FW, 
+		Enable_Negative:= ENABLE_BW, 
+		Override:= OVERRIDE );
+	IF fbPower[INDEX].Error THEN
+		Servo_On := Motion_FunctionResult.MOTION_ERROR;
+	ELSIF fbPower[INDEX].Status THEN
+		Servo_On := Motion_FunctionResult.MOTION_OK;
+	ELSE
+		Servo_On := Motion_FunctionResult.MOTION_BUSY;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Reset" Id="{e126d8bd-3570-40c3-9468-28dd8d3340a4}">
+      <Declaration><![CDATA[METHOD PUBLIC Reset : Motion_FunctionResult
+VAR_INPUT
+	INDEX :INT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF INDEX > MAX_AXES OR INDEX < 1 THEN 
+	Reset := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
+ELSE
+	fbReset[INDEX](
+		Axis:= AXIS[INDEX].AXIS, 
+		Execute:= TRUE );
+	IF fbReset[INDEX].Error THEN
+		fbReset[INDEX](
+			Axis:= AXIS[INDEX].AXIS, 
+			Execute:= FALSE );
+		Reset := Motion_FunctionResult.MOTION_ERROR;
+	ELSIF fbReset[INDEX].Done THEN
+		fbReset[INDEX](
+			Axis:= AXIS[INDEX].AXIS, 
+			Execute:= FALSE );
+		Reset := Motion_FunctionResult.MOTION_OK;
+	ELSE
+		Reset := Motion_FunctionResult.MOTION_BUSY;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Action Name="ACT_UpdateStatus" Id="{fc19d8f7-7aab-443d-a6b0-6c271a3d11f7}" FolderPath="HMI Actions\">
+      <Implementation>
+        <ST><![CDATA[AXIS[i].AXIS.ReadStatus();
+PlcToHmi[i].actPos	:= AXIS[i].AXIS.NcToPlc.ActPos;
+PlcToHmi[i].actVelo := AXIS[i].AXIS.NcToPlc.ActVelo;
+PlcToHmi[i].setPos	:= AXIS[i].AXIS.NcToPlc.SetPos;
+PlcToHmi[i].setVelo := AXIS[i].AXIS.NcToPlc.SetVelo;
+PlcToHmi[i].controller_override := fbPower[i].Override;
+PlcToHmi[i].hasError := AXIS[i].AXIS.Status.Error;
+PlcToHmi[i].ErrorID := AXIS[i].AXIS.Status.ErrorID;
+PlcToHmi[i].isBwDisabled := NOT fbPower[i].Enable_Negative;
+PlcToHmi[i].isFwDisabled := NOT fbPower[i].Enable_Positive;
+PlcToHmi[i].isCalibrated := AXIS[i].AXIS.Status.Homed;
+PlcToHmi[i].isDisabled := AXIS[i].AXIS.Status.Disabled;
+PlcToHmi[i].isInRange := AXIS[i].AXIS.Status.InPositionArea;
+PlcToHmi[i].isInTarget := AXIS[i].AXIS.Status.InTargetPosition;
+PlcToHmi[i].isNegativeDirection := AXIS[i].AXIS.Status.NegativeDirection;
+PlcToHmi[i].isNotMoving := AXIS[i].AXIS.Status.NotMoving;
+PlcToHmi[i].isPositiveDirection := AXIS[i].AXIS.Status.PositiveDirection;]]></ST>
+      </Implementation>
+    </Action>
+  </POU>
+</TcPlcObject>

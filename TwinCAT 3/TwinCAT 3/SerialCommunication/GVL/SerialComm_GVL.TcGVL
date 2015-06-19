@@ -5,11 +5,12 @@
 		2015-06-04	:
 			SerialComBuffer
 			SerialStringFormat
+		2015-06-19	:
+			Move SerialStringFormat into the module itself
 *)
 
 VAR_GLOBAL
 	SerialComBuffer 	: ARRAY [1..MAX_CHANNELS] OF Serial_ComBuffer; 	(*Structure containing the standard buffer variables required for a functioning serial communication. 1 for each channel.*)
-	SerialStringFormat	: ARRAY [1..MAX_CHANNELS] OF Serial_StringFormat;(*Structure containing the prefix and sufix format for the strings. 1 for each channel.*)
 END_VAR]]></Declaration>
   </GVL>
 </TcPlcObject>
