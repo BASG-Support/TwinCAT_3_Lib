@@ -8,6 +8,9 @@ END_VAR
 VAR_OUTPUT
 END_VAR
 VAR
+	HmiToPlc	: ARRAY[1..MAX_AXES] OF Motion_HmiToPlc;
+	PlcToHmi	: ARRAY[1..MAX_AXES] OF Motion_PlcToHmi;
+	AXIS		: ARRAY[1..MAX_AXES] OF Motion_Axis;
 	fbPower 	: ARRAY [1..MAX_AXES] OF MC_POWER;
 	fbReset 	: ARRAY [1..MAX_AXES] OF MC_RESET;
 	fbHome		: ARRAY	[1..MAX_AXES] OF MC_HOME;
@@ -19,31 +22,10 @@ VAR
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[IF HMI_MODE THEN 
-	FOR i := 1 TO MAX_AXES BY 1 DO
-		ACT_UpdateStatus();
-		IF HmiToPlc[i].OFF THEN
-			ACT_Off();
-		ELSIF HmiToPlc[i].ON THEN 
-			ACT_On();
-		END_IF
-		IF NOT HmiToPlc[i].JOG_MODE THEN 
-			Jog_Stop(i);
-			IF HmiToPlc[i].HALT THEN 
-				ACT_Halt();
-			ELSIF HmiToPlc[i].MOVE_ABS THEN
-				ACT_MoveToPosition();
-			END_IF
-			IF HmiToPlc[i].MOVE_REL THEN
-				ACT_MoveByDistance();
-			END_IF
-		ELSE
-			ACT_Jog();
-		END_IF
-	END_FOR
-END_IF]]></ST>
+      <ST><![CDATA[;]]></ST>
     </Implementation>
     <Folder Name="Methods" Id="{17551b9c-2969-46ec-8e71-0b07d9c32552}" />
+    <Folder Name="Properties" Id="{705af329-ccbe-4f33-b4ad-e8be6087764d}" />
     <Folder Name="HMI Actions" Id="{a81ee722-85c9-42c1-866f-016e6d583404}" />
     <Action Name="ACT_On" Id="{055125fe-25ee-4a7a-b050-73eb03772677}" FolderPath="HMI Actions\">
       <Implementation>
@@ -163,7 +145,7 @@ Motion_FunctionResult.MOTION_OK:
 END_CASE]]></ST>
       </Implementation>
     </Action>
-    <Property Name="AXIS_COUNT" Id="{459cb5a1-6ab5-4653-9f1f-4943f3702408}">
+    <Property Name="AXIS_COUNT" Id="{459cb5a1-6ab5-4653-9f1f-4943f3702408}" FolderPath="Properties\">
       <Declaration><![CDATA[PROPERTY PUBLIC AXIS_COUNT : INT]]></Declaration>
       <Get Name="Get" Id="{9be2d030-51e7-4e34-80b7-5636315565bf}">
         <Declaration><![CDATA[VAR
@@ -223,6 +205,25 @@ END_IF]]></ST>
         <ST><![CDATA[Off(i);]]></ST>
       </Implementation>
     </Action>
+    <Property Name="HMI" Id="{62785eb5-ec51-4e58-a1b6-0d0ffb1015e7}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY PUBLIC HMI : BOOL]]></Declaration>
+      <Set Name="Set" Id="{4ef0278b-83c9-4192-a0f6-d391052e804d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[HMI_MODE := HMI;]]></ST>
+        </Implementation>
+      </Set>
+      <Get Name="Get" Id="{9866cc53-4e8f-4488-ac07-e472b466232c}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[HMI := HMI_MODE;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
     <Method Name="Halt" Id="{6989ff12-21aa-479d-ad23-23232d5ecada}" FolderPath="Methods\">
       <Declaration><![CDATA[METHOD PUBLIC Halt : Motion_FunctionResult
 VAR_INPUT
@@ -306,17 +307,33 @@ ELSIF AXIS[INDEX].AXIS.Status.Moving THEN
 END_IF]]></ST>
       </Implementation>
     </Method>
-    <Property Name="AxisGroup_Count" Id="{9f93d7b8-c6c0-420b-b549-25dfd1d07367}">
-      <Declaration><![CDATA[PROPERTY AxisGroup_Count : INT]]></Declaration>
-      <Get Name="Get" Id="{6c4c1b83-d2cd-4270-b6f4-b61728b59c66}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[AXISGROUP_Count := MAX_AXIS_GROUPS;]]></ST>
-        </Implementation>
-      </Get>
-    </Property>
+    <Action Name="HMI_Run" Id="{97bfb548-813c-44ab-8766-fd308ff1a6ff}" FolderPath="HMI Actions\">
+      <Implementation>
+        <ST><![CDATA[IF HMI_MODE THEN 
+	FOR i := 1 TO MAX_AXES BY 1 DO
+		ACT_UpdateStatus();
+		IF HmiToPlc[i].OFF THEN
+			ACT_Off();
+		ELSIF HmiToPlc[i].ON THEN 
+			ACT_On();
+		END_IF
+		IF NOT HmiToPlc[i].JOG_MODE THEN 
+			Jog_Stop(i);
+			IF HmiToPlc[i].HALT THEN 
+				ACT_Halt();
+			ELSIF HmiToPlc[i].MOVE_ABS THEN
+				ACT_MoveToPosition();
+			END_IF
+			IF HmiToPlc[i].MOVE_REL THEN
+				ACT_MoveByDistance();
+			END_IF
+		ELSE
+			ACT_Jog();
+		END_IF
+	END_FOR
+END_IF]]></ST>
+      </Implementation>
+    </Action>
     <Action Name="ACT_Reset" Id="{a7a36296-4bd3-4c04-bfcc-ad271ca28fe6}" FolderPath="HMI Actions\">
       <Implementation>
         <ST><![CDATA[IF Reset(i) = Motion_FunctionResult.MOTION_OK THEN

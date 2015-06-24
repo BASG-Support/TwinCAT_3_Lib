@@ -213,3 +213,4 @@ TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_853.app
 TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_853.crc
 TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_853_boot.tizip
 TwinCAT 3/TwinCAT 3/_Boot/TwinCAT RT (x64)/Plc/Port_853.occ
+*.compileinfo

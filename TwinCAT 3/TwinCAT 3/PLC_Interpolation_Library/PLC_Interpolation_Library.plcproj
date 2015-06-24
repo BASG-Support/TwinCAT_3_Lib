@@ -1,74 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <!-- <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>-->
     <FileVersion>1.0.0.0</FileVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{8d406a80-2e75-466f-84ce-d02b49becca8}</ProjectGuid>
-    <Name>Motion_Library</Name>
+    <ProjectGuid>{b5cae539-cf43-4436-af96-2165ab476f5c}</ProjectGuid>
+    <Name>PLC_Interpolation_Library</Name>
     <ProgramVersion>3.1.0.8</ProgramVersion>
-    <Application>{9ae2a5ac-3291-4a2e-8751-b2cb1dbbc01f}</Application>
-    <TypeSystem>{05868db5-4db3-4831-ad99-f3b7fbd9924b}</TypeSystem>
-    <Implicit_Task_Info>{a46fd2de-c814-45a7-adb7-86e00e75f05c}</Implicit_Task_Info>
-    <Implicit_KindOfTask>{fcf83947-606e-454e-87b9-41cf20e11a68}</Implicit_KindOfTask>
-    <Implicit_Jitter_Distribution>{4d79e0d3-d5ef-4e6d-9f91-4b2f6a6ccabb}</Implicit_Jitter_Distribution>
-    <LibraryReferences>{301df436-507f-40f5-bc31-d75d8e8acf74}</LibraryReferences>
+    <Application>{fd91263b-f80a-4115-a883-283e507f6647}</Application>
+    <TypeSystem>{22903609-ada4-49c0-af81-5a8add73fe4a}</TypeSystem>
+    <Implicit_Task_Info>{6ee4b622-4b81-4fec-9269-a1746241e741}</Implicit_Task_Info>
+    <Implicit_KindOfTask>{91ef67f7-a6cd-4f2c-a12f-387b97ae7917}</Implicit_KindOfTask>
+    <Implicit_Jitter_Distribution>{7138ae16-5873-43d6-a381-fe02847d9240}</Implicit_Jitter_Distribution>
+    <LibraryReferences>{d84fe2ca-65dd-4dd7-babb-315fb5db9b99}</LibraryReferences>
     <Company>Chua Siang Poh</Company>
     <Released>True</Released>
-    <Title>ServoMotion_Lib</Title>
+    <Title>PLC_Interpolation_Library</Title>
     <ProjectVersion>1.0</ProjectVersion>
     <Author>Chua Siang Poh</Author>
-    <Description>For projects that require at least 1 motion axis.
-The library is meant as an easy-to-setup module. 
-Only requring the change of a parameter.
-Other motion functions are exposed as a method.
-Includes a very simple/crude type of linear interpolation.</Description>
-    <!--    <OutputType>Exe</OutputType>
-    <RootNamespace>MyApplication</RootNamespace>
-    <AssemblyName>MyApplication</AssemblyName>-->
+    <Description>A simple library to enable you to use the NCI package to do PLC interpolation.</Description>
   </PropertyGroup>
-  <ItemGroup>
-    <Folder Include="Custom Datatypes" />
-    <Folder Include="Version" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Custom Datatypes\Motion_Axis.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Custom Datatypes\Motion_AxisGroup.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Custom Datatypes\Motion_HmiToPlc.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Custom Datatypes\Motion_PlcToHmi.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Custom Datatypes\Motion_FunctionResult.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Interpolate.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="MotionControl.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Motion_Parameters.TcGVL">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Version\Global_Version.TcGVL">
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Motion_Library.tmc">
-      <SubType>Content</SubType>
-    </Content>
-  </ItemGroup>
   <ItemGroup>
     <PlaceholderReference Include="Tc2_MC2">
       <DefaultResolution>Tc2_MC2, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc2_MC2</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_PlcInterpolation">
+      <DefaultResolution>Tc2_PlcInterpolation, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_PlcInterpolation</Namespace>
     </PlaceholderReference>
     <PlaceholderReference Include="Tc2_Standard">
       <DefaultResolution>Tc2_Standard, * (Beckhoff Automation GmbH)</DefaultResolution>
@@ -87,11 +45,32 @@ Includes a very simple/crude type of linear interpolation.</Description>
       <Namespace>Tc3_Module</Namespace>
     </PlaceholderReference>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Custom Datatypes" />
+    <Folder Include="Version" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Custom Datatypes\Interpolation_FunctionResult.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Custom Datatypes\POSITION.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="INTERPOLATION_CHANNEL.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PLC_Interpolation_Parameters.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Version\Global_Version.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
   <ProjectExtensions>
     <PlcProjectOptions>
       <XmlArchive>
-  <Data>
-    <o xml:space="preserve" t="OptionKey">
+        <Data>
+          <o xml:space="preserve" t="OptionKey">
       <v n="Name">"&lt;ProjectRoot&gt;"</v>
       <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
         <v>{F66C7017-BDD8-4114-926C-81D6D687E35F}</v>
@@ -101,67 +80,6 @@ Includes a very simple/crude type of linear interpolation.</Description>
           <d n="Values" t="Hashtable" ckt="String" cvt="Boolean">
             <v>FlagUseInit</v>
             <v>False</v>
-          </d>
-        </o>
-        <v>{C70B7845-2722-4a9b-A0EA-88C877A4B36F}</v>
-        <o>
-          <v n="Name">"{C70B7845-2722-4a9b-A0EA-88C877A4B36F}"</v>
-          <d n="SubKeys" t="Hashtable" />
-          <d n="Values" t="Hashtable" ckt="String">
-            <v>EnableMaxAuthenticationTrials</v>
-            <v>true</v>
-            <v>MaxAuthenticationTrials</v>
-            <v>3</v>
-            <v>UserList</v>
-            <o t="UserList">
-              <a n="Users" cet="User">
-                <o>
-                  <v n="Id">{4a12488e-4441-4f5c-9500-cd8e40345f24}</v>
-                  <v n="Name">"Owner"</v>
-                  <v n="FullName">""</v>
-                  <v n="Description">""</v>
-                  <v n="Active">true</v>
-                </o>
-              </a>
-            </o>
-            <v>MaxTimeOfInactivity</v>
-            <v>10</v>
-            <v>EnableMaxTimeOfInactivity</v>
-            <v>true</v>
-            <v>GroupList</v>
-            <o t="GroupList">
-              <a n="Groups" cet="Group">
-                <o>
-                  <v n="Id">{87405b33-2520-4a60-bb51-b51541950634}</v>
-                  <v n="Name">"Owner"</v>
-                  <v n="Description">""</v>
-                  <v n="IsEveryoneGroup">false</v>
-                  <v n="IsOwnerGroup">true</v>
-                  <l n="UserMembers" t="ArrayList" cet="Guid">
-                    <v>4a12488e-4441-4f5c-9500-cd8e40345f24</v>
-                  </l>
-                  <l n="GroupMembers" t="ArrayList" />
-                </o>
-                <o>
-                  <v n="Id">{b2ca0379-2f4f-400f-8c33-7b2f4e16e642}</v>
-                  <v n="Name">"Everyone"</v>
-                  <v n="Description">""</v>
-                  <v n="IsEveryoneGroup">true</v>
-                  <v n="IsOwnerGroup">false</v>
-                  <l n="UserMembers" t="ArrayList" cet="Guid">
-                    <v>4a12488e-4441-4f5c-9500-cd8e40345f24</v>
-                  </l>
-                  <l n="GroupMembers" t="ArrayList" />
-                </o>
-              </a>
-            </o>
-            <v>UserAuthentication</v>
-            <o t="UserAuthentication">
-              <d n="UserToPasswordHash" t="Hashtable" ckt="Guid" cvt="String">
-                <v>4a12488e-4441-4f5c-9500-cd8e40345f24</v>
-                <v>d41d8cd98f00b204e9800998ecf8427e</v>
-              </d>
-            </o>
           </d>
         </o>
         <v>{29BD8D0C-3586-4548-BB48-497B9A01693F}</v>
@@ -189,34 +107,14 @@ Includes a very simple/crude type of linear interpolation.</Description>
       </d>
       <d n="Values" t="Hashtable" />
     </o>
-  </Data>
-  <TypeList>
-    <Type n="ArrayList">System.Collections.ArrayList</Type>
-    <Type n="Boolean">System.Boolean</Type>
-    <Type n="Group">{daecd4be-1e2b-4335-a125-4a1ac83ea49f}</Type>
-    <Type n="GroupList">{bf4dffda-f055-446d-9d7a-5f126720896b}</Type>
-    <Type n="Guid">System.Guid</Type>
-    <Type n="Hashtable">System.Collections.Hashtable</Type>
-    <Type n="Int32">System.Int32</Type>
-    <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
-    <Type n="String">System.String</Type>
-    <Type n="User">{cd83029e-13b0-491e-9e4b-921adda0d86b}</Type>
-    <Type n="UserAuthentication">{3635a671-97f5-41bb-9e29-0ebb9795975c}</Type>
-    <Type n="UserList">{9fe6b547-6bc8-4f11-b589-b517860c5891}</Type>
-  </TypeList>
-</XmlArchive>
+        </Data>
+        <TypeList>
+          <Type n="Boolean">System.Boolean</Type>
+          <Type n="Hashtable">System.Collections.Hashtable</Type>
+          <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
+          <Type n="String">System.String</Type>
+        </TypeList>
+      </XmlArchive>
     </PlcProjectOptions>
   </ProjectExtensions>
-  <!-- 
-   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug\</OutputPath>
-    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Release\</OutputPath>
-    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
-  </PropertyGroup>
--->
 </Project>

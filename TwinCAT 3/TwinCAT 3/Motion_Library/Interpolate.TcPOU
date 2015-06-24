@@ -15,7 +15,19 @@ END_VAR
     <Implementation>
       <ST><![CDATA[;]]></ST>
     </Implementation>
-    <Method Name="Set_AxisGroup" Id="{ab6dcdb3-bc01-4bb0-a35c-f32c7165dec7}">
+    <Folder Name="Methods" Id="{a74d0231-eaf2-4812-b485-b0a95658117b}" />
+    <Property Name="AxisGroup_Count" Id="{9f93d7b8-c6c0-420b-b549-25dfd1d07367}">
+      <Declaration><![CDATA[PROPERTY AxisGroup_Count : INT]]></Declaration>
+      <Get Name="Get" Id="{6c4c1b83-d2cd-4270-b6f4-b61728b59c66}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AXISGROUP_Count := MAX_AXIS_GROUPS;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Set_AxisGroup" Id="{ab6dcdb3-bc01-4bb0-a35c-f32c7165dec7}" FolderPath="Methods\">
       <Declaration><![CDATA[METHOD PUBLIC Set_AxisGroup : Motion_FunctionResult
 VAR_INPUT
 	AXIS_GROUP_INDEX	: INT;
@@ -40,159 +52,7 @@ ELSE
 END_IF]]></ST>
       </Implementation>
     </Method>
-    <Method Name="Servo_GearIn" Id="{b3abeab1-98ad-4956-99e3-d0d81843a79b}">
-      <Declaration><![CDATA[METHOD PROTECTED Servo_GearIn : Motion_FunctionResult
-VAR_INPUT
-	GROUP		: INT;
-	MASTER		: INT;
-	SLAVE		: INT;
-	RATIO		: LREAL;
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[IF GROUP < 1 OR GROUP > MAX_AXIS_GROUPS THEN
-	Servo_GearIn := Motion_FunctionResult.MOTION_UNKNOWN_AXIS_GROUP;
-ELSIF MASTER < 1 OR MASTER > MAX_AXES THEN
-	Servo_GearIn := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
-ELSIF SLAVE < 1 OR SLAVE > MAX_AXES THEN
-	Servo_GearIn := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
-ELSIF MASTER = SLAVE THEN
-	Servo_GearIn := Motion_FunctionResult.MOTION_UNKNOWN_SAME_AXIS_IN_GROUP;
-ELSE
-	fbGearIn[GROUP](
-		Master:= AXIS[MASTER].AXIS, 
-		Slave:= AXIS[SLAVE].AXIS, 
-		Execute:= TRUE, 
-		RatioNumerator:= RATIO, 
-		RatioDenominator:= 1 );
-	IF fbGearIn[GROUP].InGear THEN
-		fbGearIn[GROUP](
-			Master:= AXIS[MASTER].AXIS, 
-			Slave:= AXIS[SLAVE].AXIS, 
-			Execute:= FALSE );
-		Servo_GearIn := Motion_FunctionResult.MOTION_OK;
-	ELSIF fbGearIn[GROUP].Error THEN
-		fbGearIn[GROUP](
-			Master:= AXIS[MASTER].AXIS, 
-			Slave:= AXIS[SLAVE].AXIS, 
-			Execute:= FALSE );
-		Servo_GearIn := Motion_FunctionResult.MOTION_ERROR;
-	ELSIF fbGearIn[GROUP].CommandAborted THEN 
-		fbGearIn[GROUP](
-			Master:= AXIS[MASTER].AXIS, 
-			Slave:= AXIS[SLAVE].AXIS, 
-			Execute:= FALSE );
-		Servo_GearIn := Motion_FunctionResult.MOTION_COMMAND_ABORTED; 
-	ELSE
-		Servo_GearIn:= Motion_FunctionResult.MOTION_BUSY;
-	END_IF
-END_IF]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="Interpolate" Id="{c023b78f-5502-4c68-8805-acdafc8e4468}">
-      <Declaration><![CDATA[METHOD PROTECTED Interpolate : Motion_FunctionResult
-VAR_INPUT
-	GROUP			: INT;
-	TO_X_POSITION	: LREAL;
-	TO_Y_POSITION	: LREAL;
-	VELOCITY		: LREAL;
-END_VAR
-VAR
-	delta_t : LREAL;
-	delta_x : LREAL;
-	delta_y : LREAL;
-	distance: LREAL;
-END_VAR]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[IF GROUP < 1 OR GROUP > MAX_AXIS_GROUPS THEN
-	Interpolate := Motion_FunctionResult.MOTION_UNKNOWN_AXIS_GROUP;
-ELSIF AXISGROUP[GROUP].X_AXIS < 1 OR AXISGROUP[GROUP].X_AXIS > MAX_AXES THEN
-	Interpolate := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
-ELSIF AXISGROUP[GROUP].Y_AXIS < 1 OR AXISGROUP[GROUP].Y_AXIS > MAX_AXES THEN
-	Interpolate := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
-ELSIF AXISGROUP[GROUP].X_AXIS = AXISGROUP[GROUP].Y_AXIS THEN
-	Interpolate := Motion_FunctionResult.MOTION_UNKNOWN_SAME_AXIS_IN_GROUP;
-//ELSIF AXISGROUP[GROUP].STATE <> -10 THEN
-//	Interpolate := Motion_FunctionResult.MOTION_ERROR;
-ELSE
- 	CASE AXISGROUP[GROUP].STATE OF
-	-10:
-		delta_x := TO_X_POSITION - AXIS[AXISGROUP[GROUP].X_AXIS].AXIS.NcToPlc.ActPos;
-		delta_y := TO_Y_POSITION - AXIS[AXISGROUP[GROUP].Y_AXIS].AXIS.NcToPlc.ActPos;
-		distance:= SQRT((delta_x*delta_x) + (delta_y*delta_y));
-		delta_t := distance/VELOCITY;
-		AXISGROUP[GROUP].V_X := delta_x/delta_t;
-		AXISGROUP[GROUP].V_Y := delta_y/delta_t;
-		IF AXISGROUP[GROUP].V_X < 0.00001 AND AXISGROUP[GROUP].V_Y > 0.00001 THEN
-			AXISGROUP[GROUP].Y_IS_MASTER := TRUE;
-		ELSE
-			AXISGROUP[GROUP].Y_IS_MASTER := FALSE;
-		END_IF
-		AXISGROUP[GROUP].STATE := 10;
-		Interpolate := Motion_FunctionResult.MOTION_BUSY;
-	10:
-		IF AXISGROUP[GROUP].Y_IS_MASTER THEN
-			IF Servo_GearIn(GROUP,AXISGROUP[GROUP].Y_AXIS,AXISGROUP[GROUP].X_AXIS,AXISGROUP[GROUP].V_X/AXISGROUP[GROUP].V_Y) = Motion_FunctionResult.MOTION_OK THEN
-				AXISGROUP[GROUP].STATE := 20;
-			END_IF
-		ELSE
-			IF Servo_GearIn(GROUP,AXISGROUP[GROUP].X_AXIS,AXISGROUP[GROUP].Y_AXIS,AXISGROUP[GROUP].V_Y/AXISGROUP[GROUP].V_X) = Motion_FunctionResult.MOTION_OK THEN
-				AXISGROUP[GROUP].STATE := 20;
-			END_IF
-		END_IF
-		Interpolate := Motion_FunctionResult.MOTION_BUSY;
-	20: 
-		IF AXISGROUP[GROUP].Y_IS_MASTER THEN
-			IF MoveToPosition(AXISGROUP[GROUP].Y_AXIS, TO_Y_POSITION,ABS(AXISGROUP[GROUP].V_Y),0,0,0) = Motion_FunctionResult.MOTION_OK THEN
-				AXISGROUP[GROUP].STATE := 30;
-			END_IF 
-		ELSE
-			IF MoveToPosition(AXISGROUP[GROUP].X_AXIS, TO_X_POSITION,ABS(AXISGROUP[GROUP].V_X),0,0,0) = Motion_FunctionResult.MOTION_OK THEN
-				AXISGROUP[GROUP].STATE := 30;
-			END_IF
-		END_IF
-		Interpolate := Motion_FunctionResult.MOTION_BUSY;
-	30:
-		IF AXISGROUP[GROUP].Y_IS_MASTER THEN
-			fbGearOut[GROUP](
-				Slave:= AXIS[AXISGROUP[GROUP].X_AXIS].AXIS, 
-				Execute:= TRUE );
-			IF fbGearOut[GROUP].Done THEN
-				fbGearOut[GROUP](
-					Slave:= AXIS[AXISGROUP[GROUP].X_AXIS].AXIS, 
-					Execute:= FALSE );
-				AXISGROUP[GROUP].STATE := -10;
-				Interpolate := Motion_FunctionResult.MOTION_OK;
-			ELSIF fbGearOut[GROUP].Error THEN
-				fbGearOut[GROUP](
-					Slave:= AXIS[AXISGROUP[GROUP].X_AXIS].AXIS, 
-					Execute:= FALSE );
-				AXISGROUP[GROUP].STATE := -10;
-				Interpolate := Motion_FunctionResult.MOTION_ERROR;
-			END_IF
-		ELSE
-			fbGearOut[GROUP](
-				Slave:= AXIS[AXISGROUP[GROUP].Y_AXIS].AXIS, 
-				Execute:= TRUE );
-			IF fbGearOut[GROUP].Done THEN
-				fbGearOut[GROUP](
-					Slave:= AXIS[AXISGROUP[GROUP].Y_AXIS].AXIS, 
-					Execute:= FALSE );
-				AXISGROUP[GROUP].STATE := -10;
-				Interpolate := Motion_FunctionResult.MOTION_OK;
-			ELSIF fbGearOut[GROUP].Error THEN
-				fbGearOut[GROUP](
-					Slave:= AXIS[AXISGROUP[GROUP].Y_AXIS].AXIS, 
-					Execute:= FALSE );
-				AXISGROUP[GROUP].STATE := -10;
-				Interpolate := Motion_FunctionResult.MOTION_ERROR;
-			END_IF
-		END_IF
-	END_CASE
-END_IF]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="LinearInterpolate" Id="{eee2ac97-89df-432a-bc26-8b1b695c1981}">
+    <Method Name="LinearInterpolate" Id="{eee2ac97-89df-432a-bc26-8b1b695c1981}" FolderPath="Methods\">
       <Declaration><![CDATA[METHOD PUBLIC LinearInterpolate : Motion_FunctionResult
 VAR_INPUT
 	GROUP 			: INT;
