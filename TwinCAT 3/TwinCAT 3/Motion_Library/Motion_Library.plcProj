@@ -103,24 +103,13 @@ Includes a very simple/crude type of linear interpolation.</Description>
             <v>False</v>
           </d>
         </o>
-        <v>{29BD8D0C-3586-4548-BB48-497B9A01693F}</v>
-        <o>
-          <v n="Name">"{29BD8D0C-3586-4548-BB48-497B9A01693F}"</v>
-          <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
-            <v>Rules</v>
-            <o>
-              <v n="Name">"Rules"</v>
-              <d n="SubKeys" t="Hashtable" />
-              <d n="Values" t="Hashtable" />
-            </o>
-          </d>
-          <d n="Values" t="Hashtable" />
-        </o>
         <v>{C70B7845-2722-4a9b-A0EA-88C877A4B36F}</v>
         <o>
           <v n="Name">"{C70B7845-2722-4a9b-A0EA-88C877A4B36F}"</v>
           <d n="SubKeys" t="Hashtable" />
           <d n="Values" t="Hashtable" ckt="String">
+            <v>EnableMaxAuthenticationTrials</v>
+            <v>true</v>
             <v>MaxAuthenticationTrials</v>
             <v>3</v>
             <v>UserList</v>
@@ -173,9 +162,20 @@ Includes a very simple/crude type of linear interpolation.</Description>
                 <v>d41d8cd98f00b204e9800998ecf8427e</v>
               </d>
             </o>
-            <v>EnableMaxAuthenticationTrials</v>
-            <v>true</v>
           </d>
+        </o>
+        <v>{29BD8D0C-3586-4548-BB48-497B9A01693F}</v>
+        <o>
+          <v n="Name">"{29BD8D0C-3586-4548-BB48-497B9A01693F}"</v>
+          <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
+            <v>Rules</v>
+            <o>
+              <v n="Name">"Rules"</v>
+              <d n="SubKeys" t="Hashtable" />
+              <d n="Values" t="Hashtable" />
+            </o>
+          </d>
+          <d n="Values" t="Hashtable" />
         </o>
         <v>{40450F57-0AA3-4216-96F3-5444ECB29763}</v>
         <o>

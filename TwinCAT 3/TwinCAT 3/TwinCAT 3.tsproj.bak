@@ -33,6 +33,12 @@
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 				</Instance>
 			</Project>
+			<Project GUID="{B5CAE539-CF43-4436-AF96-2165AB476F5C}" Name="PLC_Interpolation_Library" PrjFilePath="PLC_Interpolation_Library\PLC_Interpolation_Library.plcproj" TmcFilePath="PLC_Interpolation_Library\PLC_Interpolation_Library.tmc" ReloadTmc="true" AmsPort="855" FileArchiveSettings="#x000e">
+				<Instance Id="#x01010050" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
+					<Name>PLC_Interpolation_Library Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+				</Instance>
+			</Project>
 		</Plc>
 	</Project>
 </TcSmProject>
