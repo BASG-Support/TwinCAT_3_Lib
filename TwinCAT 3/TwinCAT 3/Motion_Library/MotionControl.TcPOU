@@ -8,6 +8,7 @@ END_VAR
 VAR_OUTPUT
 END_VAR
 VAR
+	AXIS_COUNT	: INT := 0;
 	HmiToPlc	: ARRAY[1..MAX_AXES] OF Motion_HmiToPlc;
 	PlcToHmi	: ARRAY[1..MAX_AXES] OF Motion_PlcToHmi;
 	AXIS		: ARRAY[1..MAX_AXES] OF Motion_Axis;
@@ -39,7 +40,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF INDEX > MAX_AXES OR INDEX < 1 THEN 
+        <ST><![CDATA[IF INDEX > AXIS_COUNT OR INDEX < 1 THEN 
 	Home := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
 ELSE
 	fbHome[INDEX](
@@ -76,14 +77,18 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[fbJog[INDEX](
-	Axis:= AXIS[INDEX].AXIS, 
-	JogForward:= FALSE, 
-	JogBackwards:= FALSE );
-IF fbJog[INDEX].Error THEN 
-	Jog_Stop := Motion_FunctionResult.MOTION_ERROR;
+        <ST><![CDATA[IF INDEX > AXIS_COUNT OR INDEX < 1 THEN 
+	Reset := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
 ELSE
-	Jog_Stop := Motion_FunctionResult.MOTION_OK;
+	fbJog[INDEX](
+		Axis:= AXIS[INDEX].AXIS, 
+		JogForward:= FALSE, 
+		JogBackwards:= FALSE );
+	IF fbJog[INDEX].Error THEN 
+		Jog_Stop := Motion_FunctionResult.MOTION_ERROR;
+	ELSE
+		Jog_Stop := Motion_FunctionResult.MOTION_OK;
+	END_IF
 END_IF]]></ST>
       </Implementation>
     </Method>
@@ -94,7 +99,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF INDEX > MAX_AXES OR INDEX < 1 THEN 
+        <ST><![CDATA[IF INDEX > AXIS_COUNT OR INDEX < 1 THEN 
 	Off := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
 ELSE
 	fbPower[INDEX](
@@ -145,14 +150,23 @@ Motion_FunctionResult.MOTION_OK:
 END_CASE]]></ST>
       </Implementation>
     </Action>
-    <Property Name="AXIS_COUNT" Id="{459cb5a1-6ab5-4653-9f1f-4943f3702408}" FolderPath="Properties\">
-      <Declaration><![CDATA[PROPERTY PUBLIC AXIS_COUNT : INT]]></Declaration>
+    <Property Name="COUNT" Id="{459cb5a1-6ab5-4653-9f1f-4943f3702408}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY PUBLIC COUNT : INT]]></Declaration>
+      <Set Name="Set" Id="{6fb218ec-b5b3-46d4-afd0-a81260142c21}">
+        <Declaration><![CDATA[PUBLIC 
+VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AXIS_COUNT := COUNT;]]></ST>
+        </Implementation>
+      </Set>
       <Get Name="Get" Id="{9be2d030-51e7-4e34-80b7-5636315565bf}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[AXIS_COUNT := MAX_AXES;]]></ST>
+          <ST><![CDATA[COUNT := AXIS_COUNT;]]></ST>
         </Implementation>
       </Get>
     </Property>
@@ -168,7 +182,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF INDEX > MAX_AXES OR INDEX < 1 AND VELOCITY <= 0 THEN 
+        <ST><![CDATA[IF INDEX > AXIS_COUNT OR INDEX < 1 AND VELOCITY <= 0 THEN 
 	MoveToPosition := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
 ELSE
 	fbMoveA[INDEX](
@@ -231,7 +245,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF INDEX > MAX_AXES OR INDEX < 1 THEN 
+        <ST><![CDATA[IF INDEX > AXIS_COUNT OR INDEX < 1 THEN 
 	Halt := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
 ELSE
 	fbHalt[INDEX](
@@ -290,20 +304,24 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF FAST_MODE THEN 
-	fbJog[INDEX].Mode := MC_JOGMODE_STANDARD_FAST;
+        <ST><![CDATA[IF INDEX > AXIS_COUNT OR INDEX < 1 THEN 
+	Reset := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
 ELSE
-	fbJog[INDEX].Mode := MC_JOGMODE_STANDARD_SLOW;
-END_IF
-
-fbJog[INDEX](
-	Axis:= AXIS[INDEX].AXIS, 
-	JogForward:= NOT REVERSE, 
-	JogBackwards:= REVERSE );
-IF fbJog[INDEX].Error THEN 
-	Jog_Start := Motion_FunctionResult.MOTION_ERROR;
-ELSIF AXIS[INDEX].AXIS.Status.Moving THEN 
-	Jog_Start := Motion_FunctionResult.MOTION_OK;
+	IF FAST_MODE THEN 
+		fbJog[INDEX].Mode := MC_JOGMODE_STANDARD_FAST;
+	ELSE
+		fbJog[INDEX].Mode := MC_JOGMODE_STANDARD_SLOW;
+	END_IF
+	
+	fbJog[INDEX](
+		Axis:= AXIS[INDEX].AXIS, 
+		JogForward:= NOT REVERSE, 
+		JogBackwards:= REVERSE );
+	IF fbJog[INDEX].Error THEN 
+		Jog_Start := Motion_FunctionResult.MOTION_ERROR;
+	ELSIF AXIS[INDEX].AXIS.Status.Moving THEN 
+		Jog_Start := Motion_FunctionResult.MOTION_OK;
+	END_IF
 END_IF]]></ST>
       </Implementation>
     </Method>
@@ -353,7 +371,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF INDEX > MAX_AXES OR INDEX < 1 AND VELOCITY <= 0 THEN 
+        <ST><![CDATA[IF INDEX > AXIS_COUNT OR INDEX < 1 AND VELOCITY <= 0 THEN 
 	MoveByDistance := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
 ELSE
 	fbMoveR[INDEX](
@@ -410,7 +428,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF INDEX > MAX_AXES OR INDEX < 1 THEN 
+        <ST><![CDATA[IF INDEX > AXIS_COUNT OR INDEX < 1 THEN 
 	On := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
 ELSE
 	fbPower[INDEX](
@@ -436,7 +454,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF INDEX > MAX_AXES OR INDEX < 1 THEN 
+        <ST><![CDATA[IF INDEX > AXIS_COUNT OR INDEX < 1 THEN 
 	Reset := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
 ELSE
 	fbReset[INDEX](

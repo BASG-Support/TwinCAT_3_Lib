@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
+  <Itf Name="ITF_MotionControl" Id="{bd2d28f9-0185-4612-a42e-8d77cf508d1a}">
+    <Declaration><![CDATA[INTERFACE ITF_MotionControl
+]]></Declaration>
+    <Method Name="Home" Id="{02be24f8-97e1-4dcd-bfcf-bee0b1794bed}">
+      <Declaration><![CDATA[METHOD PUBLIC Home : Motion_FunctionResult
+VAR_INPUT
+	INDEX : INT;
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="MoveByDistance" Id="{27cd7e24-7a95-424c-a1cb-8b2865d9e226}">
+      <Declaration><![CDATA[METHOD PUBLIC MoveByDistance : Motion_FunctionResult
+VAR_INPUT
+	INDEX 			: INT;
+	DISTANCE 		: LREAL;
+	VELOCITY 		: LREAL;
+	ACCELERATION 	: LREAL;
+	DECELERATION 	: LREAL;
+	JERK 			: LREAL;
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="Halt" Id="{31a19591-50ed-42d5-bc0c-ffe21067b6d5}">
+      <Declaration><![CDATA[METHOD PUBLIC Halt : Motion_FunctionResult
+VAR_INPUT
+	INDEX : INT;
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="Jog_Start" Id="{321d9431-06dc-4211-be66-737f8f630f05}">
+      <Declaration><![CDATA[METHOD PUBLIC Jog_Start : Motion_FunctionResult
+VAR_INPUT
+	INDEX		: INT;
+	REVERSE		: BOOL := FALSE;
+	FAST_MODE	: BOOL := FALSE;
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="Jog_Stop" Id="{6971b6fe-f7da-4bbd-94a6-7b567909e3f2}">
+      <Declaration><![CDATA[METHOD PUBLIC Jog_Stop : Motion_FunctionResult
+VAR_INPUT
+	INDEX : INT;
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="On" Id="{86258aac-9faf-432f-8f81-58ff60815e24}">
+      <Declaration><![CDATA[METHOD On : Motion_FunctionResult
+VAR_INPUT
+	INDEX : INT;
+	ENABLE_FW 	: BOOL;
+	ENABLE_BW	: BOOL;
+	OVERRIDE	: LREAL;
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="MoveToPosition" Id="{87b56079-48ec-491e-96ad-38c90803c3bd}">
+      <Declaration><![CDATA[METHOD PUBLIC MoveToPosition : Motion_FunctionResult
+VAR_INPUT
+	INDEX 			: INT;
+	POSITION		: LREAL;
+	VELOCITY		: LREAL;
+	ACCELERATION	: LREAL;
+	DECELERATION	: LREAL;
+	JERK			: LREAL;
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="Reset" Id="{a4d5ded1-be09-4e71-9a82-e045bd5861a9}">
+      <Declaration><![CDATA[METHOD PUBLIC Reset : Motion_FunctionResult
+VAR_INPUT
+	INDEX :INT;
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="Off" Id="{a5f61034-755b-4f8c-a2d8-16b5828fecc1}">
+      <Declaration><![CDATA[METHOD PUBLIC Off : Motion_FunctionResult
+VAR_INPUT
+	INDEX : INT;
+END_VAR
+]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>
