@@ -99,8 +99,7 @@ END_IF]]></ST>
 METHOD Fast_Task : Serial_FunctionResult
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[(*
-fbSerialLineControl(
+        <ST><![CDATA[fbSerialLineControl(
 	Mode:= SERIALLINEMODE_EL6_22B, 
 	pComIn:= ADR(SerialComBuffer.rxElComBuffer), 
 	pComOut:= ADR(SerialComBuffer.txElComBuffer), 
@@ -112,8 +111,8 @@ IF fbSerialLineControl.Error THEN
 ELSE
 	Fast_Task := Serial_FunctionResult.NO_ERROR;
 END_IF
-*)
 
+(*
 fbSerialLineControl(
 	Mode:= SERIALLINEMODE_PC_COM_PORT, 
 	pComIn:= ADR(SerialComBuffer.rxPcComBuffer), 
@@ -125,7 +124,8 @@ IF fbSerialLineControl.Error THEN
 	Fast_Task := Serial_FunctionResult.COM_IO_CONTROL_ERROR;
 ELSE
 	Fast_Task := Serial_FunctionResult.NO_ERROR;
-END_IF]]></ST>
+END_IF
+*)]]></ST>
       </Implementation>
     </Method>
     <Method Name="Send_String" Id="{cc6e3bac-0145-4bdd-afb6-8ffc6a1f1b44}" FolderPath="Methods\">

@@ -92,10 +92,8 @@
           <v n="Name">"{C70B7845-2722-4a9b-A0EA-88C877A4B36F}"</v>
           <d n="SubKeys" t="Hashtable" />
           <d n="Values" t="Hashtable" ckt="String">
-            <v>EnableMaxAuthenticationTrials</v>
-            <v>true</v>
-            <v>EnableMaxTimeOfInactivity</v>
-            <v>true</v>
+            <v>MaxAuthenticationTrials</v>
+            <v>3</v>
             <v>UserList</v>
             <o t="UserList">
               <a n="Users" cet="User">
@@ -110,8 +108,8 @@
             </o>
             <v>MaxTimeOfInactivity</v>
             <v>10</v>
-            <v>MaxAuthenticationTrials</v>
-            <v>3</v>
+            <v>EnableMaxTimeOfInactivity</v>
+            <v>true</v>
             <v>GroupList</v>
             <o t="GroupList">
               <a n="Groups" cet="Group">
@@ -146,13 +144,9 @@
                 <v>d41d8cd98f00b204e9800998ecf8427e</v>
               </d>
             </o>
+            <v>EnableMaxAuthenticationTrials</v>
+            <v>true</v>
           </d>
-        </o>
-        <v>{192FAD59-8248-4824-A8DE-9177C94C195A}</v>
-        <o>
-          <v n="Name">"{192FAD59-8248-4824-A8DE-9177C94C195A}"</v>
-          <d n="SubKeys" t="Hashtable" />
-          <d n="Values" t="Hashtable" />
         </o>
         <v>{F66C7017-BDD8-4114-926C-81D6D687E35F}</v>
         <o>
@@ -162,12 +156,6 @@
             <v>FlagUseInit</v>
             <v>False</v>
           </d>
-        </o>
-        <v>{246001F4-279D-43AC-B241-948EB31120E1}</v>
-        <o>
-          <v n="Name">"{246001F4-279D-43AC-B241-948EB31120E1}"</v>
-          <d n="SubKeys" t="Hashtable" />
-          <d n="Values" t="Hashtable" />
         </o>
       </d>
       <d n="Values" t="Hashtable" />
