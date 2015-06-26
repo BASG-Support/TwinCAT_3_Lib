@@ -15,7 +15,7 @@
     <LibraryReferences>{589b0b2a-6d14-464a-842f-93df2c1d064c}</LibraryReferences>
     <Title>SerialCom_Lib</Title>
     <Released>True</Released>
-    <ProjectVersion>1.0</ProjectVersion>
+    <ProjectVersion>1.1</ProjectVersion>
     <Author>Chua Siang Poh</Author>
     <Description>Device library designed for simpler and modular serial communication applications in TwinCAT. 
 Number of serial com channels can be specified in the Parameter list.</Description>
@@ -47,12 +47,24 @@ Number of serial com channels can be specified in the Parameter list.</Descripti
     </PlaceholderReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="GVL" />
     <Folder Include="Custom Datatypes" />
+    <Folder Include="Interfaces" />
     <Folder Include="Version" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Custom Datatypes\Serial_FunctionResult.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Interfaces\ITF_SerialCommChannel.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Interfaces\ITF_Serial_FastTask.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Interfaces\ITF_Serial_StandardTask.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Serial_Channel.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Serial_FastBackgroundTask.TcPOU">
@@ -61,16 +73,10 @@ Number of serial com channels can be specified in the Parameter list.</Descripti
     <Compile Include="Serial_StandardTask.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="SerialComm_Parameters.TcGVL">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Custom Datatypes\Serial_COMBUFFER.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Custom Datatypes\Serial_StringFormat.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="GVL\SerialComm_GVL.TcGVL">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Version\Global_Version.TcGVL">
@@ -128,6 +134,8 @@ Number of serial com channels can be specified in the Parameter list.</Descripti
           <v n="Name">"{C70B7845-2722-4a9b-A0EA-88C877A4B36F}"</v>
           <d n="SubKeys" t="Hashtable" />
           <d n="Values" t="Hashtable" ckt="String">
+            <v>EnableMaxAuthenticationTrials</v>
+            <v>true</v>
             <v>MaxAuthenticationTrials</v>
             <v>3</v>
             <v>UserList</v>
@@ -180,8 +188,6 @@ Number of serial com channels can be specified in the Parameter list.</Descripti
                 <v>d41d8cd98f00b204e9800998ecf8427e</v>
               </d>
             </o>
-            <v>EnableMaxAuthenticationTrials</v>
-            <v>true</v>
           </d>
         </o>
         <v>{192FAD59-8248-4824-A8DE-9177C94C195A}</v>

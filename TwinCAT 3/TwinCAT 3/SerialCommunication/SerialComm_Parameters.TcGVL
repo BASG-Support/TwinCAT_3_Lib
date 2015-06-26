@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
-  <GVL Name="SerialComm_Parameters" Id="{72f4e9d7-352f-45a2-8786-783678147d41}" ParameterList="True">
-    <Declaration><![CDATA[VAR_GLOBAL CONSTANT
-	MAX_CHANNELS 	: INT := 10; (*Number of serial communication channels in the system*)
-END_VAR]]></Declaration>
-  </GVL>
-</TcPlcObject>

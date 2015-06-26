@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
+  <POU Name="Serial_Channel" Id="{9ca3bf5d-b9c3-4060-8974-3480f8b54d6a}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC Serial_Channel IMPLEMENTS ITF_SerialCommChannel
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	fbSerialLineControl	: SERIALLINECONTROL;
+	SerialComBuffer 	: Serial_ComBuffer;
+	SerialStringFormat	: Serial_StringFormat;(*Structure containing the prefix and sufix format for the strings. 1 for each channel.*)
+	fbSendString 		: SendString;		(*Standard function block from Beckhoff.*)
+	fbReceiveString 	: ReceiveString;	(*Standard function block from Beckhoff. String default 80. for 255, use ReceiveString255.*)
+	SendDataBuffer		: STRING;			(*Placeholder for formatting the string that is to be sent.*)
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="Properties" Id="{259f85ca-56ab-415c-9123-fb457a54e080}" />
+    <Folder Name="Methods" Id="{a8079a2e-80bb-45a6-97cd-ce252188fa80}" />
+    <Property Name="SURFIX" Id="{2b8eb2a0-6751-4fe7-b4a5-12da749dbc9c}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY SURFIX : STRING
+]]></Declaration>
+      <Set Name="Set" Id="{5006e33a-16d1-4547-b6ae-707f4e659102}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[SerialStringFormat.Surfix := SURFIX;]]></ST>
+        </Implementation>
+      </Set>
+      <Get Name="Get" Id="{b87985fa-4359-46b7-8286-878b761010f6}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[SURFIX := SerialStringFormat.Surfix;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="PREFIX" Id="{78e136c6-a810-45bb-8218-aac12b5af39b}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY PREFIX : STRING
+]]></Declaration>
+      <Get Name="Get" Id="{357f8249-195d-4bdb-bd29-6ba75b45a406}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[PREFIX := SerialStringFormat.Prefix;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{62612897-0ddf-4e24-a238-cc9395be81f7}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[SerialStringFormat.Prefix := PREFIX;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="Read_String" Id="{c8aff2d5-0136-45d7-9c98-abf00aadbd62}" FolderPath="Methods\">
+      <Declaration><![CDATA[{attribute 'object_name' := 'Read_String'}
+{attribute '''NORMAL__COMMENT' := '
+	2015-06-04	:
+		The method ReadString80(INT,STRING_PTR) should be used to read a string with a length of up to 80 characters long. 
+'}
+METHOD Read_String : Serial_FunctionResult
+VAR_INPUT
+	{attribute '''NORMAL__COMMENT' := 'The address of the variable to store the received string'}
+	RECEIVED_DATA	: POINTER TO STRING;
+END_VAR
+VAR
+	String_Data_Buffer	: STRING;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbReceiveString(
+		Prefix:= SerialStringFormat.Prefix, 
+		Suffix:= SerialStringFormat.Surfix, 
+		Timeout:= T#1S, 
+		ReceivedString:= String_Data_Buffer, 
+		RXbuffer:= SerialComBuffer.rxBuffer );
+IF fbReceiveString.Error > 0 THEN
+	Read_String := Serial_FunctionResult.COM_RECEIVE_ERROR;
+END_IF
+IF fbReceiveString.StringReceived THEN
+	RECEIVED_DATA^ := String_Data_Buffer;
+	Read_String := Serial_FunctionResult.NO_ERROR;
+ELSIF fbReceiveString.Busy THEN
+	Read_String := Serial_FunctionResult.BUSY;
+ELSE
+	Read_String := Serial_FunctionResult.COM_NO_STRING_RECEIVED;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Fast_Task" Id="{c9a36d01-2439-4624-b449-758280d73373}" FolderPath="Methods\">
+      <Declaration><![CDATA[{attribute 'object_name' := 'Fast_Task'}
+METHOD Fast_Task : Serial_FunctionResult
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[(*
+fbSerialLineControl(
+	Mode:= SERIALLINEMODE_EL6_22B, 
+	pComIn:= ADR(SerialComBuffer.rxElComBuffer), 
+	pComOut:= ADR(SerialComBuffer.txElComBuffer), 
+	SizeComIn:= SIZEOF(SerialComBuffer.rxElComBuffer), 
+	TxBuffer:= SerialComBuffer.txBuffer, 
+	RxBuffer:= SerialComBuffer.rxBuffer);
+IF fbSerialLineControl.Error THEN
+	Fast_Task := Serial_FunctionResult.COM_IO_CONTROL_ERROR;
+ELSE
+	Fast_Task := Serial_FunctionResult.NO_ERROR;
+END_IF
+*)
+
+fbSerialLineControl(
+	Mode:= SERIALLINEMODE_PC_COM_PORT, 
+	pComIn:= ADR(SerialComBuffer.rxPcComBuffer), 
+	pComOut:= ADR(SerialComBuffer.txPcComBuffer), 
+	SizeComIn:= SIZEOF(SerialComBuffer.rxPcComBuffer), 
+	TxBuffer:= SerialComBuffer.txBuffer, 
+	RxBuffer:= SerialComBuffer.rxBuffer);
+IF fbSerialLineControl.Error THEN
+	Fast_Task := Serial_FunctionResult.COM_IO_CONTROL_ERROR;
+ELSE
+	Fast_Task := Serial_FunctionResult.NO_ERROR;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Send_String" Id="{cc6e3bac-0145-4bdd-afb6-8ffc6a1f1b44}" FolderPath="Methods\">
+      <Declaration><![CDATA[{attribute 'object_name' := 'Send_String'}
+METHOD Send_String : Serial_FunctionResult
+VAR_INPUT
+	{attribute '''NORMAL__COMMENT' := 'The string data to be sent to via the channel. Do not include the prefix/surfix.'}
+	DATA	: STRING;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SendDataBuffer := CONCAT(SerialStringFormat.Prefix, CONCAT(DATA, SerialStringFormat.Surfix));
+fbSendString(SendString:= SendDataBuffer, TXbuffer:= SerialComBuffer.txBuffer);
+IF fbSendString.Error > 0 THEN
+	Send_String := Serial_FunctionResult.COM_SEND_ERROR;
+END_IF
+IF fbSendString.Busy THEN
+	Send_String := Serial_FunctionResult.BUSY;
+ELSE
+	Send_String := Serial_FunctionResult.NO_ERROR;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

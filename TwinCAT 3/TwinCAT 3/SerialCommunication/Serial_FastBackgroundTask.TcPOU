@@ -1,48 +1,65 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
   <POU Name="Serial_FastBackgroundTask" Id="{93ce215f-f599-408e-a93e-9c5038c622de}" SpecialFunc="None">
-    <Declaration><![CDATA[(*
-	2015-06-04:
-		This object is meant to be used in the fast PLC task. Only 1 instance is required.
-*)
-FUNCTION_BLOCK Serial_FastBackgroundTask
+    <Declaration><![CDATA[FUNCTION_BLOCK Serial_FastBackgroundTask IMPLEMENTS ITF_Serial_FastTask
 VAR
-	fbSerialLineControl	: ARRAY[1..MAX_CHANNELS] OF SERIALLINECONTROL;
+	objSerialChannel	: POINTER TO Serial_Channel := 0;
+	Channel_Count 		: INT := 0;
 END_VAR
 
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[;]]></ST>
     </Implementation>
+    <Property Name="COUNT" Id="{d0720a31-86c0-4a74-8f01-e66dff29f3a8}">
+      <Declaration><![CDATA[PROPERTY COUNT : INT
+]]></Declaration>
+      <Get Name="Get" Id="{ce0271e1-4dda-449d-95a7-97a56312b13a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[COUNT := Channel_Count;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{e1f7b652-5dc3-4659-987c-e25c26963f4a}">
+        <Declaration><![CDATA[PUBLIC 
+VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Channel_Count := COUNT;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="Update_Channel" Id="{eed82517-936b-4a0c-be1b-ed52a1f41aa0}">
-      <Declaration><![CDATA[(*
-	2015-06-04:
-		Use the Update_Channel(INT) method to allow TwinCAT to manage the serial communication to the EL60xx serial communication terminals.
-		Run the method ONCE every PLC scan cycle
-*)
-METHOD PUBLIC Update_Channel : SERIAL_FUNCTIONRESULT
+      <Declaration><![CDATA[METHOD PUBLIC Update_Channel : SERIAL_FUNCTIONRESULT
 VAR_INPUT
 	CHANNEL : INT; 	(*The serial communication channel*)
 END_VAR
-]]></Declaration>
+VAR
+	serial_channel_pointer : POINTER TO Serial_Channel;
+END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF CHANNEL < 1 OR CHANNEL > MAX_CHANNELS THEN
+        <ST><![CDATA[IF CHANNEL < 1 OR CHANNEL > Channel_Count THEN
 	Update_Channel := Serial_FunctionResult.COM_UNKNOWN_CHANNEL;
 ELSE
-	fbSerialLineControl[CHANNEL](
-		Mode:= SERIALLINEMODE_EL6_22B, 
-		pComIn:= ADR(SerialComBuffer[CHANNEL].rxElComBuffer), 
-		pComOut:= ADR(SerialComBuffer[Channel].txElComBuffer), 
-		SizeComIn:= SIZEOF(SerialComBuffer[Channel].rxElComBuffer), 
-		TxBuffer:= SerialComBuffer[Channel].txBuffer, 
-		RxBuffer:= SerialComBuffer[Channel].rxBuffer);
-	IF fbSerialLineControl[CHANNEL].Error THEN
-		Update_Channel := Serial_FunctionResult.COM_IO_CONTROL_ERROR;
-	ELSE
-		Update_Channel := Serial_FunctionResult.NO_ERROR;
-	END_IF
+	serial_channel_pointer := objSerialChannel + (INT_TO_UINT(CHANNEL - 1) * SIZEOF(Serial_Channel));
+	Update_Channel := serial_channel_pointer^.Fast_Task();
 END_IF]]></ST>
       </Implementation>
     </Method>
+    <Property Name="CHANNELS" Id="{f1d266bf-88d7-4157-8d6d-706aa93735af}">
+      <Declaration><![CDATA[PROPERTY CHANNELS : POINTER TO Serial_Channel
+]]></Declaration>
+      <Set Name="Set" Id="{5e491a10-e940-4da8-8463-b21ab5f1af04}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[objSerialChannel := CHANNELS;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
   </POU>
 </TcPlcObject>

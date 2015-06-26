@@ -1,23 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
   <POU Name="Serial_StandardTask" Id="{0e9f6b66-5ba1-45c4-9000-604dce6adced}" SpecialFunc="None">
-    <Declaration><![CDATA[(*
-	2015-06-04:
-		This is the standard object that should be instantiated in the machine/application code. Only 1 instance is required.
-		It is not required to constantly call up the instance during the runtime; simply use the methods.
-		The prefix and surfix for each channel can be set via the Global Variable 'SerialStringFormat[].Prefix' and 'SerialStringFormat[].Surfix' respectively.
-	2015-06-04:
-		Relocated the SerialStringFormat into here.
-		Added methods to allow dynamic changing of formats (pre/surfix)
-*)
-FUNCTION_BLOCK Serial_StandardTask
-VAR_OUTPUT
-END_VAR
+    <Declaration><![CDATA[FUNCTION_BLOCK PUBLIC Serial_StandardTask IMPLEMENTS ITF_Serial_StandardTask
 VAR
-	SerialStringFormat	: ARRAY [1..MAX_CHANNELS] OF Serial_StringFormat;(*Structure containing the prefix and sufix format for the strings. 1 for each channel.*)
-	fbSendString 		: ARRAY[1..MAX_CHANNELS] OF SendString;		(*Standard function block from Beckhoff.*)
-	fbReceiveString 	: ARRAY[1..MAX_CHANNELS] OF ReceiveString;	(*Standard function block from Beckhoff. String default 80. for 255, use ReceiveString255.*)
-	SendDataBuffer		: ARRAY[1..MAX_CHANNELS] OF STRING;			(*Placeholder for formatting the string that is to be sent.*)
+	objSerialChannel	: POINTER TO Serial_Channel := 0;
+	Channel_Count 		: INT := 0;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -30,16 +17,32 @@ VAR_INPUT
 	PREFIX : STRING;
 	SURFIX : STRING;
 END_VAR
-]]></Declaration>
+VAR
+	serial_channel_pointer : POINTER TO Serial_Channel;
+END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF CHANNEL > MAX_CHANNELS OR CHANNEL < 1 THEN
+        <ST><![CDATA[IF CHANNEL > Channel_Count OR CHANNEL < 1 THEN
 	Set_Format := Serial_FunctionResult.COM_UNKNOWN_CHANNEL;
 ELSE
-	SerialStringFormat[CHANNEL].Prefix := PREFIX;
-	SerialStringFormat[CHANNEL].Surfix := SURFIX;
+	serial_channel_pointer := objSerialChannel + (INT_TO_UINT(CHANNEL - 1) * SIZEOF(Serial_Channel));
+	serial_channel_pointer^.PREFIX := PREFIX;
+	serial_channel_pointer^.SURFIX := SURFIX;
+	Set_Format := Serial_FunctionResult.NO_ERROR;
 END_IF]]></ST>
       </Implementation>
     </Method>
+    <Property Name="CHANNELS" Id="{39b754f3-47be-4ec5-bdf0-524ac3dbfc20}">
+      <Declaration><![CDATA[PROPERTY CHANNELS : POINTER TO Serial_Channel
+]]></Declaration>
+      <Set Name="Set" Id="{0b252aa6-c94a-433c-80ca-8c494ba4773f}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[objSerialChannel := CHANNELS;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="ReadString80" Id="{599c74cc-629d-487b-9695-5c0ac7fadda1}">
       <Declaration><![CDATA[(*
 	2015-06-04	:
@@ -51,30 +54,26 @@ VAR_INPUT
 	RECEIVED_DATA		: POINTER TO STRING;	(*The address of the variable to store the received string*)
 END_VAR
 VAR 
+	serial_channel_pointer : POINTER TO Serial_Channel;
 	String_Data_Buffer 	: STRING;
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF CHANNEL > MAX_CHANNELS OR CHANNEL < 1 THEN
+        <ST><![CDATA[IF CHANNEL > Channel_Count OR CHANNEL < 1 THEN
 	ReadString80 := Serial_FunctionResult.COM_UNKNOWN_CHANNEL;
 ELSE
-	fbReceiveString[CHANNEL](
-		Prefix:= SerialStringFormat[CHANNEL].Prefix, 
-		Suffix:= SerialStringFormat[CHANNEL].Surfix, 
-		Timeout:= T#1S, 
-		ReceivedString:= String_Data_Buffer, 
-		RXbuffer:= SerialComBuffer[CHANNEL].rxBuffer );
-	IF fbReceiveString[CHANNEL].Error > 0 THEN
-		ReadString80 := Serial_FunctionResult.COM_RECEIVE_ERROR;
-	END_IF
-	IF fbReceiveString[CHANNEL].StringReceived THEN
-		RECEIVED_DATA^ := String_Data_Buffer;
-		ReadString80 := Serial_FunctionResult.NO_ERROR;
-	ELSIF fbReceiveString[CHANNEL].Busy THEN
-		ReadString80 := Serial_FunctionResult.BUSY;
-	ELSE
-		ReadString80 := Serial_FunctionResult.COM_NO_STRING_RECEIVED;
-	END_IF
+	serial_channel_pointer := objSerialChannel + (INT_TO_UINT(CHANNEL - 1) * SIZEOF(Serial_Channel));
+	CASE serial_channel_pointer^.Read_String(ADR(String_Data_Buffer)) OF 
+		Serial_FunctionResult.COM_RECEIVE_ERROR:
+			ReadString80 := Serial_FunctionResult.COM_RECEIVE_ERROR;
+		Serial_FunctionResult.NO_ERROR: 
+			RECEIVED_DATA^ := String_Data_Buffer;
+			ReadString80 := Serial_FunctionResult.NO_ERROR;
+		Serial_FunctionResult.COM_NO_STRING_RECEIVED:
+			ReadString80 := Serial_FunctionResult.COM_NO_STRING_RECEIVED;
+		Serial_FunctionResult.Busy:	
+			ReadString80 := Serial_FunctionResult.BUSY;
+	END_CASE
 END_IF]]></ST>
       </Implementation>
     </Method>
@@ -85,25 +84,45 @@ VAR_INPUT
 	DATA	: STRING;	(*The string data to be sent to via the channel. Do not include the prefix/surfix.*)
 END_VAR
 VAR
-	fbTRIG 	: F_TRIG;
+	serial_channel_pointer : POINTER TO Serial_Channel;
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF CHANNEL > MAX_CHANNELS OR CHANNEL < 1 THEN
+        <ST><![CDATA[IF CHANNEL > Channel_Count OR CHANNEL < 1 THEN
 	SendString80 := Serial_FunctionResult.COM_UNKNOWN_CHANNEL;
 ELSE
-	SendDataBuffer[CHANNEL] := CONCAT(SerialStringFormat[CHANNEL].Prefix, CONCAT(DATA, SerialStringFormat[CHANNEL].Surfix));
-	fbSendString[CHANNEL](SendString:= SendDataBuffer[CHANNEL], TXbuffer:= SerialComBuffer[CHANNEL].txBuffer);
-	IF fbSendString[CHANNEL].Error > 0 THEN
-		SendString80 := Serial_FunctionResult.COM_SEND_ERROR;
-	END_IF
-	IF fbSendString[CHANNEL].Busy THEN
-		SendString80 := Serial_FunctionResult.BUSY;
-	ELSE
-		SendString80 := Serial_FunctionResult.NO_ERROR;
-	END_IF
+	serial_channel_pointer := objSerialChannel + (INT_TO_UINT(CHANNEL - 1) * SIZEOF(Serial_Channel));
+	CASE serial_channel_pointer^.Send_String(DATA) OF
+		Serial_FunctionResult.COM_SEND_ERROR:
+			SendString80 := Serial_FunctionResult.COM_SEND_ERROR;
+		Serial_FunctionResult.BUSY:
+			SendString80 := Serial_FunctionResult.BUSY;	
+		Serial_FunctionResult.NO_ERROR:
+			SendString80 := Serial_FunctionResult.NO_ERROR;			
+	END_CASE
 END_IF]]></ST>
       </Implementation>
     </Method>
+    <Property Name="COUNT" Id="{b1641b19-5ded-4215-9723-8bb1252bd95b}">
+      <Declaration><![CDATA[PROPERTY COUNT : INT
+]]></Declaration>
+      <Set Name="Set" Id="{3e84831e-ea6a-424a-ba51-3299b164d7cd}">
+        <Declaration><![CDATA[PUBLIC 
+VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Channel_Count := COUNT;]]></ST>
+        </Implementation>
+      </Set>
+      <Get Name="Get" Id="{51698a01-231a-4e3a-85da-1475deeaa5d5}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[COUNT := Channel_Count;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
   </POU>
 </TcPlcObject>
