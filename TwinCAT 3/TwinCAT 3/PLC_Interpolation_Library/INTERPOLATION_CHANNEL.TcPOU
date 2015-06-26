@@ -51,7 +51,7 @@ ELSE
 END_IF]]></ST>
       </Implementation>
     </Method>
-    <Method Name="On_All" Id="{71f9300c-93a2-402f-8b26-f7ee252b372f}">
+    <Method Name="On_All" Id="{71f9300c-93a2-402f-8b26-f7ee252b372f}" FolderPath="METHODS\">
       <Declaration><![CDATA[METHOD PUBLIC On_All : Interpolation_FunctionResult
 VAR_INPUT
 END_VAR
@@ -79,6 +79,29 @@ IF m >= MAX_DIMENSIONS THEN
 	On_All := Interpolation_FunctionResult.Interpolation_OK;;
 ELSE
 	On_All := Interpolation_FunctionResult.Interpolation_Busy;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ASSIGN" Id="{8de43c7d-1f8c-489f-86b6-46c8e0371568}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD PUBLIC ASSIGN : Interpolation_FunctionResult
+VAR_INPUT
+	X : INT;
+	Y : INT;
+	Z : INT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF X < 1 OR X > MAX_DIMENSIONS THEN
+	ASSIGN := Interpolation_FunctionResult.Interpolation_OutOfBounds;
+END_IF
+IF Y < 1 OR Y > MAX_DIMENSIONS THEN
+	ASSIGN := Interpolation_FunctionResult.Interpolation_OutOfBounds;
+END_IF
+IF Z < 1 OR Z > MAX_DIMENSIONS THEN
+	ASSIGN := Interpolation_FunctionResult.Interpolation_OutOfBounds;
+END_IF
+IF X = Y OR Y = Z OR Z = X THEN
+	ASSIGN := Interpolation_FunctionResult.Interpolation_Assignment_Cannot_Be_Same;
 END_IF]]></ST>
       </Implementation>
     </Method>

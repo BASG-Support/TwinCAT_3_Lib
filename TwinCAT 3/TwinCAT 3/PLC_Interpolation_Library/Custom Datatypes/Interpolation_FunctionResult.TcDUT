@@ -7,6 +7,7 @@
 	Interpolation_Busy := 0,
 	Interpolation_Error,
 	Interpolation_OutOfBounds,
+	Interpolation_Assignment_Cannot_Be_Same,
 	Interpolation_Aborted
 );
 END_TYPE
