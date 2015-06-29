@@ -1,0 +1,312 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
+  <POU Name="Motion_Object" Id="{dc51c73b-4d67-468f-ae69-0e1bfca9e4ab}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK Motion_Object IMPLEMENTS ITF_AXIS
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	AXIS 					: AXIS_REF;
+	HOME_CALIBRATION AT %I* : BOOL;
+	PlcToHmi				: Motion_PlcToHmi;
+	fbPower 				: MC_POWER;
+	fbReset 				: MC_RESET;
+	fbHome					: MC_HOME;
+	fbMoveA 				: MC_MOVEABSOLUTE;
+	fbMoveR 				: MC_MOVERELATIVE;
+	fbJog					: MC_JOG;
+	fbHalt	 				: MC_HALT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[;]]></ST>
+    </Implementation>
+    <Folder Name="Properties" Id="{bde6f4c5-83c5-4d8b-962e-4019e38793b7}" />
+    <Folder Name="Methods" Id="{ce2d2b51-c6f5-40c6-ad46-42e6592a6200}" />
+    <Method Name="Jog_Start" Id="{202f0483-43ca-4801-aee8-8d95595f9fa3}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC Jog_Start : Motion_FunctionResult
+VAR_INPUT
+	REVERSE		: BOOL := FALSE;
+	FAST_MODE	: BOOL := FALSE;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF FAST_MODE THEN 
+	fbJog.Mode := MC_JOGMODE_STANDARD_FAST;
+ELSE
+	fbJog.Mode := MC_JOGMODE_STANDARD_SLOW;
+END_IF
+fbJog(
+	Axis:= AXIS, 
+	JogForward:= NOT REVERSE, 
+	JogBackwards:= REVERSE );
+IF fbJog.Error THEN 
+	Jog_Start := Motion_FunctionResult.MOTION_ERROR;
+ELSIF AXIS.Status.Moving THEN 
+	Jog_Start := Motion_FunctionResult.MOTION_OK;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="MoveByDistance" Id="{32279e65-470c-4c70-be90-6e5fda96b879}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC MoveByDistance : Motion_FunctionResult
+VAR_INPUT
+	DISTANCE 		: LREAL;
+	VELOCITY 		: LREAL;
+	ACCELERATION 	: LREAL;
+	DECELERATION 	: LREAL;
+	JERK 			: LREAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbMoveR(
+	Axis:= AXIS, 
+	Execute:= TRUE, 
+	Distance:= DISTANCE, 
+	Velocity:= VELOCITY, 
+	Acceleration:= ACCELERATION, 
+	Deceleration:= DECELERATION, 
+	Jerk:= JERK );
+IF fbMoveR.Error THEN
+	fbMoveR(
+		Axis:= AXIS, 
+		Execute:= FALSE );
+	MoveByDistance := Motion_FunctionResult.MOTION_ERROR;
+ELSIF fbMoveR.CommandAborted THEN
+	fbMoveR(
+		Axis:= AXIS, 
+		Execute:= FALSE );
+	MoveByDistance := Motion_FunctionResult.MOTION_COMMAND_ABORTED;
+ELSIF fbMoveR.Done THEN
+	fbMoveR(
+		Axis:= AXIS, 
+		Execute:= FALSE );
+	MoveByDistance := Motion_FunctionResult.MOTION_OK;
+ELSE
+	MoveByDistance := Motion_FunctionResult.MOTION_BUSY;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="MoveToPosition" Id="{443e31ce-6347-4022-a6e2-c7c0f7c945a7}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC MoveToPosition : Motion_FunctionResult
+VAR_INPUT
+	POSITION		: LREAL;
+	VELOCITY		: LREAL;
+	ACCELERATION	: LREAL;
+	DECELERATION	: LREAL;
+	JERK			: LREAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbMoveA(
+	Axis:= AXIS, 
+	Execute:= TRUE, 
+	Position:= POSITION, 
+	Velocity:= VELOCITY, 
+	Acceleration:= ACCELERATION, 
+	Deceleration:= DECELERATION, 
+	Jerk:= JERK );
+IF fbMoveA.Error THEN
+	fbMoveA(
+		Axis:= AXIS, 
+		Execute:= FALSE );
+	MoveToPosition := Motion_FunctionResult.MOTION_ERROR;
+ELSIF fbMoveA.CommandAborted THEN
+	fbMoveA(
+		Axis:= AXIS, 
+		Execute:= FALSE );
+	MoveToPosition := Motion_FunctionResult.MOTION_COMMAND_ABORTED;
+ELSIF fbMoveA.Done THEN
+	fbMoveA(
+		Axis:= AXIS, 
+		Execute:= FALSE );
+	MoveToPosition := Motion_FunctionResult.MOTION_OK;
+ELSE
+	MoveToPosition := Motion_FunctionResult.MOTION_BUSY;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Off" Id="{49edaa78-6e0c-4cc5-86a5-f5e586b49178}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC Off : Motion_FunctionResult
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbPower(
+	Axis:= AXIS, 
+	Enable:= FALSE, 
+	Enable_Positive:= FALSE, 
+	Enable_Negative:= FALSE, 
+	Override:= 0 );
+IF fbPower.Error THEN
+	Off := Motion_FunctionResult.MOTION_ERROR;
+ELSIF NOT fbPower.Status THEN
+	Off := Motion_FunctionResult.MOTION_OK;
+ELSE
+	Off := Motion_FunctionResult.MOTION_BUSY;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Halt" Id="{5331d9cf-a9ed-4812-a417-a765ed52a96a}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC Halt : Motion_FunctionResult
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbHalt(
+	Axis:= AXIS, 
+	Execute:= TRUE );
+fbMoveA(
+	Axis:= AXIS, 
+	Execute:= FALSE );
+fbMoveR(
+	Axis:= AXIS, 
+	Execute:= FALSE );
+IF fbHalt.Error THEN
+	fbHalt(
+		Axis:= AXIS, 
+		Execute:= FALSE );
+	Halt := Motion_FunctionResult.MOTION_ERROR;
+ELSIF fbHalt.CommandAborted THEN
+	fbHalt(
+		Axis:= AXIS, 
+		Execute:= FALSE );
+	Halt := Motion_FunctionResult.MOTION_COMMAND_ABORTED;
+ELSIF fbHalt.Done THEN
+	fbHalt(
+		Axis:= AXIS, 
+		Execute:= FALSE );
+	Halt := Motion_FunctionResult.MOTION_OK;
+ELSE
+	Halt := Motion_FunctionResult.MOTION_BUSY;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Reset" Id="{553a4322-59c3-4989-b766-72b7e385adde}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC Reset : Motion_FunctionResult
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbReset(
+	Axis:= AXIS, 
+	Execute:= TRUE );
+IF fbReset.Error THEN
+	fbReset(
+		Axis:= AXIS, 
+		Execute:= FALSE );
+	Reset := Motion_FunctionResult.MOTION_ERROR;
+ELSIF fbReset.Done THEN
+	fbReset(
+		Axis:= AXIS, 
+		Execute:= FALSE );
+	Reset := Motion_FunctionResult.MOTION_OK;
+ELSE
+	Reset := Motion_FunctionResult.MOTION_BUSY;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Jog_Stop" Id="{60f3e26c-1c5e-4743-baa4-bc97faa3f982}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC Jog_Stop : Motion_FunctionResult
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbJog(
+	Axis:= AXIS, 
+	JogForward:= FALSE, 
+	JogBackwards:= FALSE );
+IF fbJog.Error THEN 
+	Jog_Stop := Motion_FunctionResult.MOTION_ERROR;
+ELSE
+	Jog_Stop := Motion_FunctionResult.MOTION_OK;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="On" Id="{77bb1672-458f-422e-8c8c-588269339b3d}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD On : Motion_FunctionResult
+VAR_INPUT
+	ENABLE_FW 	: BOOL;
+	ENABLE_BW	: BOOL;
+	OVERRIDE	: LREAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbPower(
+	Axis:= AXIS, 
+	Enable:= TRUE, 
+	Enable_Positive:= ENABLE_FW, 
+	Enable_Negative:= ENABLE_BW, 
+	Override:= OVERRIDE );
+IF fbPower.Error THEN
+	On := Motion_FunctionResult.MOTION_ERROR;
+ELSIF fbPower.Status THEN
+	On := Motion_FunctionResult.MOTION_OK;
+ELSE
+	On := Motion_FunctionResult.MOTION_BUSY;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="ToHmi" Id="{8a44ab05-f4cd-484c-93b3-8eff06b4b7aa}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY ToHmi : Motion_PlcToHmi
+]]></Declaration>
+      <Get Name="Get" Id="{4e860af5-5350-4e69-8784-c99646d51c53}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AXIS.ReadStatus();
+PlcToHmi.actPos		:= AXIS.NcToPlc.ActPos;
+PlcToHmi.actVelo	:= AXIS.NcToPlc.ActVelo;
+PlcToHmi.setPos		:= AXIS.NcToPlc.SetPos;
+PlcToHmi.setVelo	:= AXIS.NcToPlc.SetVelo;
+PlcToHmi.controller_override := fbPower.Override;
+PlcToHmi.hasError	:= AXIS.Status.Error;
+PlcToHmi.ErrorID	:= AXIS.Status.ErrorID;
+PlcToHmi.isBwDisabled	:= NOT fbPower.Enable_Negative;
+PlcToHmi.isFwDisabled	:= NOT fbPower.Enable_Positive;
+PlcToHmi.isCalibrated	:= AXIS.Status.Homed;
+PlcToHmi.isDisabled	:= AXIS.Status.Disabled;
+PlcToHmi.isInRange	:= AXIS.Status.InPositionArea;
+PlcToHmi.isInTarget := AXIS.Status.InTargetPosition;
+PlcToHmi.isNegativeDirection := AXIS.Status.NegativeDirection;
+PlcToHmi.isNotMoving	:= AXIS.Status.NotMoving;
+PlcToHmi.isPositiveDirection := AXIS.Status.PositiveDirection;
+ToHmi := PlcToHmi;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Home" Id="{90d95f73-bb4d-4ad5-985e-a67e4f555a08}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD PUBLIC Home : Motion_FunctionResult
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbHome(
+	Axis:= AXIS, 
+	Execute:= TRUE, 
+	Position:= 0, 
+	HomingMode:= MC_DefaultHoming, 
+	bCalibrationCam:= HOME_CALIBRATION );
+IF fbHome.Error THEN
+	fbHome(
+		Axis:= AXIS, 
+		Execute:= FALSE );
+	Home := Motion_FunctionResult.MOTION_ERROR;
+ELSIF fbHome.CommandAborted THEN
+	fbHome(
+		Axis:= AXIS, 
+		Execute:= FALSE );
+	Home := Motion_FunctionResult.MOTION_COMMAND_ABORTED;
+ELSIF fbHome.Done THEN
+	fbHome(
+		Axis:= AXIS, 
+		Execute:= FALSE );
+	Home := Motion_FunctionResult.MOTION_OK;
+ELSE
+	Home := Motion_FunctionResult.MOTION_BUSY;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

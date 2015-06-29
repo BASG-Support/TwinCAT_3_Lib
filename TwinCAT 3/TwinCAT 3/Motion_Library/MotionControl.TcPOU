@@ -1,26 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
-  <POU Name="MotionControl" Id="{55b379f4-f721-4632-9623-aca35a4ff0b7}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK MotionControl
+  <POU Name="Motion_Control" Id="{55b379f4-f721-4632-9623-aca35a4ff0b7}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK Motion_Control IMPLEMENTS ITF_MotionControl
 VAR_INPUT
 	HMI_MODE : BOOL;
 END_VAR
 VAR_OUTPUT
 END_VAR
 VAR
+	AXIS_Object : POINTER TO Motion_Object;
+	HmiToPlc	: POINTER TO Motion_HmiToPlc;
+	PlcToHmi	: POINTER TO Motion_PlcToHmi;
 	AXIS_COUNT	: INT := 0;
-	HmiToPlc	: ARRAY[1..MAX_AXES] OF Motion_HmiToPlc;
-	PlcToHmi	: ARRAY[1..MAX_AXES] OF Motion_PlcToHmi;
-	AXIS		: ARRAY[1..MAX_AXES] OF Motion_Axis;
-	fbPower 	: ARRAY [1..MAX_AXES] OF MC_POWER;
-	fbReset 	: ARRAY [1..MAX_AXES] OF MC_RESET;
-	fbHome		: ARRAY	[1..MAX_AXES] OF MC_HOME;
-	fbMoveA 	: ARRAY [1..MAX_AXES] OF MC_MOVEABSOLUTE;
-	fbMoveR 	: ARRAY [1..MAX_AXES] OF MC_MOVERELATIVE;
-	fbJog		: ARRAY [1..MAX_AXES] OF MC_JOG;
-	fbHalt	 	: ARRAY [1..MAX_AXES] OF MC_HALT;
+	{attribute 'hide'}
 	i			: INT;
+	{attribute 'hide'}
+	ptrPlcToHmi	: POINTER TO Motion_PlcToHmi;
+	{attribute 'hide'}
+	ptrHmiToPlc	: POINTER TO Motion_HmiToPlc;
+	{attribute 'hide'}
+	ptrAxisObj	: POINTER TO Motion_Object;
 END_VAR
+
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[;]]></ST>
@@ -38,35 +39,15 @@ END_VAR
 VAR_INPUT
 	INDEX : INT;
 END_VAR
-]]></Declaration>
+VAR
+	ptr_MotionObj : POINTER TO Motion_Object;
+END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF INDEX > AXIS_COUNT OR INDEX < 1 THEN 
 	Home := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
 ELSE
-	fbHome[INDEX](
-		Axis:= AXIS[INDEX].AXIS, 
-		Execute:= TRUE, 
-		Position:= 0, 
-		HomingMode:= MC_DefaultHoming, 
-		bCalibrationCam:= AXIS[INDEX].HOME_CALIBRATION );
-	IF fbHome[INDEX].Error THEN
-		fbHome[INDEX](
-			Axis:= AXIS[INDEX].AXIS, 
-			Execute:= FALSE );
-		Home := Motion_FunctionResult.MOTION_ERROR;
-	ELSIF fbHome[INDEX].CommandAborted THEN
-		fbHome[INDEX](
-			Axis:= AXIS[INDEX].AXIS, 
-			Execute:= FALSE );
-		Home := Motion_FunctionResult.MOTION_COMMAND_ABORTED;
-	ELSIF fbHome[INDEX].Done THEN
-		fbHome[INDEX](
-			Axis:= AXIS[INDEX].AXIS, 
-			Execute:= FALSE );
-		Home := Motion_FunctionResult.MOTION_OK;
-	ELSE
-		Home := Motion_FunctionResult.MOTION_BUSY;
-	END_IF
+	ptr_MotionObj := Axis_Object + INT_TO_DWORD(INT_TO_UINT(INDEX -1) * SIZEOF(Motion_Object));
+    Home := ptr_MotionObj^.Home();
 END_IF]]></ST>
       </Implementation>
     </Method>
@@ -75,20 +56,16 @@ END_IF]]></ST>
 VAR_INPUT
 	INDEX : INT;
 END_VAR
+VAR
+	ptr_MotionObj : POINTER TO Motion_Object;
+END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF INDEX > AXIS_COUNT OR INDEX < 1 THEN 
-	Reset := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
+	Jog_Stop := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
 ELSE
-	fbJog[INDEX](
-		Axis:= AXIS[INDEX].AXIS, 
-		JogForward:= FALSE, 
-		JogBackwards:= FALSE );
-	IF fbJog[INDEX].Error THEN 
-		Jog_Stop := Motion_FunctionResult.MOTION_ERROR;
-	ELSE
-		Jog_Stop := Motion_FunctionResult.MOTION_OK;
-	END_IF
+	ptr_MotionObj := Axis_Object + INT_TO_DWORD(INT_TO_UINT(INDEX) * SIZEOF(Motion_Object));
+    Jog_Stop := ptr_MotionObj^.Jog_Stop();
 END_IF]]></ST>
       </Implementation>
     </Method>
@@ -97,38 +74,30 @@ END_IF]]></ST>
 VAR_INPUT
 	INDEX : INT;
 END_VAR
+VAR
+	ptr_MotionObj : POINTER TO Motion_Object;
+END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF INDEX > AXIS_COUNT OR INDEX < 1 THEN 
 	Off := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
 ELSE
-	fbPower[INDEX](
-		Axis:= AXIS[INDEX].AXIS, 
-		Enable:= FALSE, 
-		Enable_Positive:= FALSE, 
-		Enable_Negative:= FALSE, 
-		Override:= 0 );
-	IF fbPower[INDEX].Error THEN
-		Off := Motion_FunctionResult.MOTION_ERROR;
-	ELSIF NOT fbPower[INDEX].Status THEN
-		Off := Motion_FunctionResult.MOTION_OK;
-	ELSE
-		Off := Motion_FunctionResult.MOTION_BUSY;
-	END_IF
+	ptr_MotionObj := Axis_Object + INT_TO_DWORD(INT_TO_UINT(INDEX - 1) * SIZEOF(Motion_Object));
+    Off := ptr_MotionObj^.Off();
 END_IF]]></ST>
       </Implementation>
     </Method>
     <Action Name="ACT_Halt" Id="{39e232ab-6ebc-4ec0-af7e-c3ba534cc123}" FolderPath="HMI Actions\">
       <Implementation>
-        <ST><![CDATA[CASE Halt(i) OF 
+        <ST><![CDATA[CASE THIS^.Halt(i) OF 
 Motion_FunctionResult.MOTION_UNKNOWN_AXIS:
-	HmiToPlc[i].HALT := FALSE;
+	HmiToPlc^.HALT := FALSE;
 Motion_FunctionResult.MOTION_ERROR:
-	HmiToPlc[i].HALT := FALSE;
+	HmiToPlc^.HALT := FALSE;
 Motion_FunctionResult.MOTION_OK:
-	HmiToPlc[i].HALT := FALSE;
+	HmiToPlc^.HALT := FALSE;
 Motion_FunctionResult.MOTION_COMMAND_ABORTED:
-	HmiToPlc[i].HALT := FALSE;
+	HmiToPlc^.HALT := FALSE;
 Motion_FunctionResult.MOTION_BUSY:
 	;
 END_CASE]]></ST>
@@ -138,27 +107,29 @@ END_CASE]]></ST>
       <Implementation>
         <ST><![CDATA[CASE MoveToPosition(i,HmiToPlc[i].TARGET_POSITION,HmiToPlc[i].TARGET_VELOCITY,HmiToPlc[i].TARGET_ACCELERATION,HmiToPlc[i].TARGET_DECELERATION,HmiToPlc[i].TARGET_JERK) OF
 Motion_FunctionResult.MOTION_UNKNOWN_AXIS:
-	HmiToPlc[i].MOVE_ABS := FALSE;
+	HmiToPlc^.MOVE_ABS := FALSE;
 Motion_FunctionResult.MOTION_COMMAND_ABORTED: 
-	HmiToPlc[i].MOVE_ABS := FALSE;
+	HmiToPlc^.MOVE_ABS := FALSE;
 Motion_FunctionResult.MOTION_ERROR:
-	HmiToPlc[i].MOVE_ABS := FALSE;
+	HmiToPlc^.MOVE_ABS := FALSE;
 Motion_FunctionResult.MOTION_BUSY: 
 	;
 Motion_FunctionResult.MOTION_OK:
-	HmiToPlc[i].MOVE_ABS := FALSE;
+	HmiToPlc^.MOVE_ABS := FALSE;
 END_CASE]]></ST>
       </Implementation>
     </Action>
-    <Property Name="COUNT" Id="{459cb5a1-6ab5-4653-9f1f-4943f3702408}" FolderPath="Properties\">
-      <Declaration><![CDATA[PROPERTY PUBLIC COUNT : INT]]></Declaration>
+    <Property Name="Count" Id="{459cb5a1-6ab5-4653-9f1f-4943f3702408}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY PUBLIC Count : INT]]></Declaration>
       <Set Name="Set" Id="{6fb218ec-b5b3-46d4-afd0-a81260142c21}">
         <Declaration><![CDATA[PUBLIC 
 VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[AXIS_COUNT := COUNT;]]></ST>
+          <ST><![CDATA[IF COUNT > 0 THEN
+	AXIS_COUNT := COUNT;
+END_IF]]></ST>
         </Implementation>
       </Set>
       <Get Name="Get" Id="{9be2d030-51e7-4e34-80b7-5636315565bf}">
@@ -180,37 +151,16 @@ VAR_INPUT
 	DECELERATION	: LREAL;
 	JERK			: LREAL;
 END_VAR
+VAR
+	ptr_MotionObj : POINTER TO Motion_Object;
+END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF INDEX > AXIS_COUNT OR INDEX < 1 AND VELOCITY <= 0 THEN 
 	MoveToPosition := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
 ELSE
-	fbMoveA[INDEX](
-		Axis:= AXIS[INDEX].AXIS, 
-		Execute:= TRUE, 
-		Position:= POSITION, 
-		Velocity:= VELOCITY, 
-		Acceleration:= ACCELERATION, 
-		Deceleration:= DECELERATION, 
-		Jerk:= JERK );
-	IF fbMoveA[INDEX].Error THEN
-		fbMoveA[INDEX](
-			Axis:= AXIS[INDEX].AXIS, 
-			Execute:= FALSE );
-		MoveToPosition := Motion_FunctionResult.MOTION_ERROR;
-	ELSIF fbMoveA[INDEX].CommandAborted THEN
-		fbMoveA[INDEX](
-			Axis:= AXIS[INDEX].AXIS, 
-			Execute:= FALSE );
-		MoveToPosition := Motion_FunctionResult.MOTION_COMMAND_ABORTED;
-	ELSIF fbMoveA[INDEX].Done THEN
-		fbMoveA[INDEX](
-			Axis:= AXIS[INDEX].AXIS, 
-			Execute:= FALSE );
-		MoveToPosition := Motion_FunctionResult.MOTION_OK;
-	ELSE
-		MoveToPosition := Motion_FunctionResult.MOTION_BUSY;
-	END_IF
+	ptr_MotionObj := Axis_Object + INT_TO_DWORD(INT_TO_UINT(INDEX - 1) * SIZEOF(Motion_Object));
+    MoveToPosition := ptr_MotionObj^.MoveToPosition(POSITION,VELOCITY,ACCELERATION,DECELERATION,JERK);
 END_IF]]></ST>
       </Implementation>
     </Method>
@@ -243,54 +193,31 @@ END_VAR
 VAR_INPUT
 	INDEX : INT;
 END_VAR
-]]></Declaration>
+VAR
+	ptr_MotionObj : POINTER TO Motion_Object;
+END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF INDEX > AXIS_COUNT OR INDEX < 1 THEN 
 	Halt := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
 ELSE
-	fbHalt[INDEX](
-		Axis:= AXIS[INDEX].AXIS, 
-		Execute:= TRUE );
-	fbMoveA[INDEX](
-		Axis:= AXIS[INDEX].AXIS, 
-		Execute:= FALSE );
-	fbMoveR[INDEX](
-		Axis:= AXIS[INDEX].AXIS, 
-		Execute:= FALSE );
-	IF fbHalt[INDEX].Error THEN
-		fbHalt[INDEX](
-			Axis:= AXIS[INDEX].AXIS, 
-			Execute:= FALSE );
-		Halt := Motion_FunctionResult.MOTION_ERROR;
-	ELSIF fbHalt[INDEX].CommandAborted THEN
-		fbHalt[INDEX](
-			Axis:= AXIS[INDEX].AXIS, 
-			Execute:= FALSE );
-		Halt := Motion_FunctionResult.MOTION_COMMAND_ABORTED;
-	ELSIF fbHalt[INDEX].Done THEN
-		fbHalt[INDEX](
-			Axis:= AXIS[INDEX].AXIS, 
-			Execute:= FALSE );
-		Halt := Motion_FunctionResult.MOTION_OK;
-	ELSE
-		Halt := Motion_FunctionResult.MOTION_BUSY;
-	END_IF
+	ptr_MotionObj := Axis_Object + INT_TO_DWORD(INT_TO_UINT(INDEX -1) * SIZEOF(Motion_Object));
+    Halt := ptr_MotionObj^.Halt();
 END_IF]]></ST>
       </Implementation>
     </Method>
     <Action Name="ACT_MoveByDistance" Id="{7d58b39d-b312-4669-b3d1-c2d6a9066f91}" FolderPath="HMI Actions\">
       <Implementation>
-        <ST><![CDATA[CASE MoveByDistance(i,HmiToPlc[i].TARGET_POSITION,HmiToPlc[i].TARGET_VELOCITY,HmiToPlc[i].TARGET_ACCELERATION,HmiToPlc[i].TARGET_DECELERATION,HmiToPlc[i].TARGET_JERK) OF
+        <ST><![CDATA[CASE THIS^.MoveByDistance(i,HmiToPlc[i].TARGET_POSITION,HmiToPlc[i].TARGET_VELOCITY,HmiToPlc[i].TARGET_ACCELERATION,HmiToPlc[i].TARGET_DECELERATION,HmiToPlc[i].TARGET_JERK) OF
 Motion_FunctionResult.MOTION_UNKNOWN_AXIS:
-	HmiToPlc[i].MOVE_REL := FALSE;
+	HmiToPlc^.MOVE_REL := FALSE;
 Motion_FunctionResult.MOTION_COMMAND_ABORTED: 
-	HmiToPlc[i].MOVE_REL := FALSE;
+	HmiToPlc^.MOVE_REL := FALSE;
 Motion_FunctionResult.MOTION_ERROR:
-	HmiToPlc[i].MOVE_REL := FALSE;
+	HmiToPlc^.MOVE_REL := FALSE;
 Motion_FunctionResult.MOTION_BUSY: 
 	;
 Motion_FunctionResult.MOTION_OK:
-	HmiToPlc[i].MOVE_REL := FALSE;
+	HmiToPlc^.MOVE_REL := FALSE;
 END_CASE
 			]]></ST>
       </Implementation>
@@ -302,47 +229,43 @@ VAR_INPUT
 	REVERSE		: BOOL := FALSE;
 	FAST_MODE	: BOOL := FALSE;
 END_VAR
+VAR
+	ptr_MotionObj : POINTER TO Motion_Object;
+END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF INDEX > AXIS_COUNT OR INDEX < 1 THEN 
-	Reset := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
+	Jog_Start := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
 ELSE
-	IF FAST_MODE THEN 
-		fbJog[INDEX].Mode := MC_JOGMODE_STANDARD_FAST;
-	ELSE
-		fbJog[INDEX].Mode := MC_JOGMODE_STANDARD_SLOW;
-	END_IF
-	
-	fbJog[INDEX](
-		Axis:= AXIS[INDEX].AXIS, 
-		JogForward:= NOT REVERSE, 
-		JogBackwards:= REVERSE );
-	IF fbJog[INDEX].Error THEN 
-		Jog_Start := Motion_FunctionResult.MOTION_ERROR;
-	ELSIF AXIS[INDEX].AXIS.Status.Moving THEN 
-		Jog_Start := Motion_FunctionResult.MOTION_OK;
-	END_IF
+	ptr_MotionObj := Axis_Object + INT_TO_DWORD(INT_TO_UINT(INDEX -1) * SIZEOF(Motion_Object));
+    Jog_Start := ptr_MotionObj^.Jog_Start(REVERSE,FAST_MODE);
 END_IF]]></ST>
       </Implementation>
     </Method>
     <Action Name="HMI_Run" Id="{97bfb548-813c-44ab-8766-fd308ff1a6ff}" FolderPath="HMI Actions\">
       <Implementation>
         <ST><![CDATA[IF HMI_MODE THEN 
-	FOR i := 1 TO MAX_AXES BY 1 DO
+	FOR i := 1 TO AXIS_COUNT BY 1 DO
+		ptrAxisObj := AXIS_Object + ((i-1) * SIZEOF(Motion_Object)); 
+		ptrPlcToHmi := PlcToHmi + ((i-1) * SIZEOF(Motion_PlcToHmi)); 
+		ptrHmiToPlc := HmiToPlc + ((i-1) * SIZEOF(Motion_HmiToPlc)); 
 		ACT_UpdateStatus();
-		IF HmiToPlc[i].OFF THEN
+		IF HmiToPlc^.OFF THEN
 			ACT_Off();
-		ELSIF HmiToPlc[i].ON THEN 
+		ELSIF HmiToPlc^.ON THEN 
 			ACT_On();
 		END_IF
-		IF NOT HmiToPlc[i].JOG_MODE THEN 
-			Jog_Stop(i);
-			IF HmiToPlc[i].HALT THEN 
+		IF HmiToPlc^.RESET THEN 
+			ACT_Reset();
+		END_IF
+		IF NOT HmiToPlc^.JOG_MODE THEN 
+			THIS^.Jog_Stop(i);
+			IF HmiToPlc^.HALT THEN 
 				ACT_Halt();
-			ELSIF HmiToPlc[i].MOVE_ABS THEN
+			ELSIF HmiToPlc^.MOVE_ABS THEN
 				ACT_MoveToPosition();
 			END_IF
-			IF HmiToPlc[i].MOVE_REL THEN
+			IF HmiToPlc^.MOVE_REL THEN
 				ACT_MoveByDistance();
 			END_IF
 		ELSE
@@ -355,7 +278,7 @@ END_IF]]></ST>
     <Action Name="ACT_Reset" Id="{a7a36296-4bd3-4c04-bfcc-ad271ca28fe6}" FolderPath="HMI Actions\">
       <Implementation>
         <ST><![CDATA[IF Reset(i) = Motion_FunctionResult.MOTION_OK THEN
-	HmiToPlc[i].RESET := FALSE;
+	HmiToPlc^.RESET := FALSE;
 END_IF]]></ST>
       </Implementation>
     </Action>
@@ -369,49 +292,28 @@ VAR_INPUT
 	DECELERATION 	: LREAL;
 	JERK 			: LREAL;
 END_VAR
+VAR
+	ptr_MotionObj : POINTER TO Motion_Object;
+END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF INDEX > AXIS_COUNT OR INDEX < 1 AND VELOCITY <= 0 THEN 
 	MoveByDistance := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
 ELSE
-	fbMoveR[INDEX](
-		Axis:= AXIS[INDEX].AXIS, 
-		Execute:= TRUE, 
-		Distance:= DISTANCE, 
-		Velocity:= VELOCITY, 
-		Acceleration:= ACCELERATION, 
-		Deceleration:= DECELERATION, 
-		Jerk:= JERK );
-	IF fbMoveR[INDEX].Error THEN
-		fbMoveR[INDEX](
-			Axis:= AXIS[INDEX].AXIS, 
-			Execute:= FALSE );
-		MoveByDistance := Motion_FunctionResult.MOTION_ERROR;
-	ELSIF fbMoveR[INDEX].CommandAborted THEN
-		fbMoveR[INDEX](
-			Axis:= AXIS[INDEX].AXIS, 
-			Execute:= FALSE );
-		MoveByDistance := Motion_FunctionResult.MOTION_COMMAND_ABORTED;
-	ELSIF fbMoveR[INDEX].Done THEN
-		fbMoveR[INDEX](
-			Axis:= AXIS[INDEX].AXIS, 
-			Execute:= FALSE );
-		MoveByDistance := Motion_FunctionResult.MOTION_OK;
-	ELSE
-		MoveByDistance := Motion_FunctionResult.MOTION_BUSY;
-	END_IF
+	ptr_MotionObj := Axis_Object + INT_TO_DWORD(INT_TO_UINT(INDEX - 1) * SIZEOF(Motion_Object));
+    MoveByDistance := ptr_MotionObj^.MoveByDistance(DISTANCE,VELOCITY,ACCELERATION,DECELERATION,JERK);
 END_IF]]></ST>
       </Implementation>
     </Method>
     <Action Name="ACT_Jog" Id="{cc0383b4-9148-4bf0-9c5a-f7313178b54b}" FolderPath="HMI Actions\">
       <Implementation>
-        <ST><![CDATA[IF HmiToPlc[i].JOG_FW_FAST THEN
+        <ST><![CDATA[IF HmiToPlc^.JOG_FW_FAST THEN
 	Jog_Start(i, FALSE, TRUE);
-ELSIF HmiToPlc[i].JOG_FW_SLOW THEN
+ELSIF HmiToPlc^.JOG_FW_SLOW THEN
 	Jog_Start(i, FALSE, FALSE);
-ELSIF HmiToPlc[i].JOG_BW_FAST THEN
+ELSIF HmiToPlc^.JOG_BW_FAST THEN
 	Jog_Start(i, TRUE, TRUE);
-ELSIF HmiToPlc[i].JOG_BW_SLOW THEN
+ELSIF HmiToPlc^.JOG_BW_SLOW THEN
 	Jog_Start(i, TRUE, FALSE);
 ELSE
 	Jog_Stop(i);
@@ -426,24 +328,16 @@ VAR_INPUT
 	ENABLE_BW	: BOOL;
 	OVERRIDE	: LREAL;
 END_VAR
+VAR
+	ptr_MotionObj : POINTER TO Motion_Object;
+END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF INDEX > AXIS_COUNT OR INDEX < 1 THEN 
 	On := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
 ELSE
-	fbPower[INDEX](
-		Axis:= AXIS[INDEX].AXIS, 
-		Enable:= TRUE, 
-		Enable_Positive:= ENABLE_FW, 
-		Enable_Negative:= ENABLE_BW, 
-		Override:= OVERRIDE );
-	IF fbPower[INDEX].Error THEN
-		On := Motion_FunctionResult.MOTION_ERROR;
-	ELSIF fbPower[INDEX].Status THEN
-		On := Motion_FunctionResult.MOTION_OK;
-	ELSE
-		On := Motion_FunctionResult.MOTION_BUSY;
-	END_IF
+	ptr_MotionObj := Axis_Object + INT_TO_DWORD(INT_TO_UINT(INDEX - 1) * SIZEOF(Motion_Object));
+    On := ptr_MotionObj^.On(ENABLE_FW,ENABLE_BW,OVERRIDE);
 END_IF]]></ST>
       </Implementation>
     </Method>
@@ -452,50 +346,35 @@ END_IF]]></ST>
 VAR_INPUT
 	INDEX :INT;
 END_VAR
+VAR
+	ptr_MotionObj : POINTER TO Motion_Object;
+END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF INDEX > AXIS_COUNT OR INDEX < 1 THEN 
 	Reset := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
 ELSE
-	fbReset[INDEX](
-		Axis:= AXIS[INDEX].AXIS, 
-		Execute:= TRUE );
-	IF fbReset[INDEX].Error THEN
-		fbReset[INDEX](
-			Axis:= AXIS[INDEX].AXIS, 
-			Execute:= FALSE );
-		Reset := Motion_FunctionResult.MOTION_ERROR;
-	ELSIF fbReset[INDEX].Done THEN
-		fbReset[INDEX](
-			Axis:= AXIS[INDEX].AXIS, 
-			Execute:= FALSE );
-		Reset := Motion_FunctionResult.MOTION_OK;
-	ELSE
-		Reset := Motion_FunctionResult.MOTION_BUSY;
-	END_IF
+	ptr_MotionObj := Axis_Object + INT_TO_DWORD(INT_TO_UINT(INDEX - 1) * SIZEOF(Motion_Object));
+    Reset := ptr_MotionObj^.Reset();
 END_IF]]></ST>
       </Implementation>
     </Method>
     <Action Name="ACT_UpdateStatus" Id="{fc19d8f7-7aab-443d-a6b0-6c271a3d11f7}" FolderPath="HMI Actions\">
       <Implementation>
-        <ST><![CDATA[AXIS[i].AXIS.ReadStatus();
-PlcToHmi[i].actPos	:= AXIS[i].AXIS.NcToPlc.ActPos;
-PlcToHmi[i].actVelo := AXIS[i].AXIS.NcToPlc.ActVelo;
-PlcToHmi[i].setPos	:= AXIS[i].AXIS.NcToPlc.SetPos;
-PlcToHmi[i].setVelo := AXIS[i].AXIS.NcToPlc.SetVelo;
-PlcToHmi[i].controller_override := fbPower[i].Override;
-PlcToHmi[i].hasError := AXIS[i].AXIS.Status.Error;
-PlcToHmi[i].ErrorID := AXIS[i].AXIS.Status.ErrorID;
-PlcToHmi[i].isBwDisabled := NOT fbPower[i].Enable_Negative;
-PlcToHmi[i].isFwDisabled := NOT fbPower[i].Enable_Positive;
-PlcToHmi[i].isCalibrated := AXIS[i].AXIS.Status.Homed;
-PlcToHmi[i].isDisabled := AXIS[i].AXIS.Status.Disabled;
-PlcToHmi[i].isInRange := AXIS[i].AXIS.Status.InPositionArea;
-PlcToHmi[i].isInTarget := AXIS[i].AXIS.Status.InTargetPosition;
-PlcToHmi[i].isNegativeDirection := AXIS[i].AXIS.Status.NegativeDirection;
-PlcToHmi[i].isNotMoving := AXIS[i].AXIS.Status.NotMoving;
-PlcToHmi[i].isPositiveDirection := AXIS[i].AXIS.Status.PositiveDirection;]]></ST>
+        <ST><![CDATA[ptrPlcToHmi^ := ptrAxisObj^.ToHmi;]]></ST>
       </Implementation>
     </Action>
+    <Property Name="AXIS" Id="{fd24b662-ad51-4b71-a65c-ddcefcbcb58f}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY AXIS : POINTER TO Motion_Object
+]]></Declaration>
+      <Set Name="Set" Id="{202590d2-eb4f-4c08-b713-480e513dea0a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AXIS_Object := AXIS;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
   </POU>
 </TcPlcObject>
