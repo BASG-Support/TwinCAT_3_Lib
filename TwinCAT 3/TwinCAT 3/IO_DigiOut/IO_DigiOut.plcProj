@@ -92,13 +92,15 @@
           <v n="Name">"{C70B7845-2722-4a9b-A0EA-88C877A4B36F}"</v>
           <d n="SubKeys" t="Hashtable" />
           <d n="Values" t="Hashtable" ckt="String">
+            <v>EnableMaxAuthenticationTrials</v>
+            <v>true</v>
             <v>MaxAuthenticationTrials</v>
             <v>3</v>
             <v>UserList</v>
             <o t="UserList">
               <a n="Users" cet="User">
                 <o>
-                  <v n="Id">{a27bdb89-82c6-410d-8250-e9db80f26ecf}</v>
+                  <v n="Id">{9f328d31-0cfd-4057-bd49-f20b5e112f8d}</v>
                   <v n="Name">"Owner"</v>
                   <v n="FullName">""</v>
                   <v n="Description">""</v>
@@ -114,24 +116,24 @@
             <o t="GroupList">
               <a n="Groups" cet="Group">
                 <o>
-                  <v n="Id">{9769fca3-ab8d-4761-8998-fa7cbdedf46f}</v>
-                  <v n="Name">"Owner"</v>
-                  <v n="Description">""</v>
-                  <v n="IsEveryoneGroup">false</v>
-                  <v n="IsOwnerGroup">true</v>
-                  <l n="UserMembers" t="ArrayList" cet="Guid">
-                    <v>a27bdb89-82c6-410d-8250-e9db80f26ecf</v>
-                  </l>
-                  <l n="GroupMembers" t="ArrayList" />
-                </o>
-                <o>
-                  <v n="Id">{52891d6d-d536-4a84-a7c0-9b545b2fcbfc}</v>
+                  <v n="Id">{364bd476-50f1-4aa9-97b1-f44da390ec49}</v>
                   <v n="Name">"Everyone"</v>
                   <v n="Description">""</v>
                   <v n="IsEveryoneGroup">true</v>
                   <v n="IsOwnerGroup">false</v>
                   <l n="UserMembers" t="ArrayList" cet="Guid">
-                    <v>a27bdb89-82c6-410d-8250-e9db80f26ecf</v>
+                    <v>9f328d31-0cfd-4057-bd49-f20b5e112f8d</v>
+                  </l>
+                  <l n="GroupMembers" t="ArrayList" />
+                </o>
+                <o>
+                  <v n="Id">{e5926f4b-d119-4b0c-90a5-b8e56dc61b7d}</v>
+                  <v n="Name">"Owner"</v>
+                  <v n="Description">""</v>
+                  <v n="IsEveryoneGroup">false</v>
+                  <v n="IsOwnerGroup">true</v>
+                  <l n="UserMembers" t="ArrayList" cet="Guid">
+                    <v>9f328d31-0cfd-4057-bd49-f20b5e112f8d</v>
                   </l>
                   <l n="GroupMembers" t="ArrayList" />
                 </o>
@@ -140,13 +142,17 @@
             <v>UserAuthentication</v>
             <o t="UserAuthentication">
               <d n="UserToPasswordHash" t="Hashtable" ckt="Guid" cvt="String">
-                <v>a27bdb89-82c6-410d-8250-e9db80f26ecf</v>
+                <v>9f328d31-0cfd-4057-bd49-f20b5e112f8d</v>
                 <v>d41d8cd98f00b204e9800998ecf8427e</v>
               </d>
             </o>
-            <v>EnableMaxAuthenticationTrials</v>
-            <v>true</v>
           </d>
+        </o>
+        <v>{192FAD59-8248-4824-A8DE-9177C94C195A}</v>
+        <o>
+          <v n="Name">"{192FAD59-8248-4824-A8DE-9177C94C195A}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" />
         </o>
         <v>{F66C7017-BDD8-4114-926C-81D6D687E35F}</v>
         <o>
@@ -156,6 +162,12 @@
             <v>FlagUseInit</v>
             <v>False</v>
           </d>
+        </o>
+        <v>{246001F4-279D-43AC-B241-948EB31120E1}</v>
+        <o>
+          <v n="Name">"{246001F4-279D-43AC-B241-948EB31120E1}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" />
         </o>
       </d>
       <d n="Values" t="Hashtable" />

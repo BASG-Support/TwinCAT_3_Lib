@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
+  <Itf Name="ITF_DBAdaptor" Id="{9f1b48f4-eeab-41cf-aa48-0de36856ceaf}">
+    <Declaration><![CDATA[INTERFACE ITF_DBAdaptor
+]]></Declaration>
+    <Method Name="SQL_Delete" Id="{0fbb7eef-5b1d-4ce3-9a20-27f9497c2b6f}">
+      <Declaration><![CDATA[METHOD SQL_Delete : DB_FunctionResult
+VAR_INPUT
+	SQL : STRING(255);
+END_VAR
+]]></Declaration>
+    </Method>
+    <Property Name="TimeOut" Id="{5779eafa-16cf-470a-8f85-7ccb89d20314}">
+      <Declaration><![CDATA[PROPERTY TimeOut : TIME]]></Declaration>
+      <Get Name="Get" Id="{3c7c7727-a7d6-4cbb-8131-c3f33dedc97d}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{81c24d5a-eb28-4a7d-9faa-7afa6d22e4c4}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="sNetID" Id="{6218a16c-d9f3-41b9-bb01-140403b9e4c6}">
+      <Declaration><![CDATA[PROPERTY sNetID : string(23)]]></Declaration>
+      <Set Name="Set" Id="{821fd5a2-7ab2-4f39-8241-5e34a7276c51}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+      <Get Name="Get" Id="{f3d3ea48-2b82-4d77-8095-103ff0a43b18}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="SQL_Insert" Id="{78ccc74b-ce47-4f46-be9e-3db2490b5857}">
+      <Declaration><![CDATA[METHOD SQL_Insert : DB_FunctionResult
+VAR_INPUT
+	SQL 				: STRING(255);
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="SQL_Select" Id="{e40e14ef-015a-4862-afd8-c63b79cb4a71}">
+      <Declaration><![CDATA[METHOD SQL_Select : DB_FunctionResult
+VAR_INPUT
+	SQL 				: STRING(255);
+	START_INDEX			: UDINT;
+	ROWS				: UDINT;
+	ROW_DATA_BYTES		: UDINT;
+	ptr_ReceiveBuffer	: POINTER TO BYTE;
+END_VAR
+]]></Declaration>
+    </Method>
+    <Property Name="udiDatabase_ID" Id="{e894097f-8ff3-442b-98a0-e40afe89fbbc}">
+      <Declaration><![CDATA[PROPERTY udiDatabase_ID : UDINT]]></Declaration>
+      <Set Name="Set" Id="{2b84286a-d965-4af1-a8e4-0fbc497a20e3}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+      <Get Name="Get" Id="{716134e7-56b7-43fc-8b20-ce1f2c2effb9}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+  </Itf>
+</TcPlcObject>

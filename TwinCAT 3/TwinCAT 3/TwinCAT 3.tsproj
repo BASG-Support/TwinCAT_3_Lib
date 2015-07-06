@@ -39,9 +39,9 @@
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 				</Instance>
 			</Project>
-			<Project GUID="{787018B7-2A45-42DD-81FD-35555ECC1A05}" Name="SqliteDatabase" PrjFilePath="SqliteDatabase\SqliteDatabase.plcproj" TmcFilePath="SqliteDatabase\SqliteDatabase.tmc" ReloadTmc="true" AmsPort="856" FileArchiveSettings="#x000e">
+			<Project GUID="{787018B7-2A45-42DD-81FD-35555ECC1A05}" Name="SqliteAdaptor" PrjFilePath="SqliteAdaptor\SqliteAdaptor.plcProj" TmcFilePath="SqliteAdaptor\SqliteAdaptor.tmc" ReloadTmc="true" AmsPort="856" FileArchiveSettings="#x000e">
 				<Instance Id="#x01010060" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
-					<Name>SqliteDatabase Instance</Name>
+					<Name>SqliteAdaptor Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 				</Instance>
 			</Project>
