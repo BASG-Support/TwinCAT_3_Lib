@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.38">
   <POU Name="Motion_Object" Id="{dc51c73b-4d67-468f-ae69-0e1bfca9e4ab}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK Motion_Object IMPLEMENTS ITF_AXIS
 VAR_INPUT
@@ -8,7 +8,9 @@ VAR_OUTPUT
 END_VAR
 VAR
 	AXIS 					: AXIS_REF;
-	HOME_CALIBRATION AT %I* : BOOL;
+	NOT_Limit AT %I* 		: BOOL;
+	POT_Limit AT %I* 		: BOOL;
+	HOME_CALIBRATION		: BOOL;
 	PlcToHmi				: Motion_PlcToHmi;
 	fbPower 				: MC_POWER;
 	fbReset 				: MC_RESET;
@@ -279,10 +281,17 @@ ToHmi := PlcToHmi;]]></ST>
     <Method Name="Home" Id="{90d95f73-bb4d-4ad5-985e-a67e4f555a08}" FolderPath="Methods\">
       <Declaration><![CDATA[METHOD PUBLIC Home : Motion_FunctionResult
 VAR_INPUT
+	TO_NEGATIVE : BOOL;
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[fbHome(
+        <ST><![CDATA[IF TO_NEGATIVE THEN 
+	HOME_CALIBRATION := NOT_Limit;
+ELSE
+	HOME_CALIBRATION := POT_Limit;
+END_IF
+
+fbHome(
 	Axis:= AXIS, 
 	Execute:= TRUE, 
 	Position:= 0, 

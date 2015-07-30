@@ -1,11 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.38">
   <Itf Name="ITF_AXIS" Id="{2162fe5c-d16b-4a8c-879f-b4ac3bb2325d}">
     <Declaration><![CDATA[INTERFACE ITF_AXIS
 ]]></Declaration>
     <Method Name="Home" Id="{2a8c7193-a291-4f77-91b0-17a75e4d587a}">
       <Declaration><![CDATA[METHOD PUBLIC Home : Motion_FunctionResult
 VAR_INPUT
+	TO_NEGATIVE : BOOL;
 END_VAR
 ]]></Declaration>
     </Method>

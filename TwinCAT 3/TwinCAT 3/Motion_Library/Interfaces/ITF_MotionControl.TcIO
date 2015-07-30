@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.38">
   <Itf Name="ITF_MotionControl" Id="{bd2d28f9-0185-4612-a42e-8d77cf508d1a}">
     <Declaration><![CDATA[INTERFACE ITF_MotionControl
 ]]></Declaration>
@@ -68,6 +68,7 @@ END_VAR]]></Declaration>
       <Declaration><![CDATA[METHOD PUBLIC Home : Motion_FunctionResult
 VAR_INPUT
 	INDEX : INT;
+	TO_NEGATIVE : BOOL;
 END_VAR]]></Declaration>
     </Method>
     <Method Name="MoveToPosition" Id="{9dc22dd0-fc93-4a22-a500-c7c0c2ff0103}">

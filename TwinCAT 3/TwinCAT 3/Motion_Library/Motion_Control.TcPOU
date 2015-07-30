@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.38">
   <POU Name="Motion_Control" Id="{55b379f4-f721-4632-9623-aca35a4ff0b7}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK Motion_Control IMPLEMENTS ITF_MotionControl
 VAR_INPUT
@@ -50,6 +50,7 @@ END_VAR
       <Declaration><![CDATA[METHOD PUBLIC Home : Motion_FunctionResult
 VAR_INPUT
 	INDEX : INT;
+	TO_NEGATIVE : BOOL;
 END_VAR
 VAR
 	ptr_MotionObj : POINTER TO Motion_Object;
@@ -59,7 +60,7 @@ END_VAR]]></Declaration>
 	Home := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
 ELSE
 	ptr_MotionObj := Axis_Object + INT_TO_DWORD(INT_TO_UINT(INDEX -1) * SIZEOF(Motion_Object));
-    Home := ptr_MotionObj^.Home();
+    Home := ptr_MotionObj^.Home(TO_NEGATIVE);
 END_IF]]></ST>
       </Implementation>
     </Method>
