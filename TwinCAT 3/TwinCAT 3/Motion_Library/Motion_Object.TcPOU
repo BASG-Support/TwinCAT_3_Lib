@@ -261,19 +261,21 @@ END_VAR
 PlcToHmi.actPos		:= AXIS.NcToPlc.ActPos;
 PlcToHmi.actVelo	:= AXIS.NcToPlc.ActVelo;
 PlcToHmi.setPos		:= AXIS.NcToPlc.SetPos;
-PlcToHmi.setVelo	:= AXIS.NcToPlc.SetVelo;
-PlcToHmi.controller_override := fbPower.Override;
-PlcToHmi.hasError	:= AXIS.Status.Error;
-PlcToHmi.ErrorID	:= AXIS.Status.ErrorID;
-PlcToHmi.isBwDisabled	:= NOT fbPower.Enable_Negative;
-PlcToHmi.isFwDisabled	:= NOT fbPower.Enable_Positive;
-PlcToHmi.isCalibrated	:= AXIS.Status.Homed;
-PlcToHmi.isDisabled	:= AXIS.Status.Disabled;
-PlcToHmi.isInRange	:= AXIS.Status.InPositionArea;
-PlcToHmi.isInTarget := AXIS.Status.InTargetPosition;
-PlcToHmi.isNegativeDirection := AXIS.Status.NegativeDirection;
-PlcToHmi.isNotMoving	:= AXIS.Status.NotMoving;
-PlcToHmi.isPositiveDirection := AXIS.Status.PositiveDirection;
+PlcToHmi.setVelo				:= AXIS.NcToPlc.SetVelo;
+PlcToHmi.controller_override 	:= fbPower.Override;
+PlcToHmi.hasError				:= AXIS.Status.Error;
+PlcToHmi.ErrorID				:= AXIS.Status.ErrorID;
+PlcToHmi.isBwDisabled			:= NOT fbPower.Enable_Negative;
+PlcToHmi.isFwDisabled			:= NOT fbPower.Enable_Positive;
+PlcToHmi.isCalibrated			:= AXIS.Status.Homed;
+PlcToHmi.isDisabled				:= AXIS.Status.Disabled;
+PlcToHmi.isInRange				:= AXIS.Status.InPositionArea;
+PlcToHmi.isInTarget 			:= AXIS.Status.InTargetPosition;
+PlcToHmi.isNegativeDirection 	:= AXIS.Status.NegativeDirection;
+PlcToHmi.isNotMoving			:= AXIS.Status.NotMoving;
+PlcToHmi.isPositiveDirection 	:= AXIS.Status.PositiveDirection;
+PlcToHmi.NegativeLimitOn 		:= NOT_Limit;
+PlcToHmi.PositiveLimitOn 		:= POT_Limit;
 ToHmi := PlcToHmi;]]></ST>
         </Implementation>
       </Get>

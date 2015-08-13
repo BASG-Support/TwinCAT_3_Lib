@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.38">
   <DUT Name="Motion_PlcToHmi" Id="{1da300d1-f238-4497-b81a-36eb9fe7f711}">
     <Declaration><![CDATA[TYPE Motion_PlcToHmi :
 STRUCT
@@ -19,7 +19,9 @@ STRUCT
 	isPositiveDirection : BOOL;
 	isNegativeDirection : BOOL;            
     isInTarget 			: BOOL;            
-    isInRange 			: BOOL;              
+    isInRange 			: BOOL;   
+	NegativeLimitOn		: BOOL;
+	PositiveLimitOn		: BOOL;           
 END_STRUCT
 END_TYPE
 ]]></Declaration>

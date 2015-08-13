@@ -8,18 +8,19 @@ END_VAR
 VAR_OUTPUT
 END_VAR
 VAR
-	AXIS_Object : POINTER TO Motion_Object;
-	HmiToPlc	: POINTER TO Motion_HmiToPlc;
-	PlcToHmi	: POINTER TO Motion_PlcToHmi;
-	AXIS_COUNT	: INT := 0;
+	AXIS_Object 	: POINTER TO Motion_Object;
+	HmiToPlc		: POINTER TO Motion_HmiToPlc;
+	PlcToHmi		: POINTER TO Motion_PlcToHmi;
+	AXIS_COUNT		: INT := 0;
+	HomeToNegative	: BOOL := TRUE;
 	{attribute 'hide'}
-	i			: INT;
+	i				: INT;
 	{attribute 'hide'}
-	ptrPlcToHmi	: POINTER TO Motion_PlcToHmi;
+	ptrPlcToHmi		: POINTER TO Motion_PlcToHmi;
 	{attribute 'hide'}
-	ptrHmiToPlc	: POINTER TO Motion_HmiToPlc;
+	ptrHmiToPlc		: POINTER TO Motion_HmiToPlc;
 	{attribute 'hide'}
-	ptrAxisObj	: POINTER TO Motion_Object;
+	ptrAxisObj		: POINTER TO Motion_Object;
 END_VAR
 
 ]]></Declaration>
@@ -46,11 +47,30 @@ END_VAR
         <ST><![CDATA[On(i, HmiToPlc[i].ON_FW, HmiToPlc[i].ON_BW, HmiToPlc[i].CONTROLLER_OVERRIDE);]]></ST>
       </Implementation>
     </Action>
+    <Property Name="InvertHomeDirection" Id="{07561adb-093e-4829-8253-55deb4091056}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY PUBLIC InvertHomeDirection : BOOL]]></Declaration>
+      <Get Name="Get" Id="{900c518b-2835-4c5b-80c3-b13012845d2a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[InvertHomeDirection := HomeToNegative;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{def61d6e-0d36-466d-a2fe-ef3bddca370b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[HomeToNegative := InvertHomeDirection;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="Home" Id="{177da0d7-0e75-4752-b88f-e867267c266c}" FolderPath="Methods\">
       <Declaration><![CDATA[METHOD PUBLIC Home : Motion_FunctionResult
 VAR_INPUT
 	INDEX : INT;
-	TO_NEGATIVE : BOOL;
+	//TO_NEGATIVE : BOOL;
 END_VAR
 VAR
 	ptr_MotionObj : POINTER TO Motion_Object;
@@ -60,7 +80,7 @@ END_VAR]]></Declaration>
 	Home := Motion_FunctionResult.MOTION_UNKNOWN_AXIS;
 ELSE
 	ptr_MotionObj := Axis_Object + INT_TO_DWORD(INT_TO_UINT(INDEX -1) * SIZEOF(Motion_Object));
-    Home := ptr_MotionObj^.Home(TO_NEGATIVE);
+    Home := ptr_MotionObj^.Home(HomeToNegative);
 END_IF]]></ST>
       </Implementation>
     </Method>
