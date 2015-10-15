@@ -28,43 +28,54 @@ Includes a very simple/crude type of linear interpolation.</Description>
     <AssemblyName>MyApplication</AssemblyName>-->
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="Custom Datatypes" />
-    <Folder Include="Interfaces" />
+    <Folder Include="Motion" />
+    <Folder Include="Motion\Custom Datatypes" />
+    <Folder Include="Motion\Interfaces" />
     <Folder Include="Version" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Custom Datatypes\Motion_Axis.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Custom Datatypes\Motion_AxisGroup.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Custom Datatypes\Motion_HmiToPlc.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Custom Datatypes\Motion_PlcToHmi.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Custom Datatypes\Motion_FunctionResult.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Interfaces\ITF_AXIS.TcIO">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Interfaces\ITF_MotionControl.TcIO">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Interpolate.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Motion_Control.TcPOU">
+    <Compile Include="Motion\Custom Datatypes\Motion_Axis.TcDUT">
       <SubType>Code</SubType>
+      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
     </Compile>
-    <Compile Include="Motion_Object.TcPOU">
+    <Compile Include="Motion\Custom Datatypes\Motion_AxisGroup.TcDUT">
       <SubType>Code</SubType>
+      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
     </Compile>
-    <Compile Include="Motion_Parameters.TcGVL">
+    <Compile Include="Motion\Custom Datatypes\Motion_FunctionResult.TcDUT">
       <SubType>Code</SubType>
+      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
+    </Compile>
+    <Compile Include="Motion\Custom Datatypes\Motion_HmiToPlc.TcDUT">
+      <SubType>Code</SubType>
+      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
+    </Compile>
+    <Compile Include="Motion\Custom Datatypes\Motion_PlcToHmi.TcDUT">
+      <SubType>Code</SubType>
+      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
+    </Compile>
+    <Compile Include="Motion\Interfaces\ITF_AXIS.TcIO">
+      <SubType>Code</SubType>
+      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
+    </Compile>
+    <Compile Include="Motion\Interfaces\ITF_MotionControl.TcIO">
+      <SubType>Code</SubType>
+      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
+    </Compile>
+    <Compile Include="Motion\Motion_Control.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
+    </Compile>
+    <Compile Include="Motion\Motion_Object.TcPOU">
+      <SubType>Code</SubType>
+      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
+    </Compile>
+    <Compile Include="Motion\Motion_Parameters.TcGVL">
+      <SubType>Code</SubType>
+      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
     </Compile>
     <Compile Include="Version\Global_Version.TcGVL">
       <SubType>Code</SubType>
@@ -151,7 +162,7 @@ Includes a very simple/crude type of linear interpolation.</Description>
             <o t="UserList">
               <a n="Users" cet="User">
                 <o>
-                  <v n="Id">{9f328d31-0cfd-4057-bd49-f20b5e112f8d}</v>
+                  <v n="Id">{0b8a4d33-f8b5-4ffb-824a-9807dd530e9a}</v>
                   <v n="Name">"Owner"</v>
                   <v n="FullName">""</v>
                   <v n="Description">""</v>
@@ -167,24 +178,24 @@ Includes a very simple/crude type of linear interpolation.</Description>
             <o t="GroupList">
               <a n="Groups" cet="Group">
                 <o>
-                  <v n="Id">{364bd476-50f1-4aa9-97b1-f44da390ec49}</v>
-                  <v n="Name">"Everyone"</v>
-                  <v n="Description">""</v>
-                  <v n="IsEveryoneGroup">true</v>
-                  <v n="IsOwnerGroup">false</v>
-                  <l n="UserMembers" t="ArrayList" cet="Guid">
-                    <v>9f328d31-0cfd-4057-bd49-f20b5e112f8d</v>
-                  </l>
-                  <l n="GroupMembers" t="ArrayList" />
-                </o>
-                <o>
-                  <v n="Id">{e5926f4b-d119-4b0c-90a5-b8e56dc61b7d}</v>
+                  <v n="Id">{b6e7841b-278d-484a-9929-bd8f24d144c8}</v>
                   <v n="Name">"Owner"</v>
                   <v n="Description">""</v>
                   <v n="IsEveryoneGroup">false</v>
                   <v n="IsOwnerGroup">true</v>
                   <l n="UserMembers" t="ArrayList" cet="Guid">
-                    <v>9f328d31-0cfd-4057-bd49-f20b5e112f8d</v>
+                    <v>0b8a4d33-f8b5-4ffb-824a-9807dd530e9a</v>
+                  </l>
+                  <l n="GroupMembers" t="ArrayList" />
+                </o>
+                <o>
+                  <v n="Id">{3e1e67d7-9c30-4980-a080-7a2118349ea4}</v>
+                  <v n="Name">"Everyone"</v>
+                  <v n="Description">""</v>
+                  <v n="IsEveryoneGroup">true</v>
+                  <v n="IsOwnerGroup">false</v>
+                  <l n="UserMembers" t="ArrayList" cet="Guid">
+                    <v>0b8a4d33-f8b5-4ffb-824a-9807dd530e9a</v>
                   </l>
                   <l n="GroupMembers" t="ArrayList" />
                 </o>
@@ -193,7 +204,7 @@ Includes a very simple/crude type of linear interpolation.</Description>
             <v>UserAuthentication</v>
             <o t="UserAuthentication">
               <d n="UserToPasswordHash" t="Hashtable" ckt="Guid" cvt="String">
-                <v>9f328d31-0cfd-4057-bd49-f20b5e112f8d</v>
+                <v>0b8a4d33-f8b5-4ffb-824a-9807dd530e9a</v>
                 <v>d41d8cd98f00b204e9800998ecf8427e</v>
               </d>
             </o>

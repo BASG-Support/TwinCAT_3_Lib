@@ -1,0 +1,274 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4018.2">
+  <POU Name="MachineLog" Id="{0aefa441-26d4-415e-a05b-1e9e3b5b2e2d}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK MachineLog
+VAR
+	fbOpenFile: FB_FileOpen;
+	fbCloseFile: FB_FileClose;
+	fbPutInFile: FB_FilePuts;
+	hFileHandle: UINT;
+	fbGetTime: NT_GetTime;
+	CurrentTime: TIMESTRUCT;
+	CurrentTime_String: STRING(24);
+	WriteState: INT := 0;
+	LogDelimiter: STRING(5) := ',';
+	LogEOL: STRING(5) := '$R$N';
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[;]]></ST>
+    </Implementation>
+    <Method Name="CloseFile" Id="{8ee173fa-8717-4bb0-81a3-d2c71b4b06ba}">
+      <Declaration><![CDATA[{attribute 'object_name' := 'CloseFile'}
+METHOD CloseFile : FunctionResult_Log
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbCloseFile(
+	sNetId:= '', 
+	hFile:= hFileHandle, 
+	bExecute:= TRUE, 
+	tTimeout:= T#1S );
+	
+IF fbCloseFile.bError THEN
+	fbCloseFile( 
+		bExecute:= FALSE );
+	WriteState := -1;
+CloseFile := FunctionResult_Log.ERROR;
+END_IF
+
+IF NOT fbCloseFile.bBusy AND NOT fbCloseFile.bError THEN
+	fbCloseFile( 
+		bExecute:= FALSE );
+	hFileHandle := 0;
+	WriteState := WriteState + 1;
+	CloseFile := FunctionResult_Log.DONE;
+END_IF
+
+CloseFile := FunctionResult_Log.BUSY;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CreateEntry" Id="{433350bf-dead-4de3-b98a-9b98a78c3d2a}">
+      <Declaration><![CDATA[{attribute 'object_name' := 'CreateEntry'}
+METHOD CreateEntry : FunctionResult_Log
+VAR_INPUT
+	EntryMessage: STRING(255);
+END_VAR
+VAR
+	Buffer: STRING(500);
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE WriteState OF 
+	-1	:	CreateEntry := FunctionResult_Log.BUSY;
+	0	:	OpenFile('C:\Users\SiangC\Desktop\Test.txt');
+	1	:	GetTime();
+	2	:	WriteToFile(EntryMessage);
+	3	:	CloseFile();
+	4	:	IF Reset() = FunctionResult_Log.DONE THEN CreateEntry := FunctionResult_Log.DONE; END_IF
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Delimiter" Id="{5e5981f7-861e-4f57-b874-b61d5a5a479e}">
+      <Declaration><![CDATA[PROPERTY Delimiter : STRING(5)
+]]></Declaration>
+      <Get Name="Get" Id="{af37e617-ac61-4286-937a-8e8ed744ab24}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Delimiter := LogDelimiter;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{1a367bff-b36d-4557-b40a-04f9a02ff7b7}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[LogDelimiter := Delimiter;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="EntryBuilder" Id="{a3190883-e632-4954-b6ff-75a36f918db1}">
+      <Declaration><![CDATA[{attribute 'object_name' := 'EntryBuilder'}
+METHOD PRIVATE EntryBuilder : STRING(255)
+VAR_INPUT
+	MESSAGE_COMPONENT: ARRAY[0..3] OF STRING(255);
+END_VAR
+VAR
+	BUFFER: STRING(255);
+	i: INT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[BUFFER := CONCAT(MESSAGE_COMPONENT[0],MESSAGE_COMPONENT[1]);
+FOR i := 2 TO 3 BY 1 DO
+	BUFFER := CONCAT(BUFFER,MESSAGE_COMPONENT[i]);
+END_FOR
+EntryBuilder := BUFFER;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="EOL" Id="{e9cb64a9-ba40-4f7b-8cfd-f0ac590d9b3c}">
+      <Declaration><![CDATA[PROPERTY EOL : STRING(5)
+]]></Declaration>
+      <Get Name="Get" Id="{db23ccc3-de52-4fe4-8af3-4065c660b302}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[EOL := LogEOL;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{ad31c1a9-adfa-4418-b402-f5348dc81443}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[LogEOL := EOL;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="GetTime" Id="{ecffbf0d-24d6-4df2-af90-22575540ff78}">
+      <Declaration><![CDATA[{attribute 'object_name' := 'GetTime'}
+METHOD PRIVATE GetTime : FunctionResult_Log
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[(*
+	Get the system's time
+		-> Output to CurrentTime (TIMESTRUCT)
+*)
+fbGetTime(
+			NETID:= '', 
+			START:= TRUE, 
+			TMOUT:= T#1S, 
+			TIMESTR=> CurrentTime);
+(*
+	If error occurs
+		-> Reset the Execute input
+		-> Advance object state to its error state (-1)
+*)
+IF fbGetTIme.ERR THEN
+	fbGetTime( 
+		START:= FALSE );
+	WriteState := -1;
+	GetTime := FunctionResult_Log.ERROR;
+END_IF
+
+(*
+	If successful
+		-> Reset the Execute input
+		-> Convert time to STRING(24) format 
+		-> Advance object state (++)
+*)
+IF NOT fbGetTime.BUSY AND NOT fbGetTime.ERR THEN
+	fbGetTime( 
+		START:= FALSE );
+	CurrentTime_String := SYSTEMTIME_TO_STRING(CurrentTime);
+	WriteState := WriteState + 1;
+	GetTime := FunctionResult_Log.DONE;
+END_IF
+
+(*
+	Returns busy otherwise
+*)
+GetTime := FunctionResult_Log.BUSY;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="OpenFile" Id="{5b2aca3d-2f69-46e1-9d4d-aec4618992d0}">
+      <Declaration><![CDATA[{attribute 'object_name' := 'OpenFile'}
+METHOD PRIVATE OpenFile : FunctionResult_Log
+VAR_INPUT
+	sFilePath: T_MAXSTRING;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[(*
+	Executes the function block.
+		-> Obtain the File Handle and store it in hFileHandle (UINT)
+		-> File Handle is used by other File IO function blocks
+*)
+fbOpenFile(
+	sNetId:= '', 
+	sPathName:= sFilePath, 
+	nMode:= FOPEN_MODEAPPEND OR FOPEN_MODEPLUS, 
+	ePath:= PATH_GENERIC, 
+	bExecute:= TRUE, 
+	tTimeout:= T#1S,  
+	hFile=> hFileHandle);
+	
+(*
+	If error occurs.
+		-> Reset the Execute input.
+		-> Advance the object state to its Error state (-1)
+*)
+IF fbOpenFile.bError THEN 
+	fbOpenFile(
+		bExecute:= FALSE );
+	WriteState := -1;
+	OpenFile := FunctionResult_Log.ERROR;
+END_IF
+
+(*
+	Function block is complete if it is 
+		a) NOT BUSY
+		b) NO ERROR
+		-> Reset the Execute input
+		-> Advance the object state to the next state (++)
+*)
+IF NOT fbOpenFile.bBusy AND NOT fbOpenFile.bError AND hFileHandle > 0 THEN
+	fbOpenFile(
+		bExecute:= FALSE );
+	WriteState := WriteState + 1;
+	OpenFile := FunctionResult_Log.DONE;
+END_IF
+
+(*
+	Otherwise returns Busy signal
+*)
+OpenFile := FunctionResult_Log.BUSY;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Reset" Id="{78f3195c-4558-47ff-a34d-c35661552b6a}">
+      <Declaration><![CDATA[{attribute 'object_name' := 'Reset'}
+METHOD Reset : FunctionResult_Log
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbCloseFile( 
+	bExecute:= FALSE );
+fbOpenFile(
+	bExecute:= FALSE );
+fbPutInFile(
+	bExecute:= FALSE );
+WriteState := 0;
+Reset := FunctionResult_Log.DONE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="WriteToFile" Id="{6fc721da-3b4d-4a03-8765-c541278bcd12}">
+      <Declaration><![CDATA[{attribute 'object_name' := 'WriteToFile'}
+METHOD PRIVATE WriteToFile : FunctionResult_Log
+VAR_INPUT
+	MESSAGE: STRING(255);
+END_VAR
+VAR
+	MESSAGE_BUFFER: ARRAY[0..3] OF STRING(255) := [CurrentTime_String, Delimiter, MESSAGE, LogEOL];
+	BUFFER: T_MAXSTRING;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbPutInFile(
+	sNetId:= '', 
+	hFile:= hFileHandle, 
+	sLine:= EntryBuilder(MESSAGE_BUFFER), 
+	bExecute:= TRUE, 
+	tTimeout:= T#1S );
+	
+IF fbPutInFile.bError THEN
+	fbPutInFile(
+		bExecute:= FALSE );
+	WriteState := -1;
+	WriteToFile := FunctionResult_Log.ERROR;
+END_IF	
+
+IF NOT fbPutInFile.bBusy AND NOT fbPutInFile.bError THEN
+	fbPutInFile(
+		bExecute:= FALSE );
+	WriteState := WriteState + 1;
+	WriteToFile := FunctionResult_Log.DONE;
+END_IF
+
+WriteToFile := FunctionResult_Log.BUSY;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>
