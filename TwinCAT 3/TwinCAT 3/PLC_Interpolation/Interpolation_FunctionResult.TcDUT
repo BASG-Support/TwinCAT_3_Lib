@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4018.5">
+  <DUT Name="Interpolation_FunctionResult" Id="{65919c07-4f4b-4f19-9c1e-e21e8e57d9a5}">
+    <Declaration><![CDATA[TYPE Interpolation_FunctionResult :
+(
+	ERROR := -1,
+	BUSY := 0,
+	DONE,
+	ABORTED
+);
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

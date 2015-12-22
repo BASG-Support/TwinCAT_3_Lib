@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{787018b7-2a45-42dd-81fd-35555ecc1a05}</ProjectGuid>
     <Name>SqliteAdaptor</Name>
-    <ProgramVersion>3.1.0.8</ProgramVersion>
+    <ProgramVersion>3.1.0.9</ProgramVersion>
     <Application>{6c3c1616-f64f-4544-b132-352cd38cba50}</Application>
     <TypeSystem>{477d7e34-8cee-46eb-97a5-7aaa65c42bf2}</TypeSystem>
     <Implicit_Task_Info>{443a4bd8-bd32-40ff-bcce-2524798b026a}</Implicit_Task_Info>
@@ -64,8 +64,8 @@
   <ProjectExtensions>
     <PlcProjectOptions>
       <XmlArchive>
-        <Data>
-          <o xml:space="preserve" t="OptionKey">
+  <Data>
+    <o xml:space="preserve" t="OptionKey">
       <v n="Name">"&lt;ProjectRoot&gt;"</v>
       <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
         <v>{F66C7017-BDD8-4114-926C-81D6D687E35F}</v>
@@ -76,6 +76,12 @@
             <v>FlagUseInit</v>
             <v>False</v>
           </d>
+        </o>
+        <v>{192FAD59-8248-4824-A8DE-9177C94C195A}</v>
+        <o>
+          <v n="Name">"{192FAD59-8248-4824-A8DE-9177C94C195A}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" />
         </o>
         <v>{29BD8D0C-3586-4548-BB48-497B9A01693F}</v>
         <o>
@@ -102,14 +108,14 @@
       </d>
       <d n="Values" t="Hashtable" />
     </o>
-        </Data>
-        <TypeList>
-          <Type n="Boolean">System.Boolean</Type>
-          <Type n="Hashtable">System.Collections.Hashtable</Type>
-          <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
-          <Type n="String">System.String</Type>
-        </TypeList>
-      </XmlArchive>
+  </Data>
+  <TypeList>
+    <Type n="Boolean">System.Boolean</Type>
+    <Type n="Hashtable">System.Collections.Hashtable</Type>
+    <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
+    <Type n="String">System.String</Type>
+  </TypeList>
+</XmlArchive>
     </PlcProjectOptions>
   </ProjectExtensions>
 </Project>

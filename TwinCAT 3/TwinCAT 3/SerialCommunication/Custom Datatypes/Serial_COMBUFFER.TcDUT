@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4018.5">
   <DUT Name="Serial_COMBUFFER" Id="{c96ffc7c-11c3-44f3-a8bd-4a56f912f985}">
     <Declaration><![CDATA[TYPE Serial_COMBUFFER :
 STRUCT
@@ -8,16 +8,16 @@ STRUCT
 	txBuffer 		: ComBuffer;
 	rxBuffer 		: ComBuffer;
 (**)
-(**)	
+(*	
 	(* Buffers for EL COM *)
 	rxElComBuffer AT %I* 	: EL6inData22B;
 	txElComBuffer AT %Q* 	: EL6outData22B;
+*)
 (**)
-(*
 	(* Buffers for PC COM *)
 	rxPcComBuffer AT %I* 	: PcComInData;
 	txPcComBuffer AT %Q* 	: PcComOutData;
-*)
+(**)
 END_STRUCT
 END_TYPE
 ]]></Declaration>

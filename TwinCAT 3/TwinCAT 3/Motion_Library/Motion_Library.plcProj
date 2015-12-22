@@ -6,7 +6,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{8d406a80-2e75-466f-84ce-d02b49becca8}</ProjectGuid>
     <Name>Motion_Library</Name>
-    <ProgramVersion>3.1.0.8</ProgramVersion>
+    <ProgramVersion>3.1.0.9</ProgramVersion>
     <Application>{9ae2a5ac-3291-4a2e-8751-b2cb1dbbc01f}</Application>
     <TypeSystem>{05868db5-4db3-4831-ad99-f3b7fbd9924b}</TypeSystem>
     <Implicit_Task_Info>{a46fd2de-c814-45a7-adb7-86e00e75f05c}</Implicit_Task_Info>
@@ -115,6 +115,19 @@ Includes a very simple/crude type of linear interpolation.</Description>
     <o xml:space="preserve" t="OptionKey">
       <v n="Name">"&lt;ProjectRoot&gt;"</v>
       <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
+        <v>{FE9F63D4-9E34-43ce-9322-D46747A00F33}</v>
+        <o>
+          <v n="Name">"{FE9F63D4-9E34-43ce-9322-D46747A00F33}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" ckt="String">
+            <v>SourceDownloadContent</v>
+            <v>1</v>
+            <v>SourceDownloadContent2</v>
+            <a cet="Guid">
+              <v>b0b53f83-af78-49aa-8133-0063f476bd7c</v>
+            </a>
+          </d>
+        </o>
         <v>{8F99A816-E488-41E4-9FA3-846536012284}</v>
         <o>
           <v n="Name">"{8F99A816-E488-41E4-9FA3-846536012284}"</v>
@@ -154,15 +167,13 @@ Includes a very simple/crude type of linear interpolation.</Description>
           <v n="Name">"{C70B7845-2722-4a9b-A0EA-88C877A4B36F}"</v>
           <d n="SubKeys" t="Hashtable" />
           <d n="Values" t="Hashtable" ckt="String">
-            <v>EnableMaxAuthenticationTrials</v>
-            <v>true</v>
             <v>MaxAuthenticationTrials</v>
             <v>3</v>
             <v>UserList</v>
             <o t="UserList">
               <a n="Users" cet="User">
                 <o>
-                  <v n="Id">{0b8a4d33-f8b5-4ffb-824a-9807dd530e9a}</v>
+                  <v n="Id">{d2c3abc4-71a9-4e5f-8a06-4e822aef3040}</v>
                   <v n="Name">"Owner"</v>
                   <v n="FullName">""</v>
                   <v n="Description">""</v>
@@ -178,24 +189,24 @@ Includes a very simple/crude type of linear interpolation.</Description>
             <o t="GroupList">
               <a n="Groups" cet="Group">
                 <o>
-                  <v n="Id">{b6e7841b-278d-484a-9929-bd8f24d144c8}</v>
+                  <v n="Id">{6754eb77-3870-4359-98c2-7483767b0a81}</v>
                   <v n="Name">"Owner"</v>
                   <v n="Description">""</v>
                   <v n="IsEveryoneGroup">false</v>
                   <v n="IsOwnerGroup">true</v>
                   <l n="UserMembers" t="ArrayList" cet="Guid">
-                    <v>0b8a4d33-f8b5-4ffb-824a-9807dd530e9a</v>
+                    <v>d2c3abc4-71a9-4e5f-8a06-4e822aef3040</v>
                   </l>
                   <l n="GroupMembers" t="ArrayList" />
                 </o>
                 <o>
-                  <v n="Id">{3e1e67d7-9c30-4980-a080-7a2118349ea4}</v>
+                  <v n="Id">{69772e81-74c8-4522-9379-6e53fd8ebac8}</v>
                   <v n="Name">"Everyone"</v>
                   <v n="Description">""</v>
                   <v n="IsEveryoneGroup">true</v>
                   <v n="IsOwnerGroup">false</v>
                   <l n="UserMembers" t="ArrayList" cet="Guid">
-                    <v>0b8a4d33-f8b5-4ffb-824a-9807dd530e9a</v>
+                    <v>d2c3abc4-71a9-4e5f-8a06-4e822aef3040</v>
                   </l>
                   <l n="GroupMembers" t="ArrayList" />
                 </o>
@@ -204,10 +215,12 @@ Includes a very simple/crude type of linear interpolation.</Description>
             <v>UserAuthentication</v>
             <o t="UserAuthentication">
               <d n="UserToPasswordHash" t="Hashtable" ckt="Guid" cvt="String">
-                <v>0b8a4d33-f8b5-4ffb-824a-9807dd530e9a</v>
+                <v>d2c3abc4-71a9-4e5f-8a06-4e822aef3040</v>
                 <v>d41d8cd98f00b204e9800998ecf8427e</v>
               </d>
             </o>
+            <v>EnableMaxAuthenticationTrials</v>
+            <v>true</v>
           </d>
         </o>
         <v>{192FAD59-8248-4824-A8DE-9177C94C195A}</v>
@@ -241,6 +254,7 @@ Includes a very simple/crude type of linear interpolation.</Description>
     <Type n="Group">{daecd4be-1e2b-4335-a125-4a1ac83ea49f}</Type>
     <Type n="GroupList">{bf4dffda-f055-446d-9d7a-5f126720896b}</Type>
     <Type n="Guid">System.Guid</Type>
+    <Type n="Guid[]">System.Guid[]</Type>
     <Type n="Hashtable">System.Collections.Hashtable</Type>
     <Type n="Int32">System.Int32</Type>
     <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>

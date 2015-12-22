@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{5022eabd-c632-46e1-bf7c-476600d6e44e}</ProjectGuid>
     <Name>IO_DigiOut</Name>
-    <ProgramVersion>3.1.0.8</ProgramVersion>
+    <ProgramVersion>3.1.0.9</ProgramVersion>
     <Application>{10acee47-e93f-42cd-957a-b75bea333008}</Application>
     <TypeSystem>{9912fe53-9d4a-4603-8f96-9f74e3758a2e}</TypeSystem>
     <Implicit_Task_Info>{3a2565be-9512-4eda-8782-a05369be7339}</Implicit_Task_Info>
@@ -59,6 +59,19 @@
     <o xml:space="preserve" t="OptionKey">
       <v n="Name">"&lt;ProjectRoot&gt;"</v>
       <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
+        <v>{FE9F63D4-9E34-43ce-9322-D46747A00F33}</v>
+        <o>
+          <v n="Name">"{FE9F63D4-9E34-43ce-9322-D46747A00F33}"</v>
+          <d n="SubKeys" t="Hashtable" />
+          <d n="Values" t="Hashtable" ckt="String">
+            <v>SourceDownloadContent</v>
+            <v>1</v>
+            <v>SourceDownloadContent2</v>
+            <a cet="Guid">
+              <v>b0b53f83-af78-49aa-8133-0063f476bd7c</v>
+            </a>
+          </d>
+        </o>
         <v>{29BD8D0C-3586-4548-BB48-497B9A01693F}</v>
         <o>
           <v n="Name">"{29BD8D0C-3586-4548-BB48-497B9A01693F}"</v>
@@ -92,15 +105,13 @@
           <v n="Name">"{C70B7845-2722-4a9b-A0EA-88C877A4B36F}"</v>
           <d n="SubKeys" t="Hashtable" />
           <d n="Values" t="Hashtable" ckt="String">
-            <v>EnableMaxAuthenticationTrials</v>
-            <v>true</v>
             <v>MaxAuthenticationTrials</v>
             <v>3</v>
             <v>UserList</v>
             <o t="UserList">
               <a n="Users" cet="User">
                 <o>
-                  <v n="Id">{9f328d31-0cfd-4057-bd49-f20b5e112f8d}</v>
+                  <v n="Id">{d2c3abc4-71a9-4e5f-8a06-4e822aef3040}</v>
                   <v n="Name">"Owner"</v>
                   <v n="FullName">""</v>
                   <v n="Description">""</v>
@@ -116,24 +127,24 @@
             <o t="GroupList">
               <a n="Groups" cet="Group">
                 <o>
-                  <v n="Id">{364bd476-50f1-4aa9-97b1-f44da390ec49}</v>
-                  <v n="Name">"Everyone"</v>
-                  <v n="Description">""</v>
-                  <v n="IsEveryoneGroup">true</v>
-                  <v n="IsOwnerGroup">false</v>
-                  <l n="UserMembers" t="ArrayList" cet="Guid">
-                    <v>9f328d31-0cfd-4057-bd49-f20b5e112f8d</v>
-                  </l>
-                  <l n="GroupMembers" t="ArrayList" />
-                </o>
-                <o>
-                  <v n="Id">{e5926f4b-d119-4b0c-90a5-b8e56dc61b7d}</v>
+                  <v n="Id">{6754eb77-3870-4359-98c2-7483767b0a81}</v>
                   <v n="Name">"Owner"</v>
                   <v n="Description">""</v>
                   <v n="IsEveryoneGroup">false</v>
                   <v n="IsOwnerGroup">true</v>
                   <l n="UserMembers" t="ArrayList" cet="Guid">
-                    <v>9f328d31-0cfd-4057-bd49-f20b5e112f8d</v>
+                    <v>d2c3abc4-71a9-4e5f-8a06-4e822aef3040</v>
+                  </l>
+                  <l n="GroupMembers" t="ArrayList" />
+                </o>
+                <o>
+                  <v n="Id">{69772e81-74c8-4522-9379-6e53fd8ebac8}</v>
+                  <v n="Name">"Everyone"</v>
+                  <v n="Description">""</v>
+                  <v n="IsEveryoneGroup">true</v>
+                  <v n="IsOwnerGroup">false</v>
+                  <l n="UserMembers" t="ArrayList" cet="Guid">
+                    <v>d2c3abc4-71a9-4e5f-8a06-4e822aef3040</v>
                   </l>
                   <l n="GroupMembers" t="ArrayList" />
                 </o>
@@ -142,10 +153,12 @@
             <v>UserAuthentication</v>
             <o t="UserAuthentication">
               <d n="UserToPasswordHash" t="Hashtable" ckt="Guid" cvt="String">
-                <v>9f328d31-0cfd-4057-bd49-f20b5e112f8d</v>
+                <v>d2c3abc4-71a9-4e5f-8a06-4e822aef3040</v>
                 <v>d41d8cd98f00b204e9800998ecf8427e</v>
               </d>
             </o>
+            <v>EnableMaxAuthenticationTrials</v>
+            <v>true</v>
           </d>
         </o>
         <v>{192FAD59-8248-4824-A8DE-9177C94C195A}</v>
@@ -179,6 +192,7 @@
     <Type n="Group">{daecd4be-1e2b-4335-a125-4a1ac83ea49f}</Type>
     <Type n="GroupList">{bf4dffda-f055-446d-9d7a-5f126720896b}</Type>
     <Type n="Guid">System.Guid</Type>
+    <Type n="Guid[]">System.Guid[]</Type>
     <Type n="Hashtable">System.Collections.Hashtable</Type>
     <Type n="Int32">System.Int32</Type>
     <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>

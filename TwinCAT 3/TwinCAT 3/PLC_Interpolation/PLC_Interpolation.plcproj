@@ -1,33 +1,31 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <!-- <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>-->
     <FileVersion>1.0.0.0</FileVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{2eb64c17-fd89-48ac-922e-0985f9888b05}</ProjectGuid>
-    <Name>SerialCommunication</Name>
+    <ProjectGuid>{c7e4b4b5-dcfd-4291-a02a-f693f2afd2ca}</ProjectGuid>
+    <SubObjectsSortedByName>True</SubObjectsSortedByName>
+    <Name>PLC_Interpolation</Name>
     <ProgramVersion>3.1.0.9</ProgramVersion>
-    <Application>{51416b3f-1c2c-4a09-a214-5bfdb065fa44}</Application>
-    <TypeSystem>{5225d859-7e86-412d-87ac-a0be09ccf330}</TypeSystem>
-    <Implicit_Task_Info>{65405a7a-40ff-4ec9-bd78-92d90c2f6e75}</Implicit_Task_Info>
-    <Implicit_KindOfTask>{6c0d8c16-d6b0-4d46-99bb-d5617e3b4cf1}</Implicit_KindOfTask>
-    <Implicit_Jitter_Distribution>{6abd8d76-7b1f-49f9-9850-b884b3ba5cd3}</Implicit_Jitter_Distribution>
-    <LibraryReferences>{589b0b2a-6d14-464a-842f-93df2c1d064c}</LibraryReferences>
-    <Title>SerialCom_Lib</Title>
-    <Released>True</Released>
-    <ProjectVersion>1.1</ProjectVersion>
-    <Author>Chua Siang Poh</Author>
-    <Description>Device library designed for simpler and modular serial communication applications in TwinCAT. 
-Number of serial com channels can be specified in the Parameter list.</Description>
-    <Company>Chua Siang Poh</Company>
-    <!--    <OutputType>Exe</OutputType>
-    <RootNamespace>MyApplication</RootNamespace>
-    <AssemblyName>MyApplication</AssemblyName>-->
+    <Application>{31c06c71-03d2-4cb8-92fb-230f74bdfaaf}</Application>
+    <TypeSystem>{7657a34a-7be3-4b26-914c-c10310af78bd}</TypeSystem>
+    <Implicit_Task_Info>{3ec9d436-1564-4e61-a386-403e297f9b08}</Implicit_Task_Info>
+    <Implicit_KindOfTask>{c6b857ea-2f44-436b-b9e1-157851534eb1}</Implicit_KindOfTask>
+    <Implicit_Jitter_Distribution>{baaf82d3-17fe-4295-80ed-2c6c740ed2fc}</Implicit_Jitter_Distribution>
+    <LibraryReferences>{62f5611f-0de7-401b-b0bb-e982073f546f}</LibraryReferences>
   </PropertyGroup>
   <ItemGroup>
-    <PlaceholderReference Include="Tc2_SerialCom">
-      <DefaultResolution>Tc2_SerialCom, * (Beckhoff Automation GmbH)</DefaultResolution>
-      <Namespace>Tc2_SerialCom</Namespace>
+    <PlaceholderReference Include="Tc2_MC2">
+      <DefaultResolution>Tc2_MC2, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_MC2</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_NCI">
+      <DefaultResolution>Tc2_NCI, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_NCI</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_PlcInterpolation">
+      <DefaultResolution>Tc2_PlcInterpolation, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_PlcInterpolation</Namespace>
     </PlaceholderReference>
     <PlaceholderReference Include="Tc2_Standard">
       <DefaultResolution>Tc2_Standard, * (Beckhoff Automation GmbH)</DefaultResolution>
@@ -47,46 +45,30 @@ Number of serial com channels can be specified in the Parameter list.</Descripti
     </PlaceholderReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Custom Datatypes" />
-    <Folder Include="Interfaces" />
-    <Folder Include="Version" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Custom Datatypes\Serial_FunctionResult.TcDUT">
+    <Compile Include="Interpolation_FunctionResult.TcDUT">
       <SubType>Code</SubType>
+      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
     </Compile>
-    <Compile Include="Interfaces\ITF_SerialCommChannel.TcIO">
+    <Compile Include="MAIN.TcPOU">
       <SubType>Code</SubType>
+      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
     </Compile>
-    <Compile Include="Interfaces\ITF_Serial_FastTask.TcIO">
+    <Compile Include="NCIChannel.TcPOU">
       <SubType>Code</SubType>
+      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
     </Compile>
-    <Compile Include="Interfaces\ITF_Serial_StandardTask.TcIO">
+    <Compile Include="NCITable.TcPOU">
       <SubType>Code</SubType>
+      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
     </Compile>
-    <Compile Include="Serial_Channel.TcPOU">
+    <Compile Include="NCI_REF.TcDUT">
       <SubType>Code</SubType>
+      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
     </Compile>
-    <Compile Include="Serial_FastBackgroundTask.TcPOU">
+    <Compile Include="PlcTask.TcTTO">
       <SubType>Code</SubType>
+      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
     </Compile>
-    <Compile Include="Serial_StandardTask.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Custom Datatypes\Serial_COMBUFFER.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Custom Datatypes\Serial_StringFormat.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Version\Global_Version.TcGVL">
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="SerialCommunication.tmc">
-      <SubType>Content</SubType>
-    </Content>
   </ItemGroup>
   <ProjectExtensions>
     <PlcProjectOptions>
@@ -129,67 +111,6 @@ Number of serial com channels can be specified in the Parameter list.</Descripti
           <d n="SubKeys" t="Hashtable" />
           <d n="Values" t="Hashtable" />
         </o>
-        <v>{C70B7845-2722-4a9b-A0EA-88C877A4B36F}</v>
-        <o>
-          <v n="Name">"{C70B7845-2722-4a9b-A0EA-88C877A4B36F}"</v>
-          <d n="SubKeys" t="Hashtable" />
-          <d n="Values" t="Hashtable" ckt="String">
-            <v>MaxAuthenticationTrials</v>
-            <v>3</v>
-            <v>UserList</v>
-            <o t="UserList">
-              <a n="Users" cet="User">
-                <o>
-                  <v n="Id">{d2c3abc4-71a9-4e5f-8a06-4e822aef3040}</v>
-                  <v n="Name">"Owner"</v>
-                  <v n="FullName">""</v>
-                  <v n="Description">""</v>
-                  <v n="Active">true</v>
-                </o>
-              </a>
-            </o>
-            <v>MaxTimeOfInactivity</v>
-            <v>10</v>
-            <v>EnableMaxTimeOfInactivity</v>
-            <v>true</v>
-            <v>GroupList</v>
-            <o t="GroupList">
-              <a n="Groups" cet="Group">
-                <o>
-                  <v n="Id">{6754eb77-3870-4359-98c2-7483767b0a81}</v>
-                  <v n="Name">"Owner"</v>
-                  <v n="Description">""</v>
-                  <v n="IsEveryoneGroup">false</v>
-                  <v n="IsOwnerGroup">true</v>
-                  <l n="UserMembers" t="ArrayList" cet="Guid">
-                    <v>d2c3abc4-71a9-4e5f-8a06-4e822aef3040</v>
-                  </l>
-                  <l n="GroupMembers" t="ArrayList" />
-                </o>
-                <o>
-                  <v n="Id">{69772e81-74c8-4522-9379-6e53fd8ebac8}</v>
-                  <v n="Name">"Everyone"</v>
-                  <v n="Description">""</v>
-                  <v n="IsEveryoneGroup">true</v>
-                  <v n="IsOwnerGroup">false</v>
-                  <l n="UserMembers" t="ArrayList" cet="Guid">
-                    <v>d2c3abc4-71a9-4e5f-8a06-4e822aef3040</v>
-                  </l>
-                  <l n="GroupMembers" t="ArrayList" />
-                </o>
-              </a>
-            </o>
-            <v>UserAuthentication</v>
-            <o t="UserAuthentication">
-              <d n="UserToPasswordHash" t="Hashtable" ckt="Guid" cvt="String">
-                <v>d2c3abc4-71a9-4e5f-8a06-4e822aef3040</v>
-                <v>d41d8cd98f00b204e9800998ecf8427e</v>
-              </d>
-            </o>
-            <v>EnableMaxAuthenticationTrials</v>
-            <v>true</v>
-          </d>
-        </o>
         <v>{192FAD59-8248-4824-A8DE-9177C94C195A}</v>
         <o>
           <v n="Name">"{192FAD59-8248-4824-A8DE-9177C94C195A}"</v>
@@ -205,43 +126,17 @@ Number of serial com channels can be specified in the Parameter list.</Descripti
             <v>False</v>
           </d>
         </o>
-        <v>{246001F4-279D-43AC-B241-948EB31120E1}</v>
-        <o>
-          <v n="Name">"{246001F4-279D-43AC-B241-948EB31120E1}"</v>
-          <d n="SubKeys" t="Hashtable" />
-          <d n="Values" t="Hashtable" />
-        </o>
       </d>
       <d n="Values" t="Hashtable" />
     </o>
   </Data>
   <TypeList>
-    <Type n="ArrayList">System.Collections.ArrayList</Type>
     <Type n="Boolean">System.Boolean</Type>
-    <Type n="Group">{daecd4be-1e2b-4335-a125-4a1ac83ea49f}</Type>
-    <Type n="GroupList">{bf4dffda-f055-446d-9d7a-5f126720896b}</Type>
-    <Type n="Guid">System.Guid</Type>
     <Type n="Hashtable">System.Collections.Hashtable</Type>
-    <Type n="Int32">System.Int32</Type>
     <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
     <Type n="String">System.String</Type>
-    <Type n="User">{cd83029e-13b0-491e-9e4b-921adda0d86b}</Type>
-    <Type n="UserAuthentication">{3635a671-97f5-41bb-9e29-0ebb9795975c}</Type>
-    <Type n="UserList">{9fe6b547-6bc8-4f11-b589-b517860c5891}</Type>
   </TypeList>
 </XmlArchive>
     </PlcProjectOptions>
   </ProjectExtensions>
-  <!-- 
-   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug\</OutputPath>
-    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Release\</OutputPath>
-    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
-  </PropertyGroup>
--->
 </Project>

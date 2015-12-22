@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4018.5">
+  <POU Name="ADS_READ" Id="{81d8663f-738b-4f0f-a205-40209a986dc0}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK ADS_READ
+VAR_INPUT
+	sVarName: STRING := '';
+	iPLC_PORT: UINT;
+	ptrDATAVALUE: PVOID;
+	udiDATASIZE: UDINT;
+END_VAR
+VAR_OUTPUT
+	Message: STRING(255);
+END_VAR
+VAR
+	State: INT := 100;
+	CreateHandle: ADSRDWRT;
+	Data: ADSREAD;
+	DeleteHandle: ADSWRITE;
+	Ads_Handle: UDINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[CASE State OF
+	-1: //IDLING ( NOT IN USE )
+		Message := 'Idling';
+	0:	//HANDLE CREATION STATE
+		IF LEN(sVarName) > 0 THEN
+			CreateHandle(
+				NETID:= '', 
+				PORT:= (iPLC_PORT), 
+				IDXGRP:= ADSIGRP_SYM_HNDBYNAME, 
+				IDXOFFS:= 0, 
+				WRITELEN:= INT_TO_UDINT(Len(sVarName)), 
+				READLEN:= SIZEOF(Ads_Handle), 
+				SRCADDR:= ADR(sVarName), 
+				DESTADDR:= ADR(Ads_Handle), 
+				WRTRD:= TRUE, 
+				TMOUT:= T#500MS );
+			IF CreateHandle.ERR THEN
+				IF CreateHandle.ERRID = 1808 THEN
+					Message := 'Error during creation, type: WRONG NAME, or wrong TARGET PORT';
+				ELSIF CreateHandle.ERRID = 16#11 THEN
+					Message := 'Error during creation, type: TIMEOUT';
+				ELSE 
+					Message := 'Error during creation, type: OTHERS';
+				END_IF
+				State := State;
+				CreateHandle( WRTRD := FALSE );
+			ELSIF NOT CreateHandle.BUSY AND NOT CreateHandle.ERR THEN
+				State := 10;
+				CreateHandle(WRTRD := FALSE);
+				Message := 'No error';
+			END_IF
+		END_IF
+	10:	//READ FROM HANDLE STATE
+		Data(
+			NETID:= '', 
+			PORT:= (iPLC_PORT), 
+			IDXGRP:= ADSIGRP_SYM_VALBYHND, 
+			IDXOFFS:= Ads_Handle, 
+			LEN:= udiDATASIZE, 
+			DESTADDR:= ptrDATAVALUE, 
+			READ:= TRUE );
+		IF DATA.ERR THEN
+			IF DATA.ERRID = 16#711 THEN				// If handle invalid, delete handle
+				State := 100;
+				Data ( READ := FALSE );
+				Message := 'Error during write, type: HANDLE CHANGED';
+			ELSIF DeleteHandle.ERRID = 16#11 THEN	// Else if time out, then back to this step
+				State := State;
+				Data ( READ := FALSE );
+				Message := 'Error during write, type: TIMEOUT';
+			ELSE
+				State := 100;
+				Data ( READ := FALSE );
+				Message := 'Error during write, type: OTHERS';
+			END_IF
+		ELSIF NOT DATA.BUSY AND NOT DATA.ERR THEN
+			State := State;							//Re-read on next cycle, State no change
+			Data ( READ := FALSE );
+			Message := 'No error.';
+		END_IF
+	100://HANDLE DELETION STATE
+		DeleteHandle(
+			NETID:= '', 
+			PORT:= (iPLC_Port), 
+			IDXGRP:= ADSIGRP_SYM_RELEASEHND, 
+			IDXOFFS:= 0, 
+			LEN:= SIZEOF(Ads_Handle), 
+			SRCADDR:= ADR(Ads_Handle), 
+			WRITE:= TRUE, 
+			TMOUT:= T#500MS );
+		IF NOT DeleteHandle.BUSY OR DeleteHandle.ERR THEN 
+			IF DeleteHandle.ERRID = 16#711 THEN 	//If Symbol invalid
+				State := 0;							//Go to the creation
+				DeleteHandle(WRITE := FALSE);		//Finally reset
+				Message := 'Error during deletion, type: INVALID HANDLE';
+			ELSIF DeleteHandle.ERRID = 16#11 THEN	//Else if timeout
+				State := State;						//State no change
+				DeleteHandle(WRITE := FALSE);		//Retry
+				Message := 'Error during deletion, type: TIMEOUT';
+			ELSE									//Everything else
+				State := 0;							//Go to creation
+				DeleteHandle(WRITE := FALSE);		//Finally reset
+				Message := 'No error';
+			END_IF
+		END_IF 
+END_CASE]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

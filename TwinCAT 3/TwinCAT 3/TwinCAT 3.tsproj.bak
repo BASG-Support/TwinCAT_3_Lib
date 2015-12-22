@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4018.0">
+<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4018.13">
 	<Project ProjectGUID="{A5F77BEE-DB81-4156-964D-064D2E7D0374}">
 		<System>
 			<Tasks>
@@ -43,6 +43,15 @@
 				<Instance Id="#x01010060" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
 					<Name>SqliteAdaptor Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+				</Instance>
+			</Project>
+			<Project GUID="{1423A4DE-3C52-4330-BBE4-230972DA141C}" Name="FileIO" PrjFilePath="FileIO\FileIO.plcproj" TmcFilePath="FileIO\FileIO.tmc" ReloadTmc="true" AmsPort="857" FileArchiveSettings="#x000e">
+				<Instance Id="#x01010070" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
+					<Name>FileIO Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+					<TaskPouOids>
+						<TaskPouOid Prio="20" OTCID="#x01010071"/>
+					</TaskPouOids>
 				</Instance>
 			</Project>
 		</Plc>
