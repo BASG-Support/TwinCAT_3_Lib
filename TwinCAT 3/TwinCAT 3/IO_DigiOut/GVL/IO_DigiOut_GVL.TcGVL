@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
-  <GVL Name="IO_DigiOut_GVL" Id="{30e4951a-1160-4fb3-a81c-c42e73b10c4f}">
-    <Declaration><![CDATA[VAR_GLOBAL
-	Digital_Output	AT %Q* : ARRAY[1..MAX_D_OUT] OF BOOL;
-END_VAR]]></Declaration>
-  </GVL>
-</TcPlcObject>

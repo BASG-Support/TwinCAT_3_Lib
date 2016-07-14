@@ -63,6 +63,12 @@
 					</TaskPouOids>
 				</Instance>
 			</Project>
+			<Project GUID="{CFED61F7-2DE2-4027-AD0C-E90C2F191588}" Name="ADS" PrjFilePath="ADS\ADS.plcproj" TmcFilePath="ADS\ADS.tmc" ReloadTmc="true" AmsPort="859" FileArchiveSettings="#x000e">
+				<Instance Id="#x01010090" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
+					<Name>ADS Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+				</Instance>
+			</Project>
 		</Plc>
 	</Project>
 </TcSmProject>

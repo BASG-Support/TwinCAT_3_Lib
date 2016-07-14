@@ -13,6 +13,7 @@ VAR_OUTPUT
 	Message: STRING(255);
 END_VAR
 VAR
+	//
 	State: INT := 100;
 	CreateHandle: ADSRDWRT;
 	Data: ADSWRITE;
