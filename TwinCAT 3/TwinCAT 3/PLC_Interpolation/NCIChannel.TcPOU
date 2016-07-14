@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4018.5">
+  <POU Name="NCIChannel" Id="{20684766-854e-4165-893a-a3c4793a0815}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK NCIChannel
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	nciGroup	: NCI_REF;
+	xyzAxis		: ARRAY[0..2] OF POINTER TO AXIS_REF;
+	auxAxis		: ARRAY[0..4] OF POINTER TO AXIS_REF;
+	nciInit		: CfgBuildExt3DGroup;
+	stTable		: NCITable;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="FB_init" Id="{5f82b28f-3d50-453c-bf13-5d3b09955c85}">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains	: BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode		: BOOL;  // if TRUE, the instance afterwards gets moved into the copy code (online change)
+
+	X_Axis			: POINTER TO AXIS_REF;
+	Y_Axis			: POINTER TO AXIS_REF;
+	Z_Axis			: POINTER TO AXIS_REF;
+	Q1_Axis			: POINTER TO AXIS_REF;
+	Q2_Axis			: POINTER TO AXIS_REF;
+	Q3_Axis			: POINTER TO AXIS_REF;
+	Q4_Axis			: POINTER TO AXIS_REF;
+	Q5_Axis			: POINTER TO AXIS_REF;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[xyzAxis[0] := X_Axis;
+xyzAxis[1] := Y_Axis;
+xyzAxis[2] := Z_Axis;
+
+auxAxis[0] := Q1_Axis;
+auxAxis[1] := Q2_Axis;
+auxAxis[2] := Q3_Axis;
+auxAxis[3] := Q4_Axis;
+auxAxis[4] := Q5_Axis;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Initialise" Id="{765cf981-1104-4189-b0ba-d28f97f84f0a}">
+      <Declaration><![CDATA[METHOD PUBLIC Initialise : Interpolation_FunctionResult
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[nciInit(
+	bExecute:= TRUE, 
+	nGroupId:= NCIGroup.NCTOPLC_nciref.GrpId, 
+	nXAxisId:= xyzAxis[0]^.NcToPlc.AxisId, 
+	nYAxisId:= xyzAxis[1]^.NcToPlc.AxisId, 
+	nZAxisId:= xyzAxis[2]^.NcToPlc.AxisId, 
+	
+	nQ1AxisId:= auxAxis[0]^.NcToPlc.AxisId, 
+	nQ2AxisId:= auxAxis[1]^.NcToPlc.AxisId, 
+	nQ3AxisId:= auxAxis[2]^.NcToPlc.AxisId, 
+	nQ4AxisId:= auxAxis[3]^.NcToPlc.AxisId, 
+	nQ5AxisId:= auxAxis[4]^.NcToPlc.AxisId, 
+	tTimeOut:= T#1S
+	);
+	
+IF NOT nciInit.bBusy AND NOT nciInit.bErr THEN
+	nciInit( bExecute := FALSE );
+	Initialise := Interpolation_FunctionResult.DONE;
+ELSIF nciInit.bErr THEN
+	Initialise := Interpolation_FunctionResult.ERROR;
+ELSE
+	Initialise := Interpolation_FunctionResult.BUSY;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.38">
+  <DUT Name="Motion_AxisGroup" Id="{36e83b5d-735a-42c9-9b52-83249313a719}">
+    <Declaration><![CDATA[TYPE Motion_AxisGroup :
+STRUCT
+	V_X			: LREAL;
+	V_Y			: LREAL;
+	X_AXIS		: INT;
+	Y_AXIS		: INT;
+	STATE		: INT;
+	Y_IS_MASTER	: BOOL;
+	X_DONE		: BOOL;
+	Y_DONE		: BOOL;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4018.0">
+<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4018.16">
 	<Project ProjectGUID="{A5F77BEE-DB81-4156-964D-064D2E7D0374}">
 		<System>
 			<Tasks>
@@ -37,6 +37,30 @@
 				<Instance Id="#x01010050" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
 					<Name>PLC_Interpolation_Library Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+				</Instance>
+			</Project>
+			<Project GUID="{787018B7-2A45-42DD-81FD-35555ECC1A05}" Name="SqliteAdaptor" PrjFilePath="SqliteAdaptor\SqliteAdaptor.plcProj" TmcFilePath="SqliteAdaptor\SqliteAdaptor.tmc" ReloadTmc="true" AmsPort="856" FileArchiveSettings="#x000e">
+				<Instance Id="#x01010060" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
+					<Name>SqliteAdaptor Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+				</Instance>
+			</Project>
+			<Project GUID="{1423A4DE-3C52-4330-BBE4-230972DA141C}" Name="FileIO" PrjFilePath="FileIO\FileIO.plcproj" TmcFilePath="FileIO\FileIO.tmc" ReloadTmc="true" AmsPort="857" FileArchiveSettings="#x000e">
+				<Instance Id="#x01010070" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
+					<Name>FileIO Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+					<TaskPouOids>
+						<TaskPouOid Prio="20" OTCID="#x01010071"/>
+					</TaskPouOids>
+				</Instance>
+			</Project>
+			<Project GUID="{C7E4B4B5-DCFD-4291-A02A-F693F2AFD2CA}" Name="PLC_Interpolation" PrjFilePath="PLC_Interpolation\PLC_Interpolation.plcproj" TmcFilePath="PLC_Interpolation\PLC_Interpolation.tmc" ReloadTmc="true" AmsPort="858" FileArchiveSettings="#x000e">
+				<Instance Id="#x01010080" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
+					<Name>PLC_Interpolation Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+					<TaskPouOids>
+						<TaskPouOid Prio="20" OTCID="#x01010081"/>
+					</TaskPouOids>
 				</Instance>
 			</Project>
 		</Plc>

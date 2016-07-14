@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4018.2">
+  <DUT Name="FunctionResult_Log" Id="{ed2396a8-f253-48fa-97ec-398515224d96}">
+    <Declaration><![CDATA[TYPE FunctionResult_Log :
+(
+	ERROR := -1,
+	BUSY := 0,
+	DONE
+);
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>
