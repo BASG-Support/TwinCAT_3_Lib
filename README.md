@@ -1,5 +1,15 @@
 # TwinCAT_3_Lib
-Basic libraries, that builds upon the standard Beckhoff libraries, to help you get started using TwinCAT 3
+
+Special note to users and contributors
+As a guideline to contribute to this library, classes' (function blocks') multi-cycle methods should always return a DINT result code.
+The guidelines for result code is as follows:
+CODE < 0 is defined as successful execution
+CODE = 0 is defined as busy execution
+CODE > 0 is defined as failed execution
+Special code meanings can be encoded as a multiple of 1's or -1's.
+Existing code prior to this writing (14/Jul/2016) should/might be updated to reflect this new guideline.
+
+This library is provide as-is, and is meant to be used as a foundation to speed up your development when using TwinCAT 3. 
 
 Serial_Communication v1.1
 + (fb)Serial_Channel
@@ -20,3 +30,5 @@ Serial_Communication v1.1
   + Set .CHANNELS to the address of the Serial_Channel array
   + Set .COUNT to the number of channels you have created
   + It contains the method to execute the read/send strings
+
+Motion_Library v1.1
