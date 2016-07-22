@@ -1,0 +1,722 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4019.2">
+  <POU Name="M_ACTUATION" Id="{83f3e86f-be0c-497d-a38a-fa44c7f08578}" SpecialFunc="None">
+    <Declaration><![CDATA[(*
+	Y:2016		M:05		D:20
+	T:CLASS		N:ACTUATION
+	D:Class object for plc motion projects. Contains all basic necessary methods for movement. The default behavior is to home to negative limit.
+*)
+FUNCTION_BLOCK M_ACTUATION IMPLEMENTS IFC_ACTUATION
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	//PDO LINK
+		_DATALINK	: S_ACTUATION_LINK;
+	//MOTION MODULES
+		_M_POWER 	: MC_POWER;
+		_M_RESET 	: MC_RESET;
+		_M_MOVEA 	: MC_MOVEABSOLUTE;
+		_M_MOVER 	: MC_MOVERELATIVE;
+		_M_HOME		: MC_HOME;
+		_M_HALT		: MC_HALT;
+		_M_MOVEV	: MC_MoveVelocity;
+		_M_JOG		: MC_JOG;
+	//DYNAMICS
+		_VELOCITY 		: LREAL := 10;
+		_ACCELERATION 	: LREAL := 0;
+		_DECELERATION 	: LREAL := 0;
+		_JERK 			: LREAL := 0;
+	//
+		_CAL_AT_MINUS	: BOOL := TRUE;
+		_BYPASS_LIMIT	: BOOL := FALSE;
+		_NORMCLOSEDLIMIT: BOOL := FALSE;
+		_HOME_TO_LIMIT	: BOOL := TRUE;
+		_HOME_TO_MINUS	: BOOL := TRUE;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[_M_POWER(
+	Axis:= _DATALINK.NC_INTERFACE,
+	Enable_Positive := _BYPASS_LIMIT OR NOT (_DATALINK.LIMIT_PLUS	XOR _NORMCLOSEDLIMIT),
+	Enable_Negative := _BYPASS_LIMIT OR NOT (_DATALINK.LIMIT_MINUS	XOR _NORMCLOSEDLIMIT)
+); ]]></ST>
+    </Implementation>
+    <Folder Name="Properties" Id="{55b28682-5678-45a1-be86-e8333244c5a9}" />
+    <Folder Name="Methods" Id="{c275f9f3-d1c6-4b25-beb2-8d8e02061585}">
+      <Folder Name="Limits" Id="{211e4cda-c64a-4098-8b66-c118fc519e0a}" />
+      <Folder Name="Manual Motion" Id="{6a2ad7c3-fa55-4d99-8a82-6403d93e8338}" />
+    </Folder>
+    <Method Name="MoveAlong" Id="{00ef76e6-b6fc-4269-a8b5-06183ab08d50}" FolderPath="Methods\">
+      <Declaration><![CDATA[{attribute '''NORMAL__COMMENT' := '
+	Y:2016		M:05	D:20
+	D: Sets the actuation in motion along a direction.
+'}
+(*
+	Y:2016		M:05	D:20
+	D: Sets the actuation in motion along a direction.
+*)
+METHOD MoveAlong : DINT
+VAR_INPUT
+	Positive_Direction	: BOOL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF Positive_Direction THEN
+	_M_MOVEV.Direction := 1;
+ELSE
+	_M_MOVEV.Direction := 3;
+END_IF
+_M_MOVEV(
+	Axis:= _DATALINK.NC_INTERFACE, 
+	Execute:= TRUE, 
+	Velocity:= _VELOCITY, 
+	Acceleration:= _ACCELERATION, 
+	Deceleration:= _DECELERATION, 
+	Jerk:= _JERK );
+IF _M_MOVEV.Error OR _M_MOVEV.CommandAborted THEN
+	_M_MOVEV(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+	MoveAlong := 1;
+	RETURN;
+ELSIF _M_MOVEV.InVelocity THEN
+	_M_MOVEV(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+	MoveAlong := -1;
+	RETURN;
+ELSE
+	MoveAlong := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Controller_Override" Id="{193be9ec-c973-4432-8409-dd473fb9d98f}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY Controller_Override : LREAL
+]]></Declaration>
+      <Set Name="Set" Id="{1c8c7294-e30f-4278-a369-026dcdc5d6b7}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IF Controller_Override > 100 THEN
+	_M_POWER.Override := 100;
+ELSIF Controller_Override < 0 THEN
+	_M_POWER.Override := 0;
+ELSE
+	_M_POWER.Override := Controller_Override;
+END_IF]]></ST>
+        </Implementation>
+      </Set>
+      <Get Name="Get" Id="{a4274d26-c0ff-4b05-84ba-5981b621920c}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Controller_Override := _M_POWER.Override;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="ChangeLimitsType" Id="{1ddc15f6-2863-4bda-801f-07583b5bf074}" FolderPath="Methods\Limits\">
+      <Declaration><![CDATA[METHOD ChangeLimitsType : DINT
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_NORMCLOSEDLIMIT := NOT _NORMCLOSEDLIMIT;
+ChangeLimitsType := -1;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="MoveBy" Id="{1f34c8ee-38ee-4d4f-9a21-b2c7e16ec65c}" FolderPath="Methods\">
+      <Declaration><![CDATA[{attribute '''NORMAL__COMMENT' := '
+	Y:2016		M:05	D:20
+	D: Sets the actuation device in motion for a specified distance.
+'}
+(*
+	Y:2016		M:05	D:20
+	D: Sets the actuation device in motion for a specified distance.
+*)
+METHOD MoveBy : DINT
+VAR_INPUT
+	(*User defined distance to travel. Can be + or -*)
+	{attribute '''NORMAL__COMMENT' := 'User defined distance to travel. Can be + or -'}
+	Distance	: LREAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_M_MOVER(
+	Axis:= _DATALINK.NC_INTERFACE, 
+	Execute:= TRUE, 
+	Distance := Distance, 
+	Velocity:= _VELOCITY, 
+	Acceleration:= _ACCELERATION, 
+	Deceleration:= _DECELERATION, 
+	Jerk:= _JERK );
+IF _M_MOVER.Error OR _M_MOVER.CommandAborted THEN
+	_M_MOVER(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+	MoveBy := 1;
+	RETURN;
+ELSIF _M_MOVER.Done THEN
+	_M_MOVER(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+	MoveBy := -1;
+	RETURN;
+ELSE
+	MoveBy := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Home_To_Limit" Id="{29d7ced5-b76f-4e96-9fdd-3e5af77d28eb}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY Home_To_Limit : BOOL
+]]></Declaration>
+      <Set Name="Set" Id="{0e8b5b27-0b0e-4468-aba5-76c8c83ee286}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_HOME_TO_LIMIT := Home_To_Limit;]]></ST>
+        </Implementation>
+      </Set>
+      <Get Name="Get" Id="{e23010a9-8b71-4ff5-a2bf-239d66e78d04}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[HOME_TO_LIMIT := _HOME_TO_LIMIT;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="Is_LimitsBypassed" Id="{373cb74b-e8e4-49e3-b9f0-66cf621b3cef}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY Is_LimitsBypassed : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{a60fab41-c183-4c34-ac07-77a727ad1cf1}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Is_LimitsBypassed := _BYPASS_LIMIT;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Halt" Id="{387f3cbe-b1e5-4c58-9bc9-af5aa4558ce8}" FolderPath="Methods\">
+      <Declaration><![CDATA[{attribute '''NORMAL__COMMENT' := '
+	Y:2016		M:05	D:20
+	D: Halts the actuation device.
+'}
+(*
+	Y:2016		M:05	D:20
+	D: Halts the actuation device.
+*)
+METHOD Halt : DINT
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_M_HALT(
+	Axis:= _DATALINK.NC_INTERFACE, 
+	Execute:= TRUE, 
+	Deceleration:= _DECELERATION, 
+	Jerk:= _JERK );
+IF _M_HALT.Error OR _M_HALT.CommandAborted THEN
+	_M_HALT(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+	Halt := 1;
+	RETURN;
+ELSIF _M_HALT.Done THEN
+	_M_HALT(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+	Halt := -1;
+	RETURN;
+ELSE
+	Halt := 0;
+	RETURN
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Acceleration" Id="{54106c57-9a39-4c68-9b6d-d72a99bfa911}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY Acceleration : LREAL
+]]></Declaration>
+      <Set Name="Set" Id="{2128e55d-b643-495a-a5d4-d44f8fb0d40d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_ACCELERATION := ACCELERATION;]]></ST>
+        </Implementation>
+      </Set>
+      <Get Name="Get" Id="{72977da6-21db-455a-a873-2a5764e1ad25}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ACCELERATION := _ACCELERATION;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="At_NLim" Id="{5b217b7c-65e3-4c9c-be78-cb4a05a1b038}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY At_NLim : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{ad48e35d-a421-41fe-84c9-4c22c791f61a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[At_NLim := _DATALINK.LIMIT_MINUS;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="EnableLimits" Id="{631ff79c-6ce3-409a-8a12-7e94c303da26}" FolderPath="Methods\Limits\">
+      <Declaration><![CDATA[METHOD EnableLimits : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_BYPASS_LIMIT := FALSE;
+EnableLimits := -1;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Enable" Id="{6a60308c-5281-4f61-8fe8-36874ab375ee}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD Enable : DINT
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[THIS^._M_POWER.Enable := TRUE;
+IF _M_POWER.Error THEN
+	Enable := 1;
+	RETURN;
+ELSIF _M_POWER.Status THEN
+	Enable := -1;
+	RETURN;
+ELSE
+	Enable := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Axis_Id" Id="{734906c3-410e-4bb6-a384-1422a3b7396c}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY Axis_Id : UDINT
+]]></Declaration>
+      <Get Name="Get" Id="{8fc38db6-d913-4834-9dc1-763b4ad6d862}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Axis_Id := _DATALINK.NC_INTERFACE.NcToPlc.AxisId;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="Current_Position" Id="{842602ed-63a0-49f3-8bf3-dcccd76b9127}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY Current_Position : LREAL
+]]></Declaration>
+      <Get Name="Get" Id="{16c537e6-866a-482b-a240-7d5b6b56ff79}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Current_Position := _DATALINK.NC_INTERFACE.NcToPlc.ActPos;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Reset" Id="{877038c4-d3d3-4bf6-b94a-00a483736798}" FolderPath="Methods\">
+      <Declaration><![CDATA[{attribute '''NORMAL__COMMENT' := '
+	Y:2016		M:05	D:20
+	D: Resets the actuation device of any errors. Actuation device currently in motion will be halted.
+'}
+(*
+	Y:2016		M:05	D:20
+	D: Resets the actuation device of any errors. Actuation device currently in motion will be halted.
+*)
+METHOD Reset : DINT
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_M_RESET(
+	Axis:= _DATALINK.NC_INTERFACE, 
+	Execute:= TRUE 
+);
+IF _M_RESET.Error THEN
+	_M_RESET(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE 
+	);
+	Reset := 1;
+	RETURN;
+ELSIF _M_RESET.Done THEN
+	_M_RESET(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE 
+	);
+	Reset := -1;
+	RETURN;
+ELSE
+	Reset := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Disable" Id="{a4601b4a-0b23-4733-b027-79e72515700d}" FolderPath="Methods\">
+      <Declaration><![CDATA[{attribute '''NORMAL__COMMENT' := '
+	Y:2016		M:05	D:20
+	D: Sets the actuation device in a de-energised state, and disable travel on both directions.
+'}
+(*
+	Y:2016		M:05	D:20
+	D: Sets the actuation device in a de-energised state, and disable travel on both directions.
+*)
+METHOD Disable : DINT
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[THIS^._M_POWER.Enable := FALSE;
+IF _M_POWER.Error THEN
+	Disable := 1;
+	RETURN;
+ELSIF NOT _M_POWER.Status THEN
+	Disable := -1;
+	RETURN;
+ELSE
+	Disable := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Deceleration" Id="{b118d466-c4c9-4f0f-be09-5287439939a4}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY Deceleration : LREAL
+]]></Declaration>
+      <Get Name="Get" Id="{3810f951-b397-4cb8-bf7b-641b16843391}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Deceleration := _DECELERATION;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{89e1bc9f-6236-4999-8878-f6aaffe29735}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_DECELERATION := DECELERATION;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="At_PLim" Id="{b3ed0ca1-a302-4084-bf1c-fbc5392f8876}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY At_PLim : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{c31f3310-9b19-41e9-916e-217ade2641db}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[At_NLim := _DATALINK.LIMIT_PLUS;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Home" Id="{baa28ff8-a5e8-4015-9028-5f42405dd56c}" FolderPath="Methods\">
+      <Declaration><![CDATA[{attribute '''NORMAL__COMMENT' := '
+	Y:2016		M:05	D:20
+	D: Initiates the homing sequence for the actuation device. Configure the homing behavior via the class's properties.
+'}
+(*
+	Y:2016		M:05	D:20
+	D: Initiates the homing sequence for the actuation device. Configure the homing behavior via the class's properties.
+*)
+METHOD Home : DINT
+VAR_INPUT
+	CalibrateAtLimit : BOOL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT CalibrateAtLimit THEN
+	_M_HOME.bCalibrationCam := _DATALINK.CALIBRATION_SENSOR;
+ELSE
+	THIS^.BypassLimit();
+	IF THIS^.CalibrationAtMinus THEN
+		_M_HOME.bCalibrationCam := _DATALINK.LIMIT_MINUS XOR _NORMCLOSEDLIMIT;
+	ELSE
+		_M_HOME.bCalibrationCam := _DATALINK.LIMIT_PLUS XOR _NORMCLOSEDLIMIT;
+	END_IF
+END_IF
+_M_HOME(
+	Axis:= _DATALINK.NC_INTERFACE, 
+	Execute:= TRUE );
+IF _M_HOME.Error OR _M_HOME.CommandAborted THEN
+	THIS^.EnableLimits();
+	_M_HOME(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+	Home := 1;
+	RETURN;
+ELSIF _M_HOME.Done THEN
+	THIS^.EnableLimits();
+	_M_HOME(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+	Home := -1;
+	RETURN;
+ELSE
+	Home := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Is_Disabled" Id="{bc1d2744-2440-4b34-99d8-ad08eec74bc3}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY Is_Disabled : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{8591fa90-2a20-4d53-bc61-cbf71ce0cb0f}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_DATALINK.NC_INTERFACE.ReadStatus();
+Is_Disabled := _DATALINK.NC_INTERFACE.Status.Disabled;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="Is_Error" Id="{c1f25efa-1356-4238-aa85-8cc51ce21937}" FolderPath="Properties\">
+      <Declaration><![CDATA[{warning 'add property implementation'}
+PROPERTY Is_Error : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{4c867a08-ce68-45e7-b7ab-1e12aa82a6fa}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_DATALINK.NC_INTERFACE.ReadStatus();
+Is_Error := _DATALINK.NC_INTERFACE.Status.Error;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="Velocity" Id="{c298a733-cd8c-4b19-a021-8625eedff4cb}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY Velocity : LREAL
+]]></Declaration>
+      <Set Name="Set" Id="{66d13cf5-55ac-41a0-8735-9e7e378b212a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_VELOCITY := VELOCITY;]]></ST>
+        </Implementation>
+      </Set>
+      <Get Name="Get" Id="{f1a3dc6d-9a86-462f-9c6b-74fc7a2e5704}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Velocity := _VELOCITY;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="BypassLimit" Id="{cd8fc6b5-edda-4ab3-b51f-fc6e8d47141a}" FolderPath="Methods\Limits\">
+      <Declaration><![CDATA[METHOD BypassLimit : DINT
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_BYPASS_LIMIT := TRUE;
+BypassLimit := -1;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Current_Velocity" Id="{d736ebf9-df2b-45c6-9918-4fda31638e95}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY Current_Velocity : LREAL
+]]></Declaration>
+      <Get Name="Get" Id="{ab4153e2-3dc8-45f4-8dba-230c3cc2075a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Current_Position := _DATALINK.NC_INTERFACE.NcToPlc.ActVelo;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="Is_Moving" Id="{dd494614-e717-488f-a8ff-3e8d5b1d4c12}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY Is_Moving : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{2aa21554-d5a0-491a-85f6-5c7e03af50a7}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_DATALINK.NC_INTERFACE.ReadStatus();
+Is_Moving := _DATALINK.NC_INTERFACE.Status.Moving;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="BeginJog" Id="{dfbbeb95-04d7-4ea6-8e66-2462c7c0d3a2}" FolderPath="Methods\Manual Motion\">
+      <Declaration><![CDATA[{attribute '''NORMAL__COMMENT' := '
+	Y:2016		M:05	D:20
+	D: Initiates the manual motion of the actuation device. Keep the method running for as long as manual motion is required. Terminate manual motion by calling the opposite method.
+'}
+(*
+	Y:2016		M:05	D:20
+	D: Initiates the manual motion of the actuation device. Keep the method running for as long as manual motion is required. Terminate manual motion by calling the opposite method.
+*)
+METHOD BeginJog : DINT
+VAR_INPUT
+	Towards_Positive	: BOOL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_M_JOG(
+	Axis:= _DATALINK.NC_INTERFACE, 
+	JogForward:= Towards_Positive, 
+	JogBackwards:= NOT Towards_Positive, 
+	Mode:= MC_JOGMODE_CONTINOUS, 
+	Velocity:= _VELOCITY, 
+	Acceleration:= _ACCELERATION, 
+	Deceleration:= _DECELERATION, 
+	Jerk:= _JERK );
+IF _M_JOG.Error THEN
+	_M_JOG(
+		Axis := _DATALINK.NC_INTERFACE,
+		JogForward := FALSE,
+		JogBackwards := FALSE );
+	BeginJog := 1;
+	RETURN;
+ELSIF _M_JOG.Active THEN
+	BeginJog := -1;
+	RETURN;
+ELSE
+	BeginJog := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Is_LimitsNormallyClosed" Id="{e679afde-9543-41e5-9715-90d2856d0202}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY Is_LimitsNormallyClosed : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{50065e0f-f775-4406-8452-3374f4fed4c3}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Is_LimitsNormallyClosed := _NORMCLOSEDLIMIT]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="MoveTo" Id="{e78f24ac-7342-401a-9ff6-96de06143dc5}" FolderPath="Methods\">
+      <Declaration><![CDATA[{attribute '''NORMAL__COMMENT' := '
+	Y:2016		M:05	D:20
+	D: Sets the actuation in motion to the target position.
+'}
+(*
+	Y:2016		M:05	D:20
+	D: Sets the actuation in motion to the target position.
+*)
+METHOD MoveTo : DINT
+VAR_INPUT
+	(*User defined position to travel. Can be + or -*)
+	{attribute '''NORMAL__COMMENT' := 'User defined position to travel. Can be + or -'}
+	POSITION	: LREAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_M_MOVEA(
+	Axis:= _DATALINK.NC_INTERFACE, 
+	Execute:= TRUE, 
+	Position:= POSITION, 
+	Velocity:= _VELOCITY, 
+	Acceleration:= _ACCELERATION, 
+	Deceleration:= _DECELERATION, 
+	Jerk:= _JERK );
+IF _M_MOVEA.Error OR _M_MOVEA.CommandAborted THEN
+	_M_MOVEA(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+	MoveTo := 1;
+	RETURN;
+ELSIF _M_MOVEA.Done THEN
+	_M_MOVEA(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+	MoveTo := -1;
+	RETURN;
+ELSE
+	MoveTo := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Hw_ErrorId" Id="{ef4b75d0-8681-4ecd-97b0-610932d0311a}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY Hw_ErrorId : DINT
+]]></Declaration>
+      <Get Name="Get" Id="{6f3c391d-2e75-41fb-a1cc-481784300f2d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Hw_ErrorId := _DATALINK.HARDWARE_ERROR_ID;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="EndJog" Id="{f21288cf-b112-46ca-b37c-f646b77c1acd}" FolderPath="Methods\Manual Motion\">
+      <Declaration><![CDATA[{attribute '''NORMAL__COMMENT' := '
+	Y:2016		M:05	D:20
+	D: Terminates the manual motion of the actuation device.
+'}
+{warning 'add method implementation'}
+(*
+	Y:2016		M:05	D:20
+	D: Terminates the manual motion of the actuation device.
+*)
+METHOD EndJog : DINT
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_M_JOG(
+	Axis:= _DATALINK.NC_INTERFACE, 
+	JogForward:= FALSE, 
+	JogBackwards:= FALSE, 
+	Mode:= MC_JOGMODE_CONTINOUS, 
+	Velocity:= _VELOCITY, 
+	Acceleration:= _ACCELERATION, 
+	Deceleration:= _DECELERATION, 
+	Jerk:= _JERK );
+IF _M_JOG.Error THEN
+	BeginJog := 1;
+	RETURN;
+ELSE
+	BeginJog := -1;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="CalibrationAtMinus" Id="{fc78f328-d74a-433c-b681-ab763e17a560}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY CalibrationAtMinus : BOOL]]></Declaration>
+      <Set Name="Set" Id="{99dbc660-394f-48b7-a6ba-e39337697532}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_CAL_AT_MINUS := CalibrationAtMinus;]]></ST>
+        </Implementation>
+      </Set>
+      <Get Name="Get" Id="{e78ecb6e-1a4f-4bd9-a59f-2a958cce7a16}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CalibrationAtMinus := _CAL_AT_MINUS;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="Jerk" Id="{ffde50c5-85d7-40db-8155-2acf0d2c35e3}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY Jerk : LREAL
+]]></Declaration>
+      <Get Name="Get" Id="{73762e6b-a235-4465-af7d-68a36682800e}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Jerk := _JERK;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{842863d5-d8fd-455c-8d9c-e864ee19b767}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_JERK := JERK;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+  </POU>
+</TcPlcObject>
