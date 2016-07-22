@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4018.16">
-	<Project ProjectGUID="{A5F77BEE-DB81-4156-964D-064D2E7D0374}">
+<TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4020.0">
+	<Project ProjectGUID="{A5F77BEE-DB81-4156-964D-064D2E7D0374}" ShowHideConfigurations="#x6">
 		<System>
 			<Tasks>
 				<Task Id="2" Priority="20" CycleTime="100000" AmsPort="350">
@@ -18,18 +18,6 @@
 			<Project GUID="{8D406A80-2E75-466F-84CE-D02B49BECCA8}" Name="Motion_Library" PrjFilePath="Motion_Library\Motion_Library.plcProj" TmcFilePath="Motion_Library\Motion_Library.tmc" ReloadTmc="true" AmsPort="852" TargetArchiveSettings="#x0002" FileArchiveSettings="#x0000">
 				<Instance Id="#x01010020" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
 					<Name>Motion_Library Instance</Name>
-					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
-				</Instance>
-			</Project>
-			<Project GUID="{239EFFC8-E5C4-4FCA-90C6-85A2560AAB39}" Name="IO_DigiIn" PrjFilePath="IO_DigiIn\IO_DigiIn.plcProj" TmcFilePath="IO_DigiIn\IO_DigiIn.tmc" ReloadTmc="true" AmsPort="854" FileArchiveSettings="#x000e">
-				<Instance Id="#x01010040" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
-					<Name>IO_DigiIn Instance</Name>
-					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
-				</Instance>
-			</Project>
-			<Project GUID="{5022EABD-C632-46E1-BF7C-476600D6E44E}" Name="IO_DigiOut" PrjFilePath="IO_DigiOut\IO_DigiOut.plcproj" TmcFilePath="IO_DigiOut\IO_DigiOut.tmc" ReloadTmc="true" AmsPort="853" FileArchiveSettings="#x000e">
-				<Instance Id="#x01010030" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
-					<Name>IO_DigiOut Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 				</Instance>
 			</Project>

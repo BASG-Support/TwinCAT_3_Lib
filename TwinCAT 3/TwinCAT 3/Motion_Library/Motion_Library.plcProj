@@ -14,73 +14,17 @@
     <Implicit_Jitter_Distribution>{4d79e0d3-d5ef-4e6d-9f91-4b2f6a6ccabb}</Implicit_Jitter_Distribution>
     <LibraryReferences>{301df436-507f-40f5-bc31-d75d8e8acf74}</LibraryReferences>
     <Company>Chua Siang Poh</Company>
-    <Released>True</Released>
+    <Released>true</Released>
     <Title>MotionControl_Lib</Title>
     <Author>Chua Siang Poh</Author>
     <Description>For projects that require at least 1 motion axis.
 The library is meant as an easy-to-setup module. 
-Only requring the change of a parameter.
-Other motion functions are exposed as a method.
-Includes a very simple/crude type of linear interpolation.</Description>
-    <ProjectVersion>1.1</ProjectVersion>
+Motion functions are exposed as object methods.</Description>
+    <ProjectVersion>2.0</ProjectVersion>
     <!--    <OutputType>Exe</OutputType>
     <RootNamespace>MyApplication</RootNamespace>
     <AssemblyName>MyApplication</AssemblyName>-->
   </PropertyGroup>
-  <ItemGroup>
-    <Folder Include="Motion" />
-    <Folder Include="Motion\Custom Datatypes" />
-    <Folder Include="Motion\Interfaces" />
-    <Folder Include="Version" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Interpolate.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Motion\Custom Datatypes\Motion_Axis.TcDUT">
-      <SubType>Code</SubType>
-      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
-    </Compile>
-    <Compile Include="Motion\Custom Datatypes\Motion_AxisGroup.TcDUT">
-      <SubType>Code</SubType>
-      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
-    </Compile>
-    <Compile Include="Motion\Custom Datatypes\Motion_FunctionResult.TcDUT">
-      <SubType>Code</SubType>
-      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
-    </Compile>
-    <Compile Include="Motion\Custom Datatypes\Motion_HmiToPlc.TcDUT">
-      <SubType>Code</SubType>
-      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
-    </Compile>
-    <Compile Include="Motion\Custom Datatypes\Motion_PlcToHmi.TcDUT">
-      <SubType>Code</SubType>
-      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
-    </Compile>
-    <Compile Include="Motion\Interfaces\ITF_AXIS.TcIO">
-      <SubType>Code</SubType>
-      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
-    </Compile>
-    <Compile Include="Motion\Interfaces\ITF_MotionControl.TcIO">
-      <SubType>Code</SubType>
-      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
-    </Compile>
-    <Compile Include="Motion\Motion_Control.TcPOU">
-      <SubType>Code</SubType>
-      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
-    </Compile>
-    <Compile Include="Motion\Motion_Object.TcPOU">
-      <SubType>Code</SubType>
-      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
-    </Compile>
-    <Compile Include="Motion\Motion_Parameters.TcGVL">
-      <SubType>Code</SubType>
-      <ObjectProtection>00000000-0000-0000-0000-000000000000</ObjectProtection>
-    </Compile>
-    <Compile Include="Version\Global_Version.TcGVL">
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
   <ItemGroup>
     <Content Include="Motion_Library.tmc">
       <SubType>Content</SubType>
@@ -108,11 +52,31 @@ Includes a very simple/crude type of linear interpolation.</Description>
       <Namespace>Tc3_Module</Namespace>
     </PlaceholderReference>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Base Component" />
+    <Folder Include="Base Component\Class" />
+    <Folder Include="Base Component\Data" />
+    <Folder Include="Base Component\Interface" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Base Component\Class\M_ACTUATION.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base Component\Class\M_ACTUATION_EXT_HOMING.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base Component\Data\S_ACTUATION_LINK.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base Component\Interface\IFC_ACTUATION.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
   <ProjectExtensions>
     <PlcProjectOptions>
       <XmlArchive>
-  <Data>
-    <o xml:space="preserve" t="OptionKey">
+        <Data>
+          <o xml:space="preserve" t="OptionKey">
       <v n="Name">"&lt;ProjectRoot&gt;"</v>
       <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
         <v>{FE9F63D4-9E34-43ce-9322-D46747A00F33}</v>
@@ -247,23 +211,23 @@ Includes a very simple/crude type of linear interpolation.</Description>
       </d>
       <d n="Values" t="Hashtable" />
     </o>
-  </Data>
-  <TypeList>
-    <Type n="ArrayList">System.Collections.ArrayList</Type>
-    <Type n="Boolean">System.Boolean</Type>
-    <Type n="Group">{daecd4be-1e2b-4335-a125-4a1ac83ea49f}</Type>
-    <Type n="GroupList">{bf4dffda-f055-446d-9d7a-5f126720896b}</Type>
-    <Type n="Guid">System.Guid</Type>
-    <Type n="Guid[]">System.Guid[]</Type>
-    <Type n="Hashtable">System.Collections.Hashtable</Type>
-    <Type n="Int32">System.Int32</Type>
-    <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
-    <Type n="String">System.String</Type>
-    <Type n="User">{cd83029e-13b0-491e-9e4b-921adda0d86b}</Type>
-    <Type n="UserAuthentication">{3635a671-97f5-41bb-9e29-0ebb9795975c}</Type>
-    <Type n="UserList">{9fe6b547-6bc8-4f11-b589-b517860c5891}</Type>
-  </TypeList>
-</XmlArchive>
+        </Data>
+        <TypeList>
+          <Type n="ArrayList">System.Collections.ArrayList</Type>
+          <Type n="Boolean">System.Boolean</Type>
+          <Type n="Group">{daecd4be-1e2b-4335-a125-4a1ac83ea49f}</Type>
+          <Type n="GroupList">{bf4dffda-f055-446d-9d7a-5f126720896b}</Type>
+          <Type n="Guid">System.Guid</Type>
+          <Type n="Guid[]">System.Guid[]</Type>
+          <Type n="Hashtable">System.Collections.Hashtable</Type>
+          <Type n="Int32">System.Int32</Type>
+          <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
+          <Type n="String">System.String</Type>
+          <Type n="User">{cd83029e-13b0-491e-9e4b-921adda0d86b}</Type>
+          <Type n="UserAuthentication">{3635a671-97f5-41bb-9e29-0ebb9795975c}</Type>
+          <Type n="UserList">{9fe6b547-6bc8-4f11-b589-b517860c5891}</Type>
+        </TypeList>
+      </XmlArchive>
     </PlcProjectOptions>
   </ProjectExtensions>
   <!-- 
