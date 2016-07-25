@@ -57,6 +57,15 @@
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 				</Instance>
 			</Project>
+			<Project GUID="{8E4F8821-E0B1-4457-94DB-46490E98CF0D}" Name="Stream_lib" PrjFilePath="Stream_lib\Stream_lib.plcProj" TmcFilePath="Stream_lib\Stream_lib.tmc" ReloadTmc="true" AmsPort="853" FileArchiveSettings="#x000e">
+				<Instance Id="#x01010030" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
+					<Name>Stream_lib Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+					<TaskPouOids>
+						<TaskPouOid Prio="20" OTCID="#x01010031"/>
+					</TaskPouOids>
+				</Instance>
+			</Project>
 		</Plc>
 	</Project>
 </TcSmProject>

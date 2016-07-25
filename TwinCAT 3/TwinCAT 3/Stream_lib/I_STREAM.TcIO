@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4019.2">
+  <Itf Name="I_STREAM" Id="{5953bfdd-a48b-492a-8c79-c85297f262b9}">
+    <Declaration><![CDATA[INTERFACE I_STREAM
+]]></Declaration>
+    <Folder Name="Methods" Id="{56776e1f-2871-4f00-b8cd-81b909631ce0}" />
+    <Folder Name="Properties" Id="{ce63abcd-9d4d-4c5d-bee2-b335a96933fc}" />
+    <Property Name="BufferSize" Id="{c34623ff-2a57-426e-9040-e574610d22c1}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY BufferSize : UDINT]]></Declaration>
+      <Get Name="Get" Id="{7b4c4e1e-56d7-4a56-a628-da38827bbb2e}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="Close" Id="{bff1604a-fcb7-4ff1-b43a-637de2b8f049}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD Close : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Property Name="EndOfStream" Id="{a2d4d65e-a939-4187-8b6b-aa87b84d2607}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY EndOfStream : BOOL]]></Declaration>
+      <Get Name="Get" Id="{1aad2dfb-9cba-4b96-9d3e-9bc2a19318b2}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="New" Id="{e1ec388c-7809-4154-93de-6f96de4c57a0}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD New : DINT
+VAR_INPUT
+	StreamSize : UDINT;
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="Peek" Id="{045b16e8-4d45-45b7-baf5-0fa9c4b7503c}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD Peek : DINT
+VAR_INPUT
+	ptr_DataOut : POINTER TO BYTE;
+END_VAR
+]]></Declaration>
+    </Method>
+    <Property Name="Position" Id="{715bd596-28d4-44c9-aaec-3c9a90d6dfab}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY Position : UDINT]]></Declaration>
+      <Get Name="Get" Id="{e179f4bd-a493-4d3f-89f8-b7f480327d3b}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="Read" Id="{47521f98-ffb6-4e89-a486-d3df4188fd2c}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD Read : DINT
+VAR_INPUT
+	ptr_DataOut : PVOID;
+	Length		: UDINT;
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="Seek" Id="{a9835b55-ed84-4d8c-857e-520d4704ffd4}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD Seek : DINT
+VAR_INPUT
+	Offset 		: UDINT;
+	SeekStyle 	: E_STREAMSEEKTYPE;
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="Write" Id="{15d84086-0ea3-4075-a1ad-afdb7c819e01}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD Write : DINT
+VAR_INPUT
+	ptr_DataIn	: PVOID;
+	Length		: UDINT;
+END_VAR
+]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>
