@@ -37,17 +37,24 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Base Component" />
+    <Folder Include="Interface" />
     <Folder Include="Project Information" />
     <Folder Include="Version" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Base Component\ByteStream.TcPOU">
+    <Compile Include="Base Component\C_BINARYREADER.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="E_STREAMSEEKTYPE.TcDUT">
+    <Compile Include="Base Component\C_BINARYWRITER.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="I_STREAM.TcIO">
+    <Compile Include="Base Component\C_BINARYSTREAM.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base Component\E_STREAMSEEKTYPE.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Interface\I_STREAM.TcIO">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Project Information\F_GetCompany.TcPOU">
@@ -65,6 +72,11 @@
     <Compile Include="Version\Global_Version.TcGVL">
       <SubType>Code</SubType>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Stream_lib.tmc">
+      <SubType>Content</SubType>
+    </None>
   </ItemGroup>
   <ProjectExtensions>
     <PlcProjectOptions>

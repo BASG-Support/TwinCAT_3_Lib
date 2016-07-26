@@ -23,13 +23,12 @@ END_VAR
         <Declaration><![CDATA[]]></Declaration>
       </Get>
     </Property>
-    <Method Name="New" Id="{e1ec388c-7809-4154-93de-6f96de4c57a0}" FolderPath="Methods\">
-      <Declaration><![CDATA[METHOD New : DINT
-VAR_INPUT
-	StreamSize : UDINT;
-END_VAR
-]]></Declaration>
-    </Method>
+    <Property Name="IsValid" Id="{ac69761a-0435-4af0-bd1f-5705d786d8a1}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY IsValid : BOOL]]></Declaration>
+      <Get Name="Get" Id="{0903634d-092e-4a4b-8715-b863d40231f0}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
     <Method Name="Peek" Id="{045b16e8-4d45-45b7-baf5-0fa9c4b7503c}" FolderPath="Methods\">
       <Declaration><![CDATA[METHOD Peek : DINT
 VAR_INPUT
