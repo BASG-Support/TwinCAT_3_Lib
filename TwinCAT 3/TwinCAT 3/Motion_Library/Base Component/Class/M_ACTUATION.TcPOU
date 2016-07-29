@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4019.2">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
   <POU Name="M_ACTUATION" Id="{83f3e86f-be0c-497d-a38a-fa44c7f08578}" SpecialFunc="None">
     <Declaration><![CDATA[(*
 	Y:2016		M:05		D:20
@@ -214,7 +214,21 @@ END_VAR
 METHOD Halt : DINT
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_M_HALT(
+        <ST><![CDATA[//Resets other move function blocks
+	_M_MOVEV(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+	_M_MOVEA(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+	_M_MOVER(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+//Resets other home function block
+	_M_HOME(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+_M_HALT(
 	Axis:= _DATALINK.NC_INTERFACE, 
 	Execute:= TRUE, 
 	Deceleration:= _DECELERATION, 
@@ -233,7 +247,7 @@ ELSIF _M_HALT.Done THEN
 	RETURN;
 ELSE
 	Halt := 0;
-	RETURN
+	RETURN;
 END_IF]]></ST>
       </Implementation>
     </Method>
@@ -332,7 +346,25 @@ END_VAR
 METHOD Reset : DINT
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_M_RESET(
+        <ST><![CDATA[//Resets other move function blocks
+	_M_MOVEV(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+	_M_MOVEA(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+	_M_MOVER(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+//Resets other home function block
+	_M_HOME(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+//Resets other halt function block
+	_M_HALT(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );		
+_M_RESET(
 	Axis:= _DATALINK.NC_INTERFACE, 
 	Execute:= TRUE 
 );
@@ -409,7 +441,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[At_NLim := _DATALINK.LIMIT_PLUS;]]></ST>
+          <ST><![CDATA[At_PLim := _DATALINK.LIMIT_PLUS;]]></ST>
         </Implementation>
       </Get>
     </Property>
@@ -475,8 +507,7 @@ Is_Disabled := _DATALINK.NC_INTERFACE.Status.Disabled;]]></ST>
       </Get>
     </Property>
     <Property Name="Is_Error" Id="{c1f25efa-1356-4238-aa85-8cc51ce21937}" FolderPath="Properties\">
-      <Declaration><![CDATA[{warning 'add property implementation'}
-PROPERTY Is_Error : BOOL
+      <Declaration><![CDATA[PROPERTY Is_Error : BOOL
 ]]></Declaration>
       <Get Name="Get" Id="{4c867a08-ce68-45e7-b7ab-1e12aa82a6fa}">
         <Declaration><![CDATA[VAR
@@ -524,7 +555,7 @@ BypassLimit := -1;]]></ST>
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[Current_Position := _DATALINK.NC_INTERFACE.NcToPlc.ActVelo;]]></ST>
+          <ST><![CDATA[Current_Velocity := _DATALINK.NC_INTERFACE.NcToPlc.ActVelo;]]></ST>
         </Implementation>
       </Get>
     </Property>
@@ -589,7 +620,7 @@ END_IF]]></ST>
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[Is_LimitsNormallyClosed := _NORMCLOSEDLIMIT]]></ST>
+          <ST><![CDATA[Is_LimitsNormallyClosed := _NORMCLOSEDLIMIT;]]></ST>
         </Implementation>
       </Get>
     </Property>
@@ -653,7 +684,6 @@ END_VAR
 	Y:2016		M:05	D:20
 	D: Terminates the manual motion of the actuation device.
 '}
-{warning 'add method implementation'}
 (*
 	Y:2016		M:05	D:20
 	D: Terminates the manual motion of the actuation device.
@@ -671,10 +701,10 @@ METHOD EndJog : DINT
 	Deceleration:= _DECELERATION, 
 	Jerk:= _JERK );
 IF _M_JOG.Error THEN
-	BeginJog := 1;
+	EndJog := 1;
 	RETURN;
 ELSE
-	BeginJog := -1;
+	EndJog := -1;
 	RETURN;
 END_IF]]></ST>
       </Implementation>
