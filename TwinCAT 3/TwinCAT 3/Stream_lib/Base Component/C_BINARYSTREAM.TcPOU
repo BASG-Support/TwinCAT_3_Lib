@@ -1,0 +1,226 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4019.2">
+  <POU Name="C_BINARYSTREAM" Id="{62e0f9e8-dbe2-4b8a-93c1-515395b38f95}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK C_BINARYSTREAM IMPLEMENTS I_STREAM
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	_MEMBUFFER 	: POINTER TO BYTE;
+	_POSITION				: UDINT;
+	_PERMISSIBLE_LIMIT 		: UDINT;
+	_MEMSIZE	: UDINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="Methods" Id="{0b2d05ef-671b-442e-8b82-fc2ea9f8c08d}">
+      <Folder Name="internal" Id="{54f1fb5c-57f6-41fd-a892-dcc9d93fc6fa}" />
+    </Folder>
+    <Folder Name="Properties" Id="{6c6b5bf0-3eda-481e-bfb9-3a069572892e}" />
+    <Property Name="BufferSize" Id="{e84bbcf7-6c69-4399-a98c-83b895eecd16}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY BufferSize : UDINT]]></Declaration>
+      <Get Name="Get" Id="{179d321f-648e-4286-8e90-d43f9bcee4db}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[BufferSize := _MEMSIZE;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Close" Id="{08fbbf1f-4aae-4b22-8aa3-912a003574fd}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD Close : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _MEMBUFFER <> 0 THEN
+	__DELETE(_MEMBUFFER);
+	_MEMBUFFER := 0;
+END_IF
+_POSITION := 0;
+_PERMISSIBLE_LIMIT := 0;
+_MEMSIZE := 0;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="EndOfStream" Id="{6f6204a8-4c51-4744-b888-186b853df35c}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY EndOfStream : BOOL]]></Declaration>
+      <Get Name="Get" Id="{a41f174f-7aeb-44e4-a885-25ef102b07f7}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IF _MEMBUFFER <> 0 THEN
+	EndOfStream := _POSITION > _PERMISSIBLE_LIMIT;
+ELSE
+	EndOfStream := TRUE;
+END_IF]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="FB_exit" Id="{b11a3324-5538-46dc-8d5f-934cc25c15a1}" FolderPath="Methods\internal\">
+      <Declaration><![CDATA[METHOD FB_exit : BOOL
+VAR_INPUT
+	bInCopyCode : BOOL; // if TRUE, the exit method is called for exiting an instance that is copied afterwards (online change).
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT bInCopyCode THEN
+    CLOSE();
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="IsValid" Id="{ccc8adb0-a01a-484e-b272-108dd7287bc0}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY IsValid : BOOL]]></Declaration>
+      <Get Name="Get" Id="{b442281c-c63e-4130-a85d-86d73a2f050e}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IsValid := _MEMBUFFER <> 0;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="New" Id="{a99da4fd-71fa-4498-bd8a-8613142ce195}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD New : DINT
+VAR_INPUT
+	StreamSize	: UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _MEMBUFFER <> 0 THEN
+	__DELETE(_MEMBUFFER);
+END_IF
+_MEMSIZE 				:= StreamSize;
+_PERMISSIBLE_LIMIT	 	:= _MEMSIZE - 1;
+_POSITION 				:= 0;
+_MEMBUFFER 				:= __NEW(BYTE, _MEMSIZE);
+
+New := -1;
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Peek" Id="{b55022f1-6b56-4453-a1d2-a9cb27ac413b}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD Peek : DINT
+VAR_INPUT
+	ptr_DataOut	: POINTER TO BYTE;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF EndOfStream THEN
+	Peek := 1; 
+	RETURN;
+ELSE
+	ptr_DataOut^ := _MEMBUFFER[_POSITION];
+	Peek := -1;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Position" Id="{08d8c6ae-ecef-4196-beff-1e8ef3e864f8}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY Position : UDINT
+]]></Declaration>
+      <Get Name="Get" Id="{811722b0-cc41-4d04-8f0f-b51038402954}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[POSITION := _POSITION;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Read" Id="{b4bddcc6-9e3b-4b71-b85e-6d32c4f72b04}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD Read : DINT
+VAR_INPUT
+	ptr_DataOut	: PVOID;
+	Length		: UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF EndOfStream THEN
+	Read := 1;
+	RETURN;
+ELSE
+	IF _POSITION + Length > _MEMSIZE THEN
+		Read := 1;
+		RETURN;
+	ELSE
+		MEMCPY(ptr_DataOut, _MEMBUFFER + _POSITION, Length);
+		_POSITION := _POSITION + Length;
+		Read := -1;
+		RETURN;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Seek" Id="{5dc293f4-09ce-403d-a65e-b36da8ae37a2}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD Seek : DINT
+VAR_INPUT
+	Offset		: UDINT;	//Permissible range is 0 upto the total buffer size - 1;
+	SeekStyle	: E_STREAMSEEKTYPE;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE SeekStyle OF 
+	//Offsets from the beginning of the stream
+	E_STREAMSEEKTYPE.Origin:
+		IF Offset > _PERMISSIBLE_LIMIT THEN
+			Seek := 1;
+			RETURN;
+		ELSE
+			_POSITION := Offset;
+			Seek := -1;
+			RETURN;
+		END_IF
+	//Offsets from the end of the stream
+	E_STREAMSEEKTYPE.End:
+		IF Offset > _PERMISSIBLE_LIMIT THEN
+			Seek := 1;
+			RETURN;
+		ELSE
+			_POSITION := (_PERMISSIBLE_LIMIT) - Offset;
+			Seek := -1;
+			RETURN;
+		END_IF
+	//Offsets from the current position of the stream
+	E_STREAMSEEKTYPE.Current:
+		IF _POSITION + Offset > _PERMISSIBLE_LIMIT THEN
+			Seek := 1;
+			RETURN;
+		ELSE
+			_POSITION := _POSITION + Offset;
+			Seek := -1;
+			RETURN;
+		END_IF
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Write" Id="{a7b3a4e1-8e6e-49b0-bf17-937a48229722}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD Write : DINT
+VAR_INPUT
+	ptr_DataIn	: PVOID;
+	Length		: UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF EndOfStream THEN
+	Write := 1;
+	RETURN;
+ELSE
+	IF _POSITION + Length > _MEMSIZE THEN
+		Write := 1;
+		RETURN;
+	ELSE
+		MEMCPY(_MEMBUFFER + _POSITION, ptr_DataIn, Length);
+		_POSITION := _POSITION + Length;
+		Write := -1;
+		RETURN;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

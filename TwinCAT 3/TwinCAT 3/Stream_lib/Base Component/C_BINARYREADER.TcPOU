@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4019.2">
+  <POU Name="C_BINARYREADER" Id="{3b66d005-3f47-4af4-a375-894516dc8bea}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK C_BINARYREADER
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	_BASESTREAM 	: I_STREAM;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="BaseStream" Id="{71cc1926-e2dc-417b-be5f-3e2a654df2aa}">
+      <Declaration><![CDATA[PROPERTY BaseStream : I_STREAM]]></Declaration>
+      <Get Name="Get" Id="{e0c76d2d-5cef-40c9-82e4-8af46b1fce9d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[BaseStream := _BASESTREAM;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Close" Id="{de3cb16b-5206-41f8-a6b6-71c7bc0eb741}">
+      <Declaration><![CDATA[METHOD Close : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Close := _BASESTREAM.Close();
+_BASESTREAM := 0;
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="New" Id="{4608d601-859c-47f4-831c-e01655b347f4}">
+      <Declaration><![CDATA[METHOD New : DINT
+VAR_INPUT
+	STREAM : I_STREAM;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF STREAM = 0 THEN
+	New := 1;
+	RETURN;
+ELSE
+	IF STREAM.IsValid THEN
+		_BASESTREAM := STREAM;
+		_BASESTREAM.Seek( 0, E_STREAMSEEKTYPE.Origin);
+		New := -1;
+		RETURN;
+	ELSE
+		New := 1;
+		RETURN;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ReadBool" Id="{76d45542-60ae-421d-a421-b25cd500e521}">
+      <Declaration><![CDATA[METHOD ReadBool : DINT
+VAR_INPUT
+	out_data : POINTER TO BOOL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	ReadBool := 1;
+	RETURN;
+END_IF
+
+ReadBool := _BASESTREAM.Read(out_data , 1);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ReadBytes" Id="{369d9618-2206-40c5-ad7f-cfb8812abbed}">
+      <Declaration><![CDATA[METHOD ReadBytes : DINT
+VAR_INPUT
+	out_data 	: POINTER TO BYTE;
+	length		: UDINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	ReadBytes := 1;
+	RETURN;
+END_IF
+
+ReadBytes := _BASESTREAM.Read(out_data, length);
+RETURN;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ReadDouble" Id="{db11d57f-7dd3-4a73-85f8-532f0941f54f}">
+      <Declaration><![CDATA[METHOD ReadDouble : DINT
+VAR_INPUT
+	out_data : POINTER TO LREAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	ReadDouble := 1;
+	RETURN;
+END_IF
+
+ReadDouble := _BASESTREAM.Read(out_data , 8);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ReadFloat" Id="{44748d10-e06c-4cd0-983b-1dae6ee03d82}">
+      <Declaration><![CDATA[METHOD ReadFloat : DINT
+VAR_INPUT
+	out_data : POINTER TO REAL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	ReadFloat := 1;
+	RETURN;
+END_IF
+
+ReadFloat := _BASESTREAM.Read(out_data , 4);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ReadInt16" Id="{2b50ad5d-6d0a-4a08-a27e-1dee1b4acca2}">
+      <Declaration><![CDATA[METHOD ReadInt16 : DINT
+VAR_INPUT
+	out_data : POINTER TO INT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	ReadInt16 := 1;
+	RETURN;
+END_IF
+
+ReadInt16 := _BASESTREAM.Read(out_data , 2);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ReadInt32" Id="{555c708b-06af-4983-bc95-ad72bfff7519}">
+      <Declaration><![CDATA[METHOD ReadInt32 : DINT
+VAR_INPUT
+	out_data : POINTER TO DINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	ReadInt32 := 1;
+	RETURN;
+END_IF
+
+ReadInt32 := _BASESTREAM.Read(out_data , 4);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ReadString" Id="{8bbb68ff-c92f-4a55-8401-1cce0167fdf4}">
+      <Declaration><![CDATA[METHOD ReadString : DINT
+VAR_INPUT
+	out_data 	: PVOID;
+	length		: UDINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	ReadString := 1;
+	RETURN;
+END_IF
+
+ReadString := _BASESTREAM.Read(out_data, length);
+RETURN;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ReadUInt16" Id="{73cf70b9-22f9-426b-a7d1-458ae4cb6acc}">
+      <Declaration><![CDATA[METHOD ReadUInt16 : DINT
+VAR_INPUT
+	out_data : POINTER TO UINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	ReadUInt16 := 1;
+	RETURN;
+END_IF
+
+ReadUInt16 := _BASESTREAM.Read(out_data , 4);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ReadUInt32" Id="{b9ecc356-b187-4340-98f9-de3663fa31b7}">
+      <Declaration><![CDATA[METHOD ReadUInt32 : DINT
+VAR_INPUT
+	out_data : POINTER TO UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	ReadUInt32 := 1;
+	RETURN;
+END_IF
+
+ReadUInt32 := _BASESTREAM.Read(out_data , 4);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Reset" Id="{385790db-108f-4dd3-919c-3cd67536efd8}">
+      <Declaration><![CDATA[METHOD Reset : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_BASESTREAM 	:= 0;
+Reset := -1;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>
