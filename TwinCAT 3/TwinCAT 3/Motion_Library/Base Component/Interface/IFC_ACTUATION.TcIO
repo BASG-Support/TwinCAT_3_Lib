@@ -11,6 +11,7 @@
       <Folder Name="Error" Id="{9f8f8346-d556-42c1-b73e-99db84b0d790}" />
       <Folder Name="Manual Movement" Id="{ac5bcd8b-1758-4d17-8748-c9eae5861ba0}" />
       <Folder Name="Energise" Id="{f025fba4-a3a0-4d50-bc13-ac7f6ea4fd54}" />
+      <Folder Name="Homing" Id="{f907f473-4c07-44f6-b29c-1f2e5220df5b}" />
     </Folder>
     <Folder Name="METHODS" Id="{d7905b6a-305e-4679-9150-6d1e83f97d8d}">
       <Folder Name="Touch Probe" Id="{019b76bc-7f9d-4045-ba90-41eeb57479e9}" />
@@ -82,6 +83,15 @@ END_VAR
       <Set Name="Set" Id="{b5b47514-a103-416f-b6be-5e3cea5e0e15}">
         <Declaration><![CDATA[]]></Declaration>
       </Set>
+    </Property>
+    <Property Name="CALIBRATE_AT_LIMIT" Id="{4319394c-9a3d-4e4e-b6a8-5a06796d27ca}" FolderPath="PROPERTIES\Homing\">
+      <Declaration><![CDATA[PROPERTY CALIBRATE_AT_LIMIT : BOOL]]></Declaration>
+      <Set Name="Set" Id="{89c01fd9-4371-4169-8aba-dba7944fd384}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+      <Get Name="Get" Id="{c4d2b563-6c17-4a2c-bd42-fa2e0b044417}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
     </Property>
     <Method Name="HALT" Id="{4523a683-d341-4669-8277-cf1129dedeed}" FolderPath="METHODS\">
       <Declaration><![CDATA[METHOD HALT : DINT
@@ -204,6 +214,15 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
     </Method>
+    <Property Name="CALIBRATE_TO_NEGATIVE" Id="{c8fe227c-90a7-4b23-9de8-21b685d6e658}" FolderPath="PROPERTIES\Homing\">
+      <Declaration><![CDATA[PROPERTY CALIBRATE_TO_NEGATIVE : BOOL]]></Declaration>
+      <Set Name="Set" Id="{54289041-c17b-4e49-91b2-8732532a63e2}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+      <Get Name="Get" Id="{94861bda-86fd-46ae-b92b-84f9e059b700}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
     <Method Name="ACTIVATE_TOUCHPROBE" Id="{d770c0ce-96e6-4203-8b66-63d30a787437}" FolderPath="METHODS\Touch Probe\">
       <Declaration><![CDATA[METHOD ACTIVATE_TOUCHPROBE : DINT
 VAR_INPUT

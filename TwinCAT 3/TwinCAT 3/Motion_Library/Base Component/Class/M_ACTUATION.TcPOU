@@ -79,6 +79,7 @@ END_CASE]]></ST>
       <Folder Name="Info" Id="{6fe2f36c-6308-4823-9d48-35951e1bd0e7}" />
       <Folder Name="Dynamics" Id="{75a81b41-51c6-4d82-befb-e1d689db065b}" />
       <Folder Name="External Set Point" Id="{7d14b065-57a9-4c82-b18d-0b1e07e93887}" />
+      <Folder Name="Homing" Id="{8462ca12-e1aa-4fcf-a63e-ea94605b1809}" />
       <Folder Name="Limits" Id="{ce8e457b-2fe5-42de-b997-d697679f7c6c}" />
       <Folder Name="Manual Movement" Id="{d263a07f-9962-4b53-bbbc-509aa3b57409}" />
       <Folder Name="Energise" Id="{dc600048-4847-4188-a39e-5c399c67487d}" />
@@ -397,6 +398,25 @@ ELSE
 END_IF]]></ST>
       </Implementation>
     </Method>
+    <Property Name="CALIBRATE_TO_NEGATIVE" Id="{8d7cede2-15e4-4391-bc2e-77528ccafea0}" FolderPath="PROPERTIES\Homing\">
+      <Declaration><![CDATA[PROPERTY CALIBRATE_TO_NEGATIVE : BOOL]]></Declaration>
+      <Get Name="Get" Id="{25a29a99-3a52-4ea9-bc38-2c686a744480}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CALIBRATE_TO_NEGATIVE := AXIS.CALIBRATE_AT_MINUS;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{90ce2a61-ac47-438c-a340-9e5496942f2d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AXIS.CALIBRATE_AT_MINUS := CALIBRATE_TO_NEGATIVE; ]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Property Name="ACCELERATION" Id="{97938d2f-0fdc-4cd6-8461-ea3a2079620a}" FolderPath="PROPERTIES\Dynamics\">
       <Declaration><![CDATA[PROPERTY ACCELERATION : LREAL]]></Declaration>
       <Get Name="Get" Id="{3054c935-a52e-4a17-b16d-80f546af0a9e}">
@@ -438,6 +458,25 @@ END_VAR
 ]]></Declaration>
         <Implementation>
           <ST><![CDATA[Override := _FBPOWER.Override;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="CALIBRATE_AT_LIMIT" Id="{a17cb1b1-5830-4e4e-a533-f651e3521e4a}" FolderPath="PROPERTIES\Homing\">
+      <Declaration><![CDATA[PROPERTY CALIBRATE_AT_LIMIT : BOOL]]></Declaration>
+      <Set Name="Set" Id="{67b3f453-7da8-45a8-b207-c796791e1a35}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AXIS.CALIBRATE_AT_LIMIT := CALIBRATE_AT_LIMIT;]]></ST>
+        </Implementation>
+      </Set>
+      <Get Name="Get" Id="{aaa61d76-6a7d-4e5d-adcb-25f852f6ec8b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CALIBRATE_AT_LIMIT := AXIS.CALIBRATE_AT_LIMIT;]]></ST>
         </Implementation>
       </Get>
     </Property>
