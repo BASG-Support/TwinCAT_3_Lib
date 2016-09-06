@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <DUT Name="S_ACTUATIONDATA" Id="{fe15befe-386f-43cf-807e-613dc5db43a3}">
+    <Declaration><![CDATA[TYPE S_ACTUATIONDATA :
+STRUCT
+	NC_INTERFACE 		: AXIS_REF;
+	PROBE				: TRIGGER_REF;
+	
+	CALIBRATE_AT_LIMIT : BOOL := TRUE;
+	CALIBRATE_AT_MINUS : BOOL := TRUE;
+	
+	LIMITS_DISABLED : BOOL;
+	LIMITS_INVERTED : BOOL;
+	
+	HW_ERR AT %I* 	: UDINT;
+	HW_POT AT %I* 	: BOOL;
+	HW_NOT AT %I* 	: BOOL;
+	HW_HOME AT %I* 	: BOOL;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

@@ -1,248 +1,275 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4019.2">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
   <Itf Name="IFC_ACTUATION" Id="{741107ee-d689-43b4-95b8-a88e37a82ddb}">
     <Declaration><![CDATA[INTERFACE IFC_ACTUATION
 ]]></Declaration>
-    <Folder Name="Properties" Id="{c719e4e5-109a-46ca-8f99-7d6405630a36}">
-      <Folder Name="Dynamics" Id="{5581f30e-c789-4ddd-90ae-ee627e2f27ae}" />
-      <Folder Name="Status" Id="{97733913-3b5e-4370-9371-50c5befe81ee}" />
-      <Folder Name="Controller" Id="{de43923c-c0b3-40c5-88ee-ba4bf1a03314}" />
-      <Folder Name="Limit Switch" Id="{fdef80a0-3668-4e1c-afd7-1862778bc87d}" />
+    <Folder Name="PROPERTIES" Id="{9f47527e-3149-4435-b0cb-da5c00fc7d2f}">
+      <Folder Name="External Set Point" Id="{196e82f5-e701-4f49-b498-15dcdced7994}" />
+      <Folder Name="Dynamics" Id="{57865184-a704-4e9c-91bc-4201ef8642d1}" />
+      <Folder Name="Limits" Id="{65e87fc6-6764-425f-8116-5fa7f408c4da}" />
+      <Folder Name="Info" Id="{761697ad-5918-46c1-93a2-de059d736f59}" />
+      <Folder Name="Error" Id="{9f8f8346-d556-42c1-b73e-99db84b0d790}" />
+      <Folder Name="Manual Movement" Id="{ac5bcd8b-1758-4d17-8748-c9eae5861ba0}" />
+      <Folder Name="Energise" Id="{f025fba4-a3a0-4d50-bc13-ac7f6ea4fd54}" />
+      <Folder Name="Homing" Id="{f907f473-4c07-44f6-b29c-1f2e5220df5b}" />
     </Folder>
-    <Folder Name="Methods" Id="{d3f34f89-66dc-49a5-bc84-4036b57bdb7c}">
-      <Folder Name="Manual Motion" Id="{69fb7bbd-4df8-4515-8dec-2df21fee5300}" />
-      <Folder Name="Parameterisation" Id="{a0190a3c-e0b2-4b81-850c-0f37e50d6105}" />
-      <Folder Name="Status" Id="{c613e9e1-d8ed-466c-bb26-35b25641cb9e}" />
+    <Folder Name="METHODS" Id="{d7905b6a-305e-4679-9150-6d1e83f97d8d}">
+      <Folder Name="Touch Probe" Id="{019b76bc-7f9d-4045-ba90-41eeb57479e9}" />
+      <Folder Name="External Set Point" Id="{291ee295-7263-4f22-85ef-2b137ae3e384}" />
+      <Folder Name="PTP" Id="{6f98baf7-47e9-438b-b0f3-17235b7febdb}" />
     </Folder>
-    <Method Name="MoveBy" Id="{0176b795-cb01-4a3e-85d2-784fa7fd5727}" FolderPath="Methods\">
-      <Declaration><![CDATA[(*
-	Y:2016		M:05	D:20
-	D: Sets the actuation device in motion for a specified distance.
-*)
-METHOD MoveBy : DINT
-VAR_INPUT
-	//User defined distance to travel. Can be + or -
-		Distance : LREAL;
-END_VAR
-]]></Declaration>
-    </Method>
-    <Method Name="EndJog" Id="{0bd21947-bb41-4120-8832-647385f925e6}" FolderPath="Methods\Manual Motion\">
-      <Declaration><![CDATA[(*
-	Y:2016		M:05	D:20
-	D: Terminates the manual motion of the actuation device.
-*)
-METHOD EndJog : DINT
-VAR_INPUT
-END_VAR
-]]></Declaration>
-    </Method>
-    <Property Name="Current_Velocity" Id="{132f0c9d-2483-4fad-acc7-9ccb28d49d45}" FolderPath="Properties\Dynamics\">
-      <Declaration><![CDATA[PROPERTY Current_Velocity : LREAL]]></Declaration>
-      <Get Name="Get" Id="{9484f938-aae9-4af9-a284-1a453e9d97b0}">
+    <Property Name="DISABLE_LIMITS" Id="{08363dfd-7e3d-4101-865b-c8e651b7eb40}" FolderPath="PROPERTIES\Limits\">
+      <Declaration><![CDATA[PROPERTY DISABLE_LIMITS : BOOL]]></Declaration>
+      <Set Name="Set" Id="{0041a75f-f75c-4acb-9917-608a53d41ba0}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+      <Get Name="Get" Id="{b55a2a14-4239-4bb4-adb7-b7678e5900ab}">
         <Declaration><![CDATA[]]></Declaration>
       </Get>
     </Property>
-    <Method Name="MoveAlong" Id="{1b97aea1-c44f-4328-9cf1-ebce75529230}" FolderPath="Methods\">
-      <Declaration><![CDATA[(*
-	Y:2016		M:05	D:20
-	D: Sets the actuation in motion along a direction.
-*)
-METHOD MoveAlong : DINT
-VAR_INPUT
-	Positive_Direction : BOOL;
-END_VAR
-]]></Declaration>
-    </Method>
-    <Property Name="At_PLim" Id="{30f7398d-2eb2-4927-aa35-2294322fd8b0}" FolderPath="Properties\Limit Switch\">
-      <Declaration><![CDATA[PROPERTY At_PLim : BOOL]]></Declaration>
-      <Get Name="Get" Id="{13b982b8-3729-4124-a42f-942c16b17635}">
+    <Property Name="HAS_JOB" Id="{0ce1db81-03cb-4bbe-998a-748299cdecfc}" FolderPath="PROPERTIES\Info\">
+      <Declaration><![CDATA[PROPERTY HAS_JOB : BOOL]]></Declaration>
+      <Get Name="Get" Id="{498c6148-96ab-4cfc-ac82-29e36f5e7c64}">
         <Declaration><![CDATA[]]></Declaration>
       </Get>
     </Property>
-    <Method Name="Disable" Id="{494eefcb-2021-40f9-bc64-f714e04e00a6}" FolderPath="Methods\Status\">
-      <Declaration><![CDATA[(*
-	Y:2016		M:05	D:20
-	D: Sets the actuation device in a de-energised state, and disable travel on both directions.
-*)
-METHOD Disable : DINT
-VAR_INPUT
-END_VAR
-]]></Declaration>
-    </Method>
-    <Method Name="BypassLimit" Id="{4cca1587-fff3-43f6-a375-b20055a6c2dc}" FolderPath="Methods\Parameterisation\">
-      <Declaration><![CDATA[METHOD BypassLimit : DINT
-VAR_INPUT
-END_VAR
-]]></Declaration>
-    </Method>
-    <Property Name="Is_LimitsBypassed" Id="{6a57c376-1921-4f43-ba6e-521c653dccbb}" FolderPath="Properties\Limit Switch\">
-      <Declaration><![CDATA[PROPERTY Is_LimitsBypassed : BOOL]]></Declaration>
-      <Get Name="Get" Id="{b0474bd2-24b6-4461-a337-65d23b978cf2}">
+    <Property Name="JERK" Id="{15936b7f-7a40-42a4-93a8-348cb2d3081d}" FolderPath="PROPERTIES\Dynamics\">
+      <Declaration><![CDATA[PROPERTY JERK : LREAL]]></Declaration>
+      <Set Name="Set" Id="{247d50ed-5845-4c71-881f-3c5844cb21ec}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+      <Get Name="Get" Id="{f734fd9e-478e-4712-96fe-9894f4002115}">
         <Declaration><![CDATA[]]></Declaration>
       </Get>
     </Property>
-    <Property Name="Is_Moving" Id="{71986ba6-2899-4ad2-b25e-cfe9408930b0}" FolderPath="Properties\Status\">
-      <Declaration><![CDATA[PROPERTY Is_Moving : BOOL]]></Declaration>
-      <Get Name="Get" Id="{26bd88a0-20db-4d9f-a7ac-1bbd67be1985}">
+    <Method Name="DEACTIVATE_EXTERNAL_SETPOINT" Id="{17240edd-2957-42db-aa67-f9cb9fce7722}" FolderPath="METHODS\External Set Point\">
+      <Declaration><![CDATA[METHOD DEACTIVATE_EXTERNAL_SETPOINT : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Property Name="AT_NEGATIVE_LIMIT" Id="{1bec991f-658c-4aef-ba02-97fa65b308b0}" FolderPath="PROPERTIES\Limits\">
+      <Declaration><![CDATA[PROPERTY AT_NEGATIVE_LIMIT : BOOL]]></Declaration>
+      <Get Name="Get" Id="{960fa9df-91a1-4ec9-9116-8756c3e75d20}">
         <Declaration><![CDATA[]]></Declaration>
       </Get>
     </Property>
-    <Method Name="BeginJog" Id="{82670dee-53b4-48e7-a730-d540f06f2915}" FolderPath="Methods\Manual Motion\">
-      <Declaration><![CDATA[(*
-	Y:2016		M:05	D:20
-	D: Initiates the manual motion of the actuation device. Keep the method running for as long as manual motion is required. Terminate manual motion by calling the opposite method.
-*)
-METHOD BeginJog : DINT
-VAR_INPUT
-	Towards_Positive : BOOL;
-END_VAR
-]]></Declaration>
-    </Method>
-    <Property Name="At_NLim" Id="{8509c45a-0c95-46b8-9464-61a6ced33343}" FolderPath="Properties\Limit Switch\">
-      <Declaration><![CDATA[PROPERTY At_NLim : BOOL]]></Declaration>
-      <Get Name="Get" Id="{43cc891f-90a5-4235-b4b0-73b23b710d45}">
+    <Property Name="VELOCITY" Id="{22c300d3-4815-43bf-bc1f-5dee9dbe050c}" FolderPath="PROPERTIES\Info\">
+      <Declaration><![CDATA[PROPERTY VELOCITY : LREAL]]></Declaration>
+      <Get Name="Get" Id="{4af43b82-519d-4536-b46b-e23e618f466e}">
         <Declaration><![CDATA[]]></Declaration>
       </Get>
     </Property>
-    <Property Name="Is_Error" Id="{89d3765c-1af7-4f42-92a2-aedfae1a49e3}" FolderPath="Properties\Status\">
-      <Declaration><![CDATA[PROPERTY Is_Error : BOOL]]></Declaration>
-      <Get Name="Get" Id="{9840686f-7fe0-493d-b9f2-979c54aa0f48}">
-        <Declaration><![CDATA[]]></Declaration>
-      </Get>
-    </Property>
-    <Property Name="Is_Disabled" Id="{8d4b4fbd-9fdd-4598-bc12-7fd9da5cac84}" FolderPath="Properties\Status\">
-      <Declaration><![CDATA[PROPERTY Is_Disabled : BOOL]]></Declaration>
-      <Get Name="Get" Id="{64c5ff12-3cc2-4ce8-b172-87e75127161c}">
-        <Declaration><![CDATA[]]></Declaration>
-      </Get>
-    </Property>
-    <Method Name="Halt" Id="{9f41c92e-9972-4724-a787-161d9eddf98c}" FolderPath="Methods\">
-      <Declaration><![CDATA[(*
-	Y:2016		M:05	D:20
-	D: Halts the actuation device.
-*)
-METHOD Halt : DINT
-VAR_INPUT
-END_VAR
-]]></Declaration>
-    </Method>
-    <Method Name="Home" Id="{b3f8674b-05df-46b6-bd88-21454cf09ad4}" FolderPath="Methods\">
-      <Declaration><![CDATA[(*
-	Y:2016		M:05	D:20
-	D: Initiates the homing sequence for the actuation device. Configure the homing behavior via the class's properties.
-*)
-METHOD Home : DINT
-VAR_INPUT
-	CalibrateAtLimit : BOOL;
-END_VAR
-]]></Declaration>
-    </Method>
-    <Method Name="ChangeLimitsType" Id="{b447b9e2-b36e-4b3c-939e-68cb79f5ef28}" FolderPath="Methods\Parameterisation\">
-      <Declaration><![CDATA[METHOD ChangeLimitsType : DINT
-VAR_INPUT
-END_VAR
-]]></Declaration>
-    </Method>
-    <Method Name="Reset" Id="{b7885663-5497-4308-b490-ff38e1875a99}" FolderPath="Methods\Status\">
-      <Declaration><![CDATA[(*
-	Y:2016		M:05	D:20
-	D: Resets the actuation device of any errors. Actuation device currently in motion will be halted.
-*)
-METHOD Reset : DINT
-VAR_INPUT
-END_VAR
-]]></Declaration>
-    </Method>
-    <Property Name="Controller_Override" Id="{b7e373d8-2e67-4e05-8efc-5dd5092c0f01}" FolderPath="Properties\Controller\">
-      <Declaration><![CDATA[PROPERTY Controller_Override : LREAL]]></Declaration>
-      <Get Name="Get" Id="{8582e3a3-9d00-4c7a-be36-49cd84a2f78f}">
-        <Declaration><![CDATA[]]></Declaration>
-      </Get>
-      <Set Name="Set" Id="{b050f0a0-a9a9-41eb-8701-5c4d5dfa12e9}">
+    <Property Name="JOG_FORWARD" Id="{23c6d29e-860c-4bc0-bd3a-6b0dbe5c3376}" FolderPath="PROPERTIES\Manual Movement\">
+      <Declaration><![CDATA[PROPERTY JOG_FORWARD : BOOL]]></Declaration>
+      <Set Name="Set" Id="{2d8b1785-033e-42e1-9df6-212829621b60}">
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
-    <Property Name="Jerk" Id="{c8fce40a-3aef-4c57-b4c5-1baa69f0887b}" FolderPath="Properties\Dynamics\">
-      <Declaration><![CDATA[PROPERTY Jerk : LREAL]]></Declaration>
-      <Set Name="Set" Id="{3383b0fc-ef01-422b-99c4-e8583c436645}">
-        <Declaration><![CDATA[]]></Declaration>
-      </Set>
-      <Get Name="Get" Id="{c151e2d6-113c-4d88-9090-64ea520b18e2}">
-        <Declaration><![CDATA[]]></Declaration>
-      </Get>
-    </Property>
-    <Property Name="Hw_ErrorId" Id="{ca564fad-6a20-468d-bbf0-50e2a8e07ce5}" FolderPath="Properties\Status\">
-      <Declaration><![CDATA[PROPERTY Hw_ErrorId : DINT]]></Declaration>
-      <Get Name="Get" Id="{601650b5-9093-4936-9b2e-1c28ca401233}">
-        <Declaration><![CDATA[]]></Declaration>
-      </Get>
-    </Property>
-    <Property Name="Acceleration" Id="{cb57d52c-0f70-465e-933f-835d6be339be}" FolderPath="Properties\Dynamics\">
-      <Declaration><![CDATA[PROPERTY Acceleration : LREAL]]></Declaration>
-      <Get Name="Get" Id="{3f561a0d-3f9a-4f50-9067-a525a44f4418}">
-        <Declaration><![CDATA[]]></Declaration>
-      </Get>
-      <Set Name="Set" Id="{ff92613e-1435-4f7a-9ab2-99c2b7ac6296}">
+    <Property Name="SET_DIRECTION" Id="{23e9f0f8-f345-49c3-8ae0-6585129f9f50}" FolderPath="PROPERTIES\External Set Point\">
+      <Declaration><![CDATA[PROPERTY SET_DIRECTION : DINT]]></Declaration>
+      <Set Name="Set" Id="{762f3441-b8bf-4bd9-85ab-8c590e75f70c}">
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
-    <Property Name="Is_LimitsNormallyClosed" Id="{cbc4871d-da38-49b1-816f-eef62d572928}" FolderPath="Properties\Limit Switch\">
-      <Declaration><![CDATA[PROPERTY Is_LimitsNormallyClosed : BOOL]]></Declaration>
-      <Get Name="Get" Id="{c2817801-16ee-41b0-ab84-de08db1600c0}">
+    <Property Name="AXIS_ERROR" Id="{2f934574-b8dc-41b9-8a3b-b976dc2f0ef6}" FolderPath="PROPERTIES\Error\">
+      <Declaration><![CDATA[PROPERTY AXIS_ERROR : BOOL]]></Declaration>
+      <Get Name="Get" Id="{f9fcfdec-ba6c-45f2-b93f-e26d06bba26c}">
         <Declaration><![CDATA[]]></Declaration>
       </Get>
     </Property>
-    <Method Name="Enable" Id="{d0a619d5-c256-41d8-8c77-41483e470807}" FolderPath="Methods\Status\">
-      <Declaration><![CDATA[METHOD Enable : DINT
+    <Property Name="SET_POSITION" Id="{3e86c580-1ed2-4c38-80d7-18a0cb00bb18}" FolderPath="PROPERTIES\External Set Point\">
+      <Declaration><![CDATA[PROPERTY SET_POSITION : LREAL]]></Declaration>
+      <Set Name="Set" Id="{b5b47514-a103-416f-b6be-5e3cea5e0e15}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="CALIBRATE_AT_LIMIT" Id="{4319394c-9a3d-4e4e-b6a8-5a06796d27ca}" FolderPath="PROPERTIES\Homing\">
+      <Declaration><![CDATA[PROPERTY CALIBRATE_AT_LIMIT : BOOL]]></Declaration>
+      <Set Name="Set" Id="{89c01fd9-4371-4169-8aba-dba7944fd384}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+      <Get Name="Get" Id="{c4d2b563-6c17-4a2c-bd42-fa2e0b044417}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="HALT" Id="{4523a683-d341-4669-8277-cf1129dedeed}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD HALT : DINT
 VAR_INPUT
 END_VAR
 ]]></Declaration>
     </Method>
-    <Property Name="Current_Position" Id="{e2923324-9707-4dcc-ab87-343b5ff298f8}" FolderPath="Properties\Dynamics\">
-      <Declaration><![CDATA[PROPERTY Current_Position : LREAL]]></Declaration>
-      <Get Name="Get" Id="{e252db91-0d6e-46a9-ac1a-f58a56a72dd9}">
+    <Property Name="ACCELERATION" Id="{475eeeab-18ab-4eb9-98ba-e510f897e5dd}" FolderPath="PROPERTIES\Dynamics\">
+      <Declaration><![CDATA[PROPERTY ACCELERATION : LREAL]]></Declaration>
+      <Get Name="Get" Id="{5ee04825-81cc-4980-b91c-d286b3625f68}">
         <Declaration><![CDATA[]]></Declaration>
       </Get>
-    </Property>
-    <Property Name="Velocity" Id="{e5a75c82-95a9-4833-a9cd-dd55299db2d5}" FolderPath="Properties\Dynamics\">
-      <Declaration><![CDATA[PROPERTY Velocity : LREAL]]></Declaration>
-      <Set Name="Set" Id="{4e2c591c-1e68-4f36-af58-28969b5eb2c7}">
+      <Set Name="Set" Id="{b366f6a7-63d9-4988-8c5a-d2545b05e5c5}">
         <Declaration><![CDATA[]]></Declaration>
       </Set>
-      <Get Name="Get" Id="{c42e38f8-c6d3-41de-9c89-f86aab973a22}">
+    </Property>
+    <Property Name="JOG_VELOCITY" Id="{4987c255-614d-4044-87f2-fc92601e9322}" FolderPath="PROPERTIES\Manual Movement\">
+      <Declaration><![CDATA[PROPERTY JOG_VELOCITY : LREAL]]></Declaration>
+      <Get Name="Get" Id="{8cad4bfa-21a9-4d99-aeb4-8444f702266a}">
         <Declaration><![CDATA[]]></Declaration>
       </Get>
+      <Set Name="Set" Id="{d0e104e5-659a-488b-b606-56941de1b18f}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
     </Property>
-    <Method Name="EnableLimits" Id="{e60d66a8-0fbb-4155-9724-8644b002fb7f}" FolderPath="Methods\Parameterisation\">
-      <Declaration><![CDATA[METHOD EnableLimits : DINT
+    <Method Name="HOME_FORCED" Id="{53390d74-5b15-4f0b-8786-78abb34a4196}" FolderPath="METHODS\PTP\">
+      <Declaration><![CDATA[METHOD HOME_FORCED : DINT
 VAR_INPUT
 END_VAR
 ]]></Declaration>
     </Method>
-    <Method Name="MoveTo" Id="{e7ad2eec-315a-45a6-940d-04c1ec1a3512}" FolderPath="Methods\">
-      <Declaration><![CDATA[(*
-	Y:2016		M:05	D:20
-	D: Sets the actuation in motion to the target position.
-*)
-METHOD MoveTo : DINT
-VAR_INPUT
-	//User defined position to travel. Can be + or -
-		POSITION : LREAL;
-END_VAR
-]]></Declaration>
-    </Method>
-    <Property Name="Axis_Id" Id="{f1e59be8-47c4-4eb0-9ead-ec378ba02348}" FolderPath="Properties\">
-      <Declaration><![CDATA[PROPERTY Axis_Id : UDINT]]></Declaration>
-      <Get Name="Get" Id="{1bcd8a6b-956a-4b3d-9a76-978210d761e7}">
+    <Property Name="MODE" Id="{536374c0-2065-499f-adc7-3d48fc81b73e}" FolderPath="PROPERTIES\Info\">
+      <Declaration><![CDATA[PROPERTY MODE : E_ACTUATIONSTATE]]></Declaration>
+      <Get Name="Get" Id="{9d154ef8-4d57-4b89-ba59-609ea50b55e7}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{a7c5d05e-a540-4ae0-9e09-f67e65acc7f5}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="INVERT_LIMITS" Id="{6883dfc6-d055-40d1-947d-5f857e7a75aa}" FolderPath="PROPERTIES\Limits\">
+      <Declaration><![CDATA[PROPERTY INVERT_LIMITS : BOOL]]></Declaration>
+      <Set Name="Set" Id="{0ef21e6b-ada8-4d4d-a755-ffbeb0f407f6}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+      <Get Name="Get" Id="{e4c7c8ca-b218-412f-90ef-3ab4c3aab73f}">
         <Declaration><![CDATA[]]></Declaration>
       </Get>
     </Property>
-    <Property Name="Deceleration" Id="{fec92132-19ce-466f-ad15-263fdd38b50b}" FolderPath="Properties\Dynamics\">
-      <Declaration><![CDATA[PROPERTY Deceleration : LREAL]]></Declaration>
-      <Set Name="Set" Id="{8d3fa01c-0d2e-4c9a-bf91-937fadef5128}">
+    <Property Name="POSITION" Id="{6e7d5124-1f56-4dc2-8a45-829c39edc1ea}" FolderPath="PROPERTIES\Info\">
+      <Declaration><![CDATA[PROPERTY POSITION : LREAL]]></Declaration>
+      <Get Name="Get" Id="{5ed099cf-b683-4a7d-a87d-35bd7031f92a}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="MOVE_TO" Id="{922678b3-0725-4073-a2c5-c94cd0318a63}" FolderPath="METHODS\PTP\">
+      <Declaration><![CDATA[METHOD MOVE_TO : DINT
+VAR_INPUT
+	POSITION : LREAL;
+	VELOCITY : LREAL;
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="ACTIVATE_EXTERNAL_SETPOINT" Id="{994aa4e3-ba39-45d7-82a9-5a90a5f3ee43}" FolderPath="METHODS\External Set Point\">
+      <Declaration><![CDATA[METHOD ACTIVATE_EXTERNAL_SETPOINT : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="MOVE_BY" Id="{a305e87e-87f4-4e4f-b2cc-0ad1c4c25749}" FolderPath="METHODS\PTP\">
+      <Declaration><![CDATA[METHOD MOVE_BY : DINT
+VAR_INPUT
+	DISTANCE : LREAL;
+	VELOCITY : LREAL;
+END_VAR
+]]></Declaration>
+    </Method>
+    <Property Name="AT_POSITIVE_LIMIT" Id="{a8c0fcd8-55cc-464e-baf8-cbde7bbda4a3}" FolderPath="PROPERTIES\Limits\">
+      <Declaration><![CDATA[PROPERTY AT_POSITIVE_LIMIT : BOOL]]></Declaration>
+      <Get Name="Get" Id="{afbf6a1b-933f-4668-98f3-2024ce9e4832}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="JOG_BACKWARD" Id="{a93e88c6-322e-4b0e-86dd-6566119965d6}" FolderPath="PROPERTIES\Manual Movement\">
+      <Declaration><![CDATA[PROPERTY JOG_BACKWARD : BOOL]]></Declaration>
+      <Set Name="Set" Id="{b3e52bae-edcc-4f0e-9628-f329543c5c18}">
         <Declaration><![CDATA[]]></Declaration>
       </Set>
-      <Get Name="Get" Id="{f6dcbff6-2aa1-47fa-88da-aadca4a6e0c7}">
+    </Property>
+    <Property Name="HARDWARE_ERROR_CODE" Id="{b9964742-95b1-4b9b-bb54-215a0bcbc1eb}" FolderPath="PROPERTIES\Error\">
+      <Declaration><![CDATA[PROPERTY HARDWARE_ERROR_CODE : UDINT]]></Declaration>
+      <Get Name="Get" Id="{4930fec6-9688-4203-92e1-92aad868aa12}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="HOME" Id="{bc946c9f-67fb-458c-8b3c-3582188c4af0}" FolderPath="METHODS\PTP\">
+      <Declaration><![CDATA[METHOD HOME : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="RESET" Id="{bf0447b0-fb59-40f7-940c-bb12fd72a9ae}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD RESET : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Property Name="DECELERATION" Id="{c0d8c4b7-b0e0-4208-9a27-103ca6e9b79c}" FolderPath="PROPERTIES\Dynamics\">
+      <Declaration><![CDATA[PROPERTY DECELERATION : LREAL]]></Declaration>
+      <Get Name="Get" Id="{daf742a1-dcf3-41a8-a577-594cdc9851c1}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{efe030dd-2a82-4e15-af37-b45f41223759}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Method Name="DEACTIVATE_TOUCHPROBE" Id="{c6723581-9b1c-4b0b-874b-99c31d6515e9}" FolderPath="METHODS\Touch Probe\">
+      <Declaration><![CDATA[METHOD DEACTIVATE_TOUCHPROBE : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Property Name="CALIBRATE_TO_NEGATIVE" Id="{c8fe227c-90a7-4b23-9de8-21b685d6e658}" FolderPath="PROPERTIES\Homing\">
+      <Declaration><![CDATA[PROPERTY CALIBRATE_TO_NEGATIVE : BOOL]]></Declaration>
+      <Set Name="Set" Id="{54289041-c17b-4e49-91b2-8732532a63e2}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+      <Get Name="Get" Id="{94861bda-86fd-46ae-b92b-84f9e059b700}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="ACTIVATE_TOUCHPROBE" Id="{d770c0ce-96e6-4203-8b66-63d30a787437}" FolderPath="METHODS\Touch Probe\">
+      <Declaration><![CDATA[METHOD ACTIVATE_TOUCHPROBE : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Property Name="OVERRIDE" Id="{dea5b112-f5e7-46d1-a565-445ebeb55ba6}" FolderPath="PROPERTIES\Energise\">
+      <Declaration><![CDATA[PROPERTY OVERRIDE : LREAL]]></Declaration>
+      <Set Name="Set" Id="{8155523e-f400-43b3-ae41-273ab39be34e}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+      <Get Name="Get" Id="{c69ab264-7429-49d1-b28f-2454dd6620c8}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="ENABLE" Id="{eb0514ba-ddf8-4e4b-b555-ae0aa758d749}" FolderPath="PROPERTIES\Energise\">
+      <Declaration><![CDATA[PROPERTY ENABLE : BOOL]]></Declaration>
+      <Set Name="Set" Id="{5977f530-6cb5-4748-b0a3-3df19e856eaa}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+      <Get Name="Get" Id="{5e067207-eb03-489a-8471-36572cef67bc}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="IS_MOVING" Id="{eeadb4fa-4640-414c-8121-3670da7b0fa4}" FolderPath="PROPERTIES\Info\">
+      <Declaration><![CDATA[PROPERTY IS_MOVING : BOOL]]></Declaration>
+      <Get Name="Get" Id="{ac61b77a-ca89-4d58-8161-32d669029ef0}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="AXIS_ERROR_ID" Id="{fb137e0f-5478-4eeb-b8a2-42f528f9f2c9}" FolderPath="PROPERTIES\Error\">
+      <Declaration><![CDATA[PROPERTY AXIS_ERROR_ID : UDINT]]></Declaration>
+      <Get Name="Get" Id="{88dce36d-362a-48d9-90c8-390cbcdd76a8}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="MOVE_ALONG" Id="{fc37de96-2343-4023-837a-db496011cb79}" FolderPath="METHODS\PTP\">
+      <Declaration><![CDATA[METHOD MOVE_ALONG : LREAL
+VAR_INPUT
+	VELOCITY	: LREAL;
+	FORWARD 	: BOOL;
+END_VAR
+]]></Declaration>
+    </Method>
+    <Property Name="ID" Id="{fedf901f-c82b-4a00-bc45-8c20b46ffc5d}" FolderPath="PROPERTIES\Info\">
+      <Declaration><![CDATA[PROPERTY ID : UDINT]]></Declaration>
+      <Get Name="Get" Id="{d7655118-2ecc-4276-80a6-5f96b825261a}">
         <Declaration><![CDATA[]]></Declaration>
       </Get>
     </Property>
