@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <TcSmProject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.beckhoff.com/schemas/2012/07/TcSmProject" TcSmVersion="1.0" TcVersion="3.1.4020.0">
-	<Project ProjectGUID="{A5F77BEE-DB81-4156-964D-064D2E7D0374}" ShowHideConfigurations="#x6">
+	<Project ProjectGUID="{A5F77BEE-DB81-4156-964D-064D2E7D0374}" Target64Bit="true" ShowHideConfigurations="#x6">
 		<System>
 			<Tasks>
 				<Task Id="2" Priority="20" CycleTime="100000" AmsPort="350">
@@ -9,31 +9,31 @@
 			</Tasks>
 		</System>
 		<Plc>
-			<Project GUID="{2EB64C17-FD89-48AC-922E-0985F9888B05}" Name="SerialCommunication" PrjFilePath="SerialCommunication\SerialCommunication.plcProj" TmcFilePath="SerialCommunication\SerialCommunication.tmc" ReloadTmc="true" AmsPort="851" TargetArchiveSettings="#x0000" FileArchiveSettings="#x0000">
+			<Project Disabled="true" GUID="{2EB64C17-FD89-48AC-922E-0985F9888B05}" Name="SerialCommunication" PrjFilePath="SerialCommunication\SerialCommunication.plcProj" TmcFilePath="SerialCommunication\SerialCommunication.tmc" ReloadTmc="true" AmsPort="851" TargetArchiveSettings="#x0000" FileArchiveSettings="#x0000">
 				<Instance Id="#x01010010" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
 					<Name>SerialCommunication Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 				</Instance>
 			</Project>
-			<Project GUID="{8D406A80-2E75-466F-84CE-D02B49BECCA8}" Name="Motion_Library" PrjFilePath="Motion_Library\Motion_Library.plcProj" TmcFilePath="Motion_Library\Motion_Library.tmc" ReloadTmc="true" AmsPort="852" TargetArchiveSettings="#x0002" FileArchiveSettings="#x0000">
+			<Project Disabled="true" GUID="{8D406A80-2E75-466F-84CE-D02B49BECCA8}" Name="Motion_Library" PrjFilePath="Motion_Library\Motion_Library.plcProj" TmcFilePath="Motion_Library\Motion_Library.tmc" ReloadTmc="true" AmsPort="852" TargetArchiveSettings="#x0002" FileArchiveSettings="#x0000">
 				<Instance Id="#x01010020" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
 					<Name>Motion_Library Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 				</Instance>
 			</Project>
-			<Project GUID="{B5CAE539-CF43-4436-AF96-2165AB476F5C}" Name="PLC_Interpolation_Library" PrjFilePath="PLC_Interpolation_Library\PLC_Interpolation_Library.plcproj" TmcFilePath="PLC_Interpolation_Library\PLC_Interpolation_Library.tmc" ReloadTmc="true" AmsPort="855" FileArchiveSettings="#x000e">
+			<Project Disabled="true" GUID="{B5CAE539-CF43-4436-AF96-2165AB476F5C}" Name="PLC_Interpolation_Library" PrjFilePath="PLC_Interpolation_Library\PLC_Interpolation_Library.plcproj" TmcFilePath="PLC_Interpolation_Library\PLC_Interpolation_Library.tmc" ReloadTmc="true" AmsPort="855" FileArchiveSettings="#x000e">
 				<Instance Id="#x01010050" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
 					<Name>PLC_Interpolation_Library Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 				</Instance>
 			</Project>
-			<Project GUID="{787018B7-2A45-42DD-81FD-35555ECC1A05}" Name="SqliteAdaptor" PrjFilePath="SqliteAdaptor\SqliteAdaptor.plcProj" TmcFilePath="SqliteAdaptor\SqliteAdaptor.tmc" ReloadTmc="true" AmsPort="856" FileArchiveSettings="#x000e">
+			<Project Disabled="true" GUID="{787018B7-2A45-42DD-81FD-35555ECC1A05}" Name="SqliteAdaptor" PrjFilePath="SqliteAdaptor\SqliteAdaptor.plcProj" TmcFilePath="SqliteAdaptor\SqliteAdaptor.tmc" ReloadTmc="true" AmsPort="856" FileArchiveSettings="#x000e">
 				<Instance Id="#x01010060" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
 					<Name>SqliteAdaptor Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 				</Instance>
 			</Project>
-			<Project GUID="{1423A4DE-3C52-4330-BBE4-230972DA141C}" Name="FileIO" PrjFilePath="FileIO\FileIO.plcproj" TmcFilePath="FileIO\FileIO.tmc" ReloadTmc="true" AmsPort="857" FileArchiveSettings="#x000e">
+			<Project Disabled="true" GUID="{1423A4DE-3C52-4330-BBE4-230972DA141C}" Name="FileIO" PrjFilePath="FileIO\FileIO.plcproj" TmcFilePath="FileIO\FileIO.tmc" ReloadTmc="true" AmsPort="857" FileArchiveSettings="#x000e">
 				<Instance Id="#x01010070" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
 					<Name>FileIO Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
@@ -42,7 +42,7 @@
 					</TaskPouOids>
 				</Instance>
 			</Project>
-			<Project GUID="{C7E4B4B5-DCFD-4291-A02A-F693F2AFD2CA}" Name="PLC_Interpolation" PrjFilePath="PLC_Interpolation\PLC_Interpolation.plcproj" TmcFilePath="PLC_Interpolation\PLC_Interpolation.tmc" ReloadTmc="true" AmsPort="858" FileArchiveSettings="#x000e">
+			<Project Disabled="true" GUID="{C7E4B4B5-DCFD-4291-A02A-F693F2AFD2CA}" Name="PLC_Interpolation" PrjFilePath="PLC_Interpolation\PLC_Interpolation.plcproj" TmcFilePath="PLC_Interpolation\PLC_Interpolation.tmc" ReloadTmc="true" AmsPort="858" FileArchiveSettings="#x000e">
 				<Instance Id="#x01010080" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
 					<Name>PLC_Interpolation Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
@@ -51,10 +51,19 @@
 					</TaskPouOids>
 				</Instance>
 			</Project>
-			<Project GUID="{CFED61F7-2DE2-4027-AD0C-E90C2F191588}" Name="ADS" PrjFilePath="ADS\ADS.plcproj" TmcFilePath="ADS\ADS.tmc" ReloadTmc="true" AmsPort="859" FileArchiveSettings="#x000e">
+			<Project Disabled="true" GUID="{CFED61F7-2DE2-4027-AD0C-E90C2F191588}" Name="ADS" PrjFilePath="ADS\ADS.plcproj" TmcFilePath="ADS\ADS.tmc" ReloadTmc="true" AmsPort="859" FileArchiveSettings="#x000e">
 				<Instance Id="#x01010090" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
 					<Name>ADS Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+				</Instance>
+			</Project>
+			<Project GUID="{8E4F8821-E0B1-4457-94DB-46490E98CF0D}" Name="Stream_lib" PrjFilePath="Stream_lib\Stream_lib.plcProj" TmcFilePath="Stream_lib\Stream_lib.tmc" ReloadTmc="true" AmsPort="853" FileArchiveSettings="#x000e">
+				<Instance Id="#x01010030" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
+					<Name>Stream_lib Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+					<TaskPouOids>
+						<TaskPouOid Prio="20" OTCID="#x01010031"/>
+					</TaskPouOids>
 				</Instance>
 			</Project>
 		</Plc>

@@ -1,7 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+<<<<<<< HEAD
   <POU Name="M_ACTUATION" Id="{bc150775-e52b-47ac-85b7-16c43507f156}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK M_ACTUATION IMPLEMENTS IFC_ACTUATION
+=======
+  <POU Name="M_ACTUATION" Id="{83f3e86f-be0c-497d-a38a-fa44c7f08578}" SpecialFunc="None">
+    <Declaration><![CDATA[(*
+	Y:2016		M:05		D:20
+	T:CLASS		N:ACTUATION
+	D:Class object for plc motion projects. Contains all basic necessary methods for movement. The default behavior is to home to negative limit.
+*)
+FUNCTION_BLOCK M_ACTUATION IMPLEMENTS IFC_ACTUATION
+>>>>>>> refs/remotes/origin/master
 VAR_INPUT
 END_VAR
 VAR_OUTPUT
@@ -204,6 +214,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
+<<<<<<< HEAD
         <ST><![CDATA[CASE STATE OF 
 	E_ACTUATIONSTATE.E_SETPOINT_ACTUATION:
 		_FBEXTEN(
@@ -234,6 +245,43 @@ END_VAR
 		ACTIVATE_EXTERNAL_SETPOINT := 99;
 		RETURN;
 END_CASE]]></ST>
+=======
+        <ST><![CDATA[//Resets other move function blocks
+	_M_MOVEV(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+	_M_MOVEA(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+	_M_MOVER(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+//Resets other home function block
+	_M_HOME(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+_M_HALT(
+	Axis:= _DATALINK.NC_INTERFACE, 
+	Execute:= TRUE, 
+	Deceleration:= _DECELERATION, 
+	Jerk:= _JERK );
+IF _M_HALT.Error OR _M_HALT.CommandAborted THEN
+	_M_HALT(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+	Halt := 1;
+	RETURN;
+ELSIF _M_HALT.Done THEN
+	_M_HALT(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+	Halt := -1;
+	RETURN;
+ELSE
+	Halt := 0;
+	RETURN;
+END_IF]]></ST>
+>>>>>>> refs/remotes/origin/master
       </Implementation>
     </Method>
     <Property Name="INVERT_LIMITS" Id="{5ce0e497-6e1f-4022-adcd-d4a0aa6b2849}" FolderPath="PROPERTIES\Limits\">
@@ -347,6 +395,7 @@ END_VAR
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
+<<<<<<< HEAD
         <Implementation>
           <ST><![CDATA[HARDWARE_ERROR_CODE := AXIS.HW_ERR;]]></ST>
         </Implementation>
@@ -356,6 +405,61 @@ END_VAR
       <Declaration><![CDATA[METHOD ACTIVATE_TOUCHPROBE : DINT
 VAR_INPUT
 END_VAR
+=======
+      <Implementation>
+        <ST><![CDATA[//Resets other move function blocks
+	_M_MOVEV(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+	_M_MOVEA(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+	_M_MOVER(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+//Resets other home function block
+	_M_HOME(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );
+//Resets other halt function block
+	_M_HALT(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE );		
+_M_RESET(
+	Axis:= _DATALINK.NC_INTERFACE, 
+	Execute:= TRUE 
+);
+IF _M_RESET.Error THEN
+	_M_RESET(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE 
+	);
+	Reset := 1;
+	RETURN;
+ELSIF _M_RESET.Done THEN
+	_M_RESET(
+		Axis:= _DATALINK.NC_INTERFACE, 
+		Execute:= FALSE 
+	);
+	Reset := -1;
+	RETURN;
+ELSE
+	Reset := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Disable" Id="{a4601b4a-0b23-4733-b027-79e72515700d}" FolderPath="Methods\">
+      <Declaration><![CDATA[{attribute '''NORMAL__COMMENT' := '
+	Y:2016		M:05	D:20
+	D: Sets the actuation device in a de-energised state, and disable travel on both directions.
+'}
+(*
+	Y:2016		M:05	D:20
+	D: Sets the actuation device in a de-energised state, and disable travel on both directions.
+*)
+METHOD Disable : DINT
+>>>>>>> refs/remotes/origin/master
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[_FBTPROBE(
@@ -424,7 +528,11 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
+<<<<<<< HEAD
           <ST><![CDATA[ACCELERATION := MOTION_ACCELERATION;]]></ST>
+=======
+          <ST><![CDATA[At_PLim := _DATALINK.LIMIT_PLUS;]]></ST>
+>>>>>>> refs/remotes/origin/master
         </Implementation>
       </Get>
       <Set Name="Set" Id="{4b56bcd7-6f1f-45a6-949f-6262d89f5925}">
@@ -461,11 +569,16 @@ END_VAR
         </Implementation>
       </Get>
     </Property>
+<<<<<<< HEAD
     <Property Name="CALIBRATE_AT_LIMIT" Id="{a17cb1b1-5830-4e4e-a533-f651e3521e4a}" FolderPath="PROPERTIES\Homing\">
       <Declaration><![CDATA[PROPERTY CALIBRATE_AT_LIMIT : BOOL]]></Declaration>
       <Set Name="Set" Id="{67b3f453-7da8-45a8-b207-c796791e1a35}">
         <Declaration><![CDATA[VAR
 END_VAR
+=======
+    <Property Name="Is_Error" Id="{c1f25efa-1356-4238-aa85-8cc51ce21937}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY Is_Error : BOOL
+>>>>>>> refs/remotes/origin/master
 ]]></Declaration>
         <Implementation>
           <ST><![CDATA[AXIS.CALIBRATE_AT_LIMIT := CALIBRATE_AT_LIMIT;]]></ST>
@@ -604,7 +717,11 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
+<<<<<<< HEAD
           <ST><![CDATA[DISABLE_LIMITS := AXIS.LIMITS_DISABLED;]]></ST>
+=======
+          <ST><![CDATA[Current_Velocity := _DATALINK.NC_INTERFACE.NcToPlc.ActVelo;]]></ST>
+>>>>>>> refs/remotes/origin/master
         </Implementation>
       </Get>
     </Property>
@@ -676,8 +793,12 @@ END_CASE]]></ST>
 END_VAR
 ]]></Declaration>
         <Implementation>
+<<<<<<< HEAD
           <ST><![CDATA[AXIS.NC_INTERFACE.ReadStatus();
 IS_MOVING := AXIS.NC_INTERFACE.Status.Moving;]]></ST>
+=======
+          <ST><![CDATA[Is_LimitsNormallyClosed := _NORMCLOSEDLIMIT;]]></ST>
+>>>>>>> refs/remotes/origin/master
         </Implementation>
       </Get>
     </Property>
@@ -752,6 +873,7 @@ END_VAR
         </Implementation>
       </Get>
     </Property>
+<<<<<<< HEAD
     <Method Name="RESET" Id="{d8664777-e864-4c39-ad25-758cd93392c9}" FolderPath="METHODS\">
       <Declaration><![CDATA[METHOD RESET : DINT
 VAR_INPUT
@@ -775,6 +897,34 @@ ELSIF _FBRESET.Done THEN
 	RETURN;
 ELSE 
 	RESET := 0;
+=======
+    <Method Name="EndJog" Id="{f21288cf-b112-46ca-b37c-f646b77c1acd}" FolderPath="Methods\Manual Motion\">
+      <Declaration><![CDATA[{attribute '''NORMAL__COMMENT' := '
+	Y:2016		M:05	D:20
+	D: Terminates the manual motion of the actuation device.
+'}
+(*
+	Y:2016		M:05	D:20
+	D: Terminates the manual motion of the actuation device.
+*)
+METHOD EndJog : DINT
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_M_JOG(
+	Axis:= _DATALINK.NC_INTERFACE, 
+	JogForward:= FALSE, 
+	JogBackwards:= FALSE, 
+	Mode:= MC_JOGMODE_CONTINOUS, 
+	Velocity:= _VELOCITY, 
+	Acceleration:= _ACCELERATION, 
+	Deceleration:= _DECELERATION, 
+	Jerk:= _JERK );
+IF _M_JOG.Error THEN
+	EndJog := 1;
+	RETURN;
+ELSE
+	EndJog := -1;
+>>>>>>> refs/remotes/origin/master
 	RETURN;
 END_IF]]></ST>
       </Implementation>
