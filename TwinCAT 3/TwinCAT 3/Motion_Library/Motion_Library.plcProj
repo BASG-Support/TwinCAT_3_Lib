@@ -20,7 +20,7 @@
     <Description>For projects that require at least 1 motion axis.
 The library is meant as an easy-to-setup module. 
 Motion functions are exposed as object methods.</Description>
-    <ProjectVersion>2.0</ProjectVersion>
+    <ProjectVersion>2.1</ProjectVersion>
     <!--    <OutputType>Exe</OutputType>
     <RootNamespace>MyApplication</RootNamespace>
     <AssemblyName>MyApplication</AssemblyName>-->
@@ -62,10 +62,10 @@ Motion functions are exposed as object methods.</Description>
     <Compile Include="Base Component\Class\M_ACTUATION.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Base Component\Class\M_ACTUATION_EXT_HOMING.TcPOU">
+    <Compile Include="Base Component\Data\E_ACTUATIONSTATE.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Base Component\Data\S_ACTUATION_LINK.TcDUT">
+    <Compile Include="Base Component\Data\S_ACTUATIONDATA.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Base Component\Interface\IFC_ACTUATION.TcIO">

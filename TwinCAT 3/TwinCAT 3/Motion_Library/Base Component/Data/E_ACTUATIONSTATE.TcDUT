@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <DUT Name="E_ACTUATIONSTATE" Id="{5037381f-8aa9-425c-8055-c02cdc407320}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE E_ACTUATIONSTATE :
+(
+	E_MANUAL_ACTUATION := 0,
+	E_PTP_ACTUATION,
+	E_PTP_ACTUATION_EXECUTING,
+	E_SETPOINT_ACTUATION,
+	E_SETPOINT_ACTUATION_ACTIVATED
+)UDINT;
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>
