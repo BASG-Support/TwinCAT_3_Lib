@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
-  <DUT Name="E_ACTUATIONSTATE" Id="{5037381f-8aa9-425c-8055-c02cdc407320}">
+  <DUT Name="E_ACTUATIONSTATE" Id="{16e59552-fb5f-4806-a0a2-3dbbed40f20b}">
     <Declaration><![CDATA[{attribute 'qualified_only'}
 {attribute 'strict'}
 TYPE E_ACTUATIONSTATE :

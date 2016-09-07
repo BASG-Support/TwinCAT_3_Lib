@@ -1,17 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
-<<<<<<< HEAD
   <POU Name="M_ACTUATION" Id="{bc150775-e52b-47ac-85b7-16c43507f156}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK M_ACTUATION IMPLEMENTS IFC_ACTUATION
-=======
-  <POU Name="M_ACTUATION" Id="{83f3e86f-be0c-497d-a38a-fa44c7f08578}" SpecialFunc="None">
-    <Declaration><![CDATA[(*
-	Y:2016		M:05		D:20
-	T:CLASS		N:ACTUATION
-	D:Class object for plc motion projects. Contains all basic necessary methods for movement. The default behavior is to home to negative limit.
-*)
-FUNCTION_BLOCK M_ACTUATION IMPLEMENTS IFC_ACTUATION
->>>>>>> refs/remotes/origin/master
 VAR_INPUT
 END_VAR
 VAR_OUTPUT
@@ -81,132 +71,38 @@ CASE STATE OF
 END_CASE]]></ST>
     </Implementation>
     <Folder Name="METHODS" Id="{5ca65e59-8942-40c0-9326-a05bcb87e5cc}">
-      <Folder Name="Touch Probe" Id="{4fc2bda0-7546-4594-b018-5366df6daee3}" />
-      <Folder Name="PTP" Id="{ae43b488-4f2b-4db4-894a-938c0d88f781}" />
       <Folder Name="External Set Point" Id="{d699ec1d-3ab9-4c1b-804c-2dff66c71d6e}" />
+      <Folder Name="PTP" Id="{ae43b488-4f2b-4db4-894a-938c0d88f781}" />
+      <Folder Name="Touch Probe" Id="{4fc2bda0-7546-4594-b018-5366df6daee3}" />
     </Folder>
     <Folder Name="PROPERTIES" Id="{67e858ac-6b5e-4dfe-8eaa-4cb933702e74}">
-      <Folder Name="Info" Id="{6fe2f36c-6308-4823-9d48-35951e1bd0e7}" />
       <Folder Name="Dynamics" Id="{75a81b41-51c6-4d82-befb-e1d689db065b}" />
-      <Folder Name="External Set Point" Id="{7d14b065-57a9-4c82-b18d-0b1e07e93887}" />
-      <Folder Name="Homing" Id="{8462ca12-e1aa-4fcf-a63e-ea94605b1809}" />
-      <Folder Name="Limits" Id="{ce8e457b-2fe5-42de-b997-d697679f7c6c}" />
-      <Folder Name="Manual Movement" Id="{d263a07f-9962-4b53-bbbc-509aa3b57409}" />
       <Folder Name="Energise" Id="{dc600048-4847-4188-a39e-5c399c67487d}" />
       <Folder Name="Error" Id="{e8650bc8-74ab-42cf-bc6e-c4537c8de56a}" />
+      <Folder Name="External Set Point" Id="{7d14b065-57a9-4c82-b18d-0b1e07e93887}" />
+      <Folder Name="Homing" Id="{8462ca12-e1aa-4fcf-a63e-ea94605b1809}" />
+      <Folder Name="Info" Id="{6fe2f36c-6308-4823-9d48-35951e1bd0e7}" />
+      <Folder Name="Limits" Id="{ce8e457b-2fe5-42de-b997-d697679f7c6c}" />
+      <Folder Name="Manual Movement" Id="{d263a07f-9962-4b53-bbbc-509aa3b57409}" />
     </Folder>
-    <Property Name="SET_DIRECTION" Id="{0196644e-ede5-4c5a-b747-9ab8cad38a06}" FolderPath="PROPERTIES\External Set Point\">
-      <Declaration><![CDATA[PROPERTY SET_DIRECTION : DINT]]></Declaration>
-      <Set Name="Set" Id="{881e7a67-9ab5-4b74-afc8-783af4708402}">
+    <Property Name="ACCELERATION" Id="{97938d2f-0fdc-4cd6-8461-ea3a2079620a}" FolderPath="PROPERTIES\Dynamics\">
+      <Declaration><![CDATA[PROPERTY ACCELERATION : LREAL]]></Declaration>
+      <Get Name="Get" Id="{3054c935-a52e-4a17-b16d-80f546af0a9e}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[IF SET_DIRECTION >= 1 THEN
-	SETPOINT_DIRECTION := 1;
-ELSIF SET_DIRECTION <= -1 THEN
-	SETPOINT_DIRECTION := -1;
-ELSE
-	SETPOINT_DIRECTION := 0;
-END_IF]]></ST>
+          <ST><![CDATA[ACCELERATION := MOTION_ACCELERATION;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{4b56bcd7-6f1f-45a6-949f-6262d89f5925}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[MOTION_ACCELERATION := ABS(ACCELERATION);]]></ST>
         </Implementation>
       </Set>
-    </Property>
-    <Method Name="MOVE_BY" Id="{11a2157a-0644-49f9-9760-54a8391d4cb6}" FolderPath="METHODS\PTP\">
-      <Declaration><![CDATA[METHOD MOVE_BY : DINT
-VAR_INPUT
-	DISTANCE : LREAL;
-	VELOCITY : LREAL;
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[CASE STATE OF 
-	E_ACTUATIONSTATE.E_PTP_ACTUATION, E_ACTUATIONSTATE.E_PTP_ACTUATION_EXECUTING:
-		_FBMOVEREL(
-			Axis:= AXIS.NC_INTERFACE, 
-			Execute:= TRUE, 
-			Distance:= DISTANCE, 
-			Velocity:= VELOCITY, 
-			Acceleration:= ACCELERATION, 
-			Deceleration:= DECELERATION, 
-			Jerk:= JERK );
-		IF _FBMOVEREL.Error THEN
-			_FBMOVEREL(
-				Axis:= AXIS.NC_INTERFACE, 
-				Execute:= FALSE );
-			STATE := E_ACTUATIONSTATE.E_PTP_ACTUATION;
-			MOVE_BY := 1;
-			RETURN;
-		ELSIF _FBMOVEREL.CommandAborted THEN
-			_FBMOVEREL(
-				Axis:= AXIS.NC_INTERFACE, 
-				Execute:= FALSE );
-			STATE := E_ACTUATIONSTATE.E_PTP_ACTUATION;
-			MOVE_BY := 2;
-			RETURN;
-		ELSIF _FBMOVEREL.Done THEN
-			_FBMOVEREL(
-				Axis:= AXIS.NC_INTERFACE, 
-				Execute:= FALSE );
-			STATE := E_ACTUATIONSTATE.E_PTP_ACTUATION;
-			MOVE_BY := -1;
-			RETURN;
-		ELSE
-			STATE := E_ACTUATIONSTATE.E_PTP_ACTUATION_EXECUTING;
-			MOVE_BY := 0;
-			RETURN;
-		END_IF
-	ELSE
-		MOVE_BY := 99;
-		RETURN;
-END_CASE]]></ST>
-      </Implementation>
-    </Method>
-    <Property Name="SET_POSITION" Id="{150bc695-13e1-47a1-b095-f21af1248eb7}" FolderPath="PROPERTIES\External Set Point\">
-      <Declaration><![CDATA[PROPERTY SET_POSITION : LREAL]]></Declaration>
-      <Set Name="Set" Id="{6a5fd028-642a-42bb-b7e8-0ae154b4af59}">
-        <Declaration><![CDATA[
-VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[SETPOINT_POSITION := SET_POSITION;]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="AXIS_ERROR" Id="{19802b36-c822-4d4c-8e92-13b9dc69e01e}" FolderPath="PROPERTIES\Error\">
-      <Declaration><![CDATA[PROPERTY AXIS_ERROR : BOOL]]></Declaration>
-      <Get Name="Get" Id="{3712c0c6-f345-4d87-b437-c3b834a9e365}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[AXIS.NC_INTERFACE.ReadStatus();
-AXIS_ERROR := AXIS.NC_INTERFACE.Status.Error;]]></ST>
-        </Implementation>
-      </Get>
-    </Property>
-    <Property Name="ID" Id="{24b9f50d-7e55-4c3b-8df4-8d0020a0ad08}" FolderPath="PROPERTIES\Info\">
-      <Declaration><![CDATA[PROPERTY ID : UDINT]]></Declaration>
-      <Get Name="Get" Id="{b1d1a354-fb7f-4bbf-ad03-d478f30d6adc}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[ID := AXIS.NC_INTERFACE.NcToPlc.AxisId;]]></ST>
-        </Implementation>
-      </Get>
-    </Property>
-    <Property Name="VELOCITY" Id="{42bb9eb9-614f-4780-9c22-ebd5dba0a5a9}" FolderPath="PROPERTIES\Info\">
-      <Declaration><![CDATA[PROPERTY VELOCITY : LREAL]]></Declaration>
-      <Get Name="Get" Id="{92ac77b6-3e3a-4b33-82dd-51825636d1e3}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[VELOCITY := AXIS.NC_INTERFACE.NcToPlc.ActVelo;]]></ST>
-        </Implementation>
-      </Get>
     </Property>
     <Method Name="ACTIVATE_EXTERNAL_SETPOINT" Id="{4c9f1eb6-48b1-421d-a063-fe3a94ca361c}" FolderPath="METHODS\External Set Point\">
       <Declaration><![CDATA[METHOD ACTIVATE_EXTERNAL_SETPOINT : DINT
@@ -214,7 +110,6 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-<<<<<<< HEAD
         <ST><![CDATA[CASE STATE OF 
 	E_ACTUATIONSTATE.E_SETPOINT_ACTUATION:
 		_FBEXTEN(
@@ -245,61 +140,238 @@ END_VAR
 		ACTIVATE_EXTERNAL_SETPOINT := 99;
 		RETURN;
 END_CASE]]></ST>
-=======
-        <ST><![CDATA[//Resets other move function blocks
-	_M_MOVEV(
-		Axis:= _DATALINK.NC_INTERFACE, 
-		Execute:= FALSE );
-	_M_MOVEA(
-		Axis:= _DATALINK.NC_INTERFACE, 
-		Execute:= FALSE );
-	_M_MOVER(
-		Axis:= _DATALINK.NC_INTERFACE, 
-		Execute:= FALSE );
-//Resets other home function block
-	_M_HOME(
-		Axis:= _DATALINK.NC_INTERFACE, 
-		Execute:= FALSE );
-_M_HALT(
-	Axis:= _DATALINK.NC_INTERFACE, 
-	Execute:= TRUE, 
-	Deceleration:= _DECELERATION, 
-	Jerk:= _JERK );
-IF _M_HALT.Error OR _M_HALT.CommandAborted THEN
-	_M_HALT(
-		Axis:= _DATALINK.NC_INTERFACE, 
-		Execute:= FALSE );
-	Halt := 1;
-	RETURN;
-ELSIF _M_HALT.Done THEN
-	_M_HALT(
-		Axis:= _DATALINK.NC_INTERFACE, 
-		Execute:= FALSE );
-	Halt := -1;
-	RETURN;
-ELSE
-	Halt := 0;
-	RETURN;
-END_IF]]></ST>
->>>>>>> refs/remotes/origin/master
       </Implementation>
     </Method>
-    <Property Name="INVERT_LIMITS" Id="{5ce0e497-6e1f-4022-adcd-d4a0aa6b2849}" FolderPath="PROPERTIES\Limits\">
-      <Declaration><![CDATA[PROPERTY INVERT_LIMITS : BOOL]]></Declaration>
-      <Get Name="Get" Id="{59f678c3-253a-4567-869f-ff6b59c79212}">
+    <Method Name="ACTIVATE_TOUCHPROBE" Id="{810f785a-42c5-4b2a-875c-20334769525e}" FolderPath="METHODS\Touch Probe\">
+      <Declaration><![CDATA[METHOD ACTIVATE_TOUCHPROBE : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_FBTPROBE(
+	Axis:= AXIS.NC_INTERFACE, 
+	TriggerInput:= AXIS.PROBE, 
+	Execute:= TRUE, 
+	WindowOnly:= FALSE, 
+	FirstPosition:= , 
+	LastPosition:= , 
+	Done=> , 
+	Busy=> , 
+	CommandAborted=> , 
+	Error=> , 
+	ErrorID=> , 
+	RecordedPosition=> , 
+	RecordedData=> );
+IF _FBTPROBE.Error OR _FBTPROBE.CommandAborted THEN
+	_FBTPROBE(
+		Axis:= AXIS.NC_INTERFACE, 
+		TriggerInput:= AXIS.PROBE, 
+		Execute:= FALSE );
+	ACTIVATE_TOUCHPROBE := 1;
+	RETURN;
+ELSIF _FBTPROBE.Done THEN
+	_FBTPROBE(
+		Axis:= AXIS.NC_INTERFACE, 
+		TriggerInput:= AXIS.PROBE, 
+		Execute:= FALSE );
+	_PROBEDATA := _FBTPROBE.RecordedData;
+	_PROBEPOSITION := _FBTPROBE.RecordedPosition;
+	ACTIVATE_TOUCHPROBE := -1;
+	RETURN;
+ELSE
+	_FBTPROBE(
+		Axis:= AXIS.NC_INTERFACE, 
+		TriggerInput:= AXIS.PROBE, 
+		Execute:= FALSE );
+	ACTIVATE_TOUCHPROBE := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="AT_NEGATIVE_LIMIT" Id="{eec3977a-e09b-4c34-a0f9-43d8d980a464}" FolderPath="PROPERTIES\Limits\">
+      <Declaration><![CDATA[PROPERTY AT_NEGATIVE_LIMIT : BOOL]]></Declaration>
+      <Get Name="Get" Id="{690de9f4-42c9-4d9d-a9f5-2a0a74e28986}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[INVERT_LIMITS := AXIS.LIMITS_INVERTED;]]></ST>
+          <ST><![CDATA[AT_NEGATIVE_LIMIT := AXIS.HW_NOT;]]></ST>
         </Implementation>
       </Get>
-      <Set Name="Set" Id="{91c3002a-cc32-45fb-a2dd-50ad8fda90fe}">
+    </Property>
+    <Property Name="AT_POSITIVE_LIMIT" Id="{7e7ee9b8-7b9a-42d9-9a1d-8882b0412a80}" FolderPath="PROPERTIES\Limits\">
+      <Declaration><![CDATA[PROPERTY AT_POSITIVE_LIMIT : BOOL]]></Declaration>
+      <Get Name="Get" Id="{b7f053f3-b734-469f-9ac5-0a166c2e5ba3}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[AXIS.LIMITS_INVERTED := INVERT_LIMITS;]]></ST>
+          <ST><![CDATA[AT_POSITIVE_LIMIT := AXIS.HW_POT;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="AXIS_ERROR" Id="{19802b36-c822-4d4c-8e92-13b9dc69e01e}" FolderPath="PROPERTIES\Error\">
+      <Declaration><![CDATA[PROPERTY AXIS_ERROR : BOOL]]></Declaration>
+      <Get Name="Get" Id="{3712c0c6-f345-4d87-b437-c3b834a9e365}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AXIS.NC_INTERFACE.ReadStatus();
+AXIS_ERROR := AXIS.NC_INTERFACE.Status.Error;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="AXIS_ERROR_ID" Id="{b0e57887-6304-4ec6-a4a5-23560c934b83}" FolderPath="PROPERTIES\Error\">
+      <Declaration><![CDATA[PROPERTY AXIS_ERROR_ID : UDINT]]></Declaration>
+      <Get Name="Get" Id="{1950f2f9-6058-4016-80b5-0a2dbab6b34a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AXIS_ERROR_ID := AXIS.NC_INTERFACE.NcToPlc.ErrorCode;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="CALIBRATE_AT_LIMIT" Id="{a17cb1b1-5830-4e4e-a533-f651e3521e4a}" FolderPath="PROPERTIES\Homing\">
+      <Declaration><![CDATA[PROPERTY CALIBRATE_AT_LIMIT : BOOL]]></Declaration>
+      <Get Name="Get" Id="{aaa61d76-6a7d-4e5d-adcb-25f852f6ec8b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CALIBRATE_AT_LIMIT := AXIS.CALIBRATE_AT_LIMIT;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{67b3f453-7da8-45a8-b207-c796791e1a35}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AXIS.CALIBRATE_AT_LIMIT := CALIBRATE_AT_LIMIT;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="CALIBRATE_TO_NEGATIVE" Id="{8d7cede2-15e4-4391-bc2e-77528ccafea0}" FolderPath="PROPERTIES\Homing\">
+      <Declaration><![CDATA[PROPERTY CALIBRATE_TO_NEGATIVE : BOOL]]></Declaration>
+      <Get Name="Get" Id="{25a29a99-3a52-4ea9-bc38-2c686a744480}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CALIBRATE_TO_NEGATIVE := AXIS.CALIBRATE_AT_MINUS;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{90ce2a61-ac47-438c-a340-9e5496942f2d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AXIS.CALIBRATE_AT_MINUS := CALIBRATE_TO_NEGATIVE; ]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="DEACTIVATE_EXTERNAL_SETPOINT" Id="{fd87bd24-71c9-4e15-83ae-58e61096ec20}" FolderPath="METHODS\External Set Point\">
+      <Declaration><![CDATA[METHOD DEACTIVATE_EXTERNAL_SETPOINT : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE STATE OF 
+	E_ACTUATIONSTATE.E_SETPOINT_ACTUATION_ACTIVATED:
+		_FBEXTDN(
+			Axis:= AXIS.NC_INTERFACE, 
+			Execute:= TRUE );
+		IF _FBEXTDN.Error THEN
+			_FBEXTDN(
+				Axis:= AXIS.NC_INTERFACE, 
+				Execute:= FALSE );
+			STATE := E_ACTUATIONSTATE.E_SETPOINT_ACTUATION_ACTIVATED;
+			DEACTIVATE_EXTERNAL_SETPOINT := 1;
+			RETURN;
+		ELSIF _FBEXTDN.Done THEN
+			_FBEXTDN(
+				Axis:= AXIS.NC_INTERFACE, 
+				Execute:= FALSE );
+			STATE := E_ACTUATIONSTATE.E_SETPOINT_ACTUATION;
+			DEACTIVATE_EXTERNAL_SETPOINT := -1;
+			RETURN;
+		ELSE
+			STATE := E_ACTUATIONSTATE.E_SETPOINT_ACTUATION_ACTIVATED;
+			DEACTIVATE_EXTERNAL_SETPOINT := 0;
+			RETURN;
+		END_IF
+	ELSE 
+		DEACTIVATE_EXTERNAL_SETPOINT := 99;
+		RETURN;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="DEACTIVATE_TOUCHPROBE" Id="{bd768da4-c133-454d-b17b-30bb73b693af}" FolderPath="METHODS\Touch Probe\">
+      <Declaration><![CDATA[METHOD DEACTIVATE_TOUCHPROBE : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_FBTPROBE_ABORT(
+	Axis:= AXIS.NC_INTERFACE, 
+	TriggerInput:= AXIS.PROBE, 
+	Execute:= TRUE );
+IF _FBTPROBE_ABORT.Error THEN
+	_FBTPROBE_ABORT(
+		Axis:= AXIS.NC_INTERFACE, 
+		TriggerInput:= AXIS.PROBE, 
+		Execute:= FALSE );
+	DEACTIVATE_TOUCHPROBE := 1;
+	RETURN;
+ELSIF _FBTPROBE_ABORT.DONE THEN
+	_FBTPROBE_ABORT(
+		Axis:= AXIS.NC_INTERFACE, 
+		TriggerInput:= AXIS.PROBE, 
+		Execute:= FALSE );
+	DEACTIVATE_TOUCHPROBE := -1;
+	RETURN; 
+ELSE
+	DEACTIVATE_TOUCHPROBE := 0;
+	RETURN; 
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="DECELERATION" Id="{a5385963-f9d9-4451-8d6a-bce5e7a124f7}" FolderPath="PROPERTIES\Dynamics\">
+      <Declaration><![CDATA[PROPERTY DECELERATION : LREAL]]></Declaration>
+      <Get Name="Get" Id="{9af5c377-9e55-4453-be2e-b35cb43892f4}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[DECELERATION := MOTION_DECELERATION;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{156e8f67-f84e-4754-93c1-c70cf4076f8b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[MOTION_DECELERATION := ABS(DECELERATION);]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="DISABLE_LIMITS" Id="{ad730af9-4e8f-43b3-8056-5b951585711f}" FolderPath="PROPERTIES\Limits\">
+      <Declaration><![CDATA[PROPERTY DISABLE_LIMITS : BOOL]]></Declaration>
+      <Get Name="Get" Id="{f8e7c494-9ce5-417c-a66a-88d4773fa49b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[DISABLE_LIMITS := AXIS.LIMITS_DISABLED;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{d053b59e-c319-4356-8162-d5e67027010c}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AXIS.LIMITS_DISABLED := DISABLE_LIMITS;]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -322,6 +394,121 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
+    <Method Name="HALT" Id="{ecb6ab0b-0272-4ace-98d2-656919179f10}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD HALT : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_FBHALT(
+	Axis:= AXIS.NC_INTERFACE, 
+	Execute:= TRUE, 
+	Deceleration:= DECELERATION, 
+	Jerk:= JERK );
+IF _FBHALT.Error THEN
+	_FBHALT(
+		Axis:= AXIS.NC_INTERFACE, 
+		Execute:= FALSE );
+	HALT := 1;
+	RETURN;
+ELSIF _FBHALT.CommandAborted THEN
+	_FBHALT(
+		Axis:= AXIS.NC_INTERFACE, 
+		Execute:= FALSE );
+	HALT := 2;
+	RETURN;
+ELSIF _FBHALT.Done THEN
+	_FBHALT(
+		Axis:= AXIS.NC_INTERFACE, 
+		Execute:= FALSE );
+	HALT := -1;
+	RETURN;
+ELSE
+	HALT := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="HARDWARE_ERROR_CODE" Id="{801ab258-38f6-4de6-8fd6-e9fb2671cb26}" FolderPath="PROPERTIES\Error\">
+      <Declaration><![CDATA[PROPERTY HARDWARE_ERROR_CODE : UDINT]]></Declaration>
+      <Get Name="Get" Id="{23516cc1-7084-43ee-b4c5-9189ba31f5a1}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[HARDWARE_ERROR_CODE := AXIS.HW_ERR;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="HAS_JOB" Id="{75ce60ce-ac8d-47ba-b714-3d7f970b5b42}" FolderPath="PROPERTIES\Info\">
+      <Declaration><![CDATA[PROPERTY HAS_JOB : BOOL]]></Declaration>
+      <Get Name="Get" Id="{214aaed2-59ed-4384-9c73-de4e9a940000}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AXIS.NC_INTERFACE.ReadStatus();
+HAS_JOB := AXIS.NC_INTERFACE.Status.HasJob;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="HOME" Id="{dee511b4-9809-441b-982b-bcc08994dd70}" FolderPath="METHODS\PTP\">
+      <Declaration><![CDATA[METHOD HOME : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE STATE OF 
+	E_ACTUATIONSTATE.E_PTP_ACTUATION, E_ACTUATIONSTATE.E_PTP_ACTUATION_EXECUTING:
+		DISABLE_LIMITS := TRUE;
+		IF AXIS.CALIBRATE_AT_LIMIT THEN
+			IF AXIS.CALIBRATE_AT_MINUS THEN
+				_FBHOME.bCalibrationCam := AXIS.HW_NOT XOR AXIS.LIMITS_INVERTED;
+			ELSE
+				_FBHOME.bCalibrationCam := AXIS.HW_POT XOR AXIS.LIMITS_INVERTED;
+			END_IF
+		ELSE
+			_FBHOME.bCalibrationCam := AXIS.HW_HOME;
+		END_IF
+		_FBHOME(
+			Axis:= AXIS.NC_INTERFACE, 
+			Execute:= TRUE, 
+			Position:= , 
+			HomingMode:= MC_DEFAULTHOMING, 
+			bCalibrationCam:= );
+		IF _FBHOME.Error THEN
+			_FBHOME(
+				Axis:= AXIS.NC_INTERFACE, 
+				Execute:= FALSE);
+			STATE := E_ACTUATIONSTATE.E_PTP_ACTUATION;
+			DISABLE_LIMITS := FALSE;
+			HOME := 1;
+			RETURN;
+		ELSIF _FBHOME.CommandAborted THEN
+			_FBHOME(
+				Axis:= AXIS.NC_INTERFACE, 
+				Execute:= FALSE);
+			STATE := E_ACTUATIONSTATE.E_PTP_ACTUATION;
+			DISABLE_LIMITS := FALSE;
+			HOME := 2;
+			RETURN;
+		ELSIF _FBHOME.Done THEN
+			_FBHOME(
+				Axis:= AXIS.NC_INTERFACE, 
+				Execute:= FALSE);
+			STATE := E_ACTUATIONSTATE.E_PTP_ACTUATION;
+			DISABLE_LIMITS := FALSE;
+			HOME := -1;
+			RETURN;
+		ELSE
+			STATE := E_ACTUATIONSTATE.E_PTP_ACTUATION_EXECUTING;
+			HOME := 0;
+			RETURN;
+		END_IF
+END_CASE
+]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="HOME_FORCED" Id="{69b25a99-b0a3-4f7f-b80e-c69451556026}" FolderPath="METHODS\PTP\">
       <Declaration><![CDATA[METHOD HOME_FORCED : DINT
 VAR_INPUT
@@ -366,251 +553,109 @@ END_CASE
 ]]></ST>
       </Implementation>
     </Method>
-    <Property Name="HAS_JOB" Id="{75ce60ce-ac8d-47ba-b714-3d7f970b5b42}" FolderPath="PROPERTIES\Info\">
-      <Declaration><![CDATA[PROPERTY HAS_JOB : BOOL]]></Declaration>
-      <Get Name="Get" Id="{214aaed2-59ed-4384-9c73-de4e9a940000}">
+    <Property Name="ID" Id="{24b9f50d-7e55-4c3b-8df4-8d0020a0ad08}" FolderPath="PROPERTIES\Info\">
+      <Declaration><![CDATA[PROPERTY ID : UDINT]]></Declaration>
+      <Get Name="Get" Id="{b1d1a354-fb7f-4bbf-ad03-d478f30d6adc}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ID := AXIS.NC_INTERFACE.NcToPlc.AxisId;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="INVERT_LIMITS" Id="{5ce0e497-6e1f-4022-adcd-d4a0aa6b2849}" FolderPath="PROPERTIES\Limits\">
+      <Declaration><![CDATA[PROPERTY INVERT_LIMITS : BOOL]]></Declaration>
+      <Get Name="Get" Id="{59f678c3-253a-4567-869f-ff6b59c79212}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[INVERT_LIMITS := AXIS.LIMITS_INVERTED;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{91c3002a-cc32-45fb-a2dd-50ad8fda90fe}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AXIS.LIMITS_INVERTED := INVERT_LIMITS;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="IS_MOVING" Id="{b90d697a-f3b5-485f-9564-467eec03f710}" FolderPath="PROPERTIES\Info\">
+      <Declaration><![CDATA[PROPERTY IS_MOVING : BOOL]]></Declaration>
+      <Get Name="Get" Id="{a96e262b-3afe-405b-be7a-a159f6d6f265}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
           <ST><![CDATA[AXIS.NC_INTERFACE.ReadStatus();
-HAS_JOB := AXIS.NC_INTERFACE.Status.HasJob;]]></ST>
+IS_MOVING := AXIS.NC_INTERFACE.Status.Moving;]]></ST>
         </Implementation>
       </Get>
     </Property>
-    <Property Name="AT_POSITIVE_LIMIT" Id="{7e7ee9b8-7b9a-42d9-9a1d-8882b0412a80}" FolderPath="PROPERTIES\Limits\">
-      <Declaration><![CDATA[PROPERTY AT_POSITIVE_LIMIT : BOOL]]></Declaration>
-      <Get Name="Get" Id="{b7f053f3-b734-469f-9ac5-0a166c2e5ba3}">
+    <Property Name="JERK" Id="{cb777aea-8341-4cfb-886c-3b992bf2805e}" FolderPath="PROPERTIES\Dynamics\">
+      <Declaration><![CDATA[PROPERTY JERK : LREAL]]></Declaration>
+      <Get Name="Get" Id="{73886a02-9ccd-4299-80e8-e103e46ef155}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[AT_POSITIVE_LIMIT := AXIS.HW_POT;]]></ST>
+          <ST><![CDATA[JERK := MOTION_JERK;]]></ST>
         </Implementation>
       </Get>
-    </Property>
-    <Property Name="HARDWARE_ERROR_CODE" Id="{801ab258-38f6-4de6-8fd6-e9fb2671cb26}" FolderPath="PROPERTIES\Error\">
-      <Declaration><![CDATA[PROPERTY HARDWARE_ERROR_CODE : UDINT]]></Declaration>
-      <Get Name="Get" Id="{23516cc1-7084-43ee-b4c5-9189ba31f5a1}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-<<<<<<< HEAD
-        <Implementation>
-          <ST><![CDATA[HARDWARE_ERROR_CODE := AXIS.HW_ERR;]]></ST>
-        </Implementation>
-      </Get>
-    </Property>
-    <Method Name="ACTIVATE_TOUCHPROBE" Id="{810f785a-42c5-4b2a-875c-20334769525e}" FolderPath="METHODS\Touch Probe\">
-      <Declaration><![CDATA[METHOD ACTIVATE_TOUCHPROBE : DINT
-VAR_INPUT
-END_VAR
-=======
-      <Implementation>
-        <ST><![CDATA[//Resets other move function blocks
-	_M_MOVEV(
-		Axis:= _DATALINK.NC_INTERFACE, 
-		Execute:= FALSE );
-	_M_MOVEA(
-		Axis:= _DATALINK.NC_INTERFACE, 
-		Execute:= FALSE );
-	_M_MOVER(
-		Axis:= _DATALINK.NC_INTERFACE, 
-		Execute:= FALSE );
-//Resets other home function block
-	_M_HOME(
-		Axis:= _DATALINK.NC_INTERFACE, 
-		Execute:= FALSE );
-//Resets other halt function block
-	_M_HALT(
-		Axis:= _DATALINK.NC_INTERFACE, 
-		Execute:= FALSE );		
-_M_RESET(
-	Axis:= _DATALINK.NC_INTERFACE, 
-	Execute:= TRUE 
-);
-IF _M_RESET.Error THEN
-	_M_RESET(
-		Axis:= _DATALINK.NC_INTERFACE, 
-		Execute:= FALSE 
-	);
-	Reset := 1;
-	RETURN;
-ELSIF _M_RESET.Done THEN
-	_M_RESET(
-		Axis:= _DATALINK.NC_INTERFACE, 
-		Execute:= FALSE 
-	);
-	Reset := -1;
-	RETURN;
-ELSE
-	Reset := 0;
-	RETURN;
-END_IF]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="Disable" Id="{a4601b4a-0b23-4733-b027-79e72515700d}" FolderPath="Methods\">
-      <Declaration><![CDATA[{attribute '''NORMAL__COMMENT' := '
-	Y:2016		M:05	D:20
-	D: Sets the actuation device in a de-energised state, and disable travel on both directions.
-'}
-(*
-	Y:2016		M:05	D:20
-	D: Sets the actuation device in a de-energised state, and disable travel on both directions.
-*)
-METHOD Disable : DINT
->>>>>>> refs/remotes/origin/master
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[_FBTPROBE(
-	Axis:= AXIS.NC_INTERFACE, 
-	TriggerInput:= AXIS.PROBE, 
-	Execute:= TRUE, 
-	WindowOnly:= FALSE, 
-	FirstPosition:= , 
-	LastPosition:= , 
-	Done=> , 
-	Busy=> , 
-	CommandAborted=> , 
-	Error=> , 
-	ErrorID=> , 
-	RecordedPosition=> , 
-	RecordedData=> );
-IF _FBTPROBE.Error OR _FBTPROBE.CommandAborted THEN
-	_FBTPROBE(
-		Axis:= AXIS.NC_INTERFACE, 
-		TriggerInput:= AXIS.PROBE, 
-		Execute:= FALSE );
-	ACTIVATE_TOUCHPROBE := 1;
-	RETURN;
-ELSIF _FBTPROBE.Done THEN
-	_FBTPROBE(
-		Axis:= AXIS.NC_INTERFACE, 
-		TriggerInput:= AXIS.PROBE, 
-		Execute:= FALSE );
-	_PROBEDATA := _FBTPROBE.RecordedData;
-	_PROBEPOSITION := _FBTPROBE.RecordedPosition;
-	ACTIVATE_TOUCHPROBE := -1;
-	RETURN;
-ELSE
-	_FBTPROBE(
-		Axis:= AXIS.NC_INTERFACE, 
-		TriggerInput:= AXIS.PROBE, 
-		Execute:= FALSE );
-	ACTIVATE_TOUCHPROBE := 0;
-	RETURN;
-END_IF]]></ST>
-      </Implementation>
-    </Method>
-    <Property Name="CALIBRATE_TO_NEGATIVE" Id="{8d7cede2-15e4-4391-bc2e-77528ccafea0}" FolderPath="PROPERTIES\Homing\">
-      <Declaration><![CDATA[PROPERTY CALIBRATE_TO_NEGATIVE : BOOL]]></Declaration>
-      <Get Name="Get" Id="{25a29a99-3a52-4ea9-bc38-2c686a744480}">
+      <Set Name="Set" Id="{186a8563-d1b2-425c-aab0-084bc9363ed3}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[CALIBRATE_TO_NEGATIVE := AXIS.CALIBRATE_AT_MINUS;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{90ce2a61-ac47-438c-a340-9e5496942f2d}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[AXIS.CALIBRATE_AT_MINUS := CALIBRATE_TO_NEGATIVE; ]]></ST>
+          <ST><![CDATA[MOTION_JERK := ABS(JERK);]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Property Name="ACCELERATION" Id="{97938d2f-0fdc-4cd6-8461-ea3a2079620a}" FolderPath="PROPERTIES\Dynamics\">
-      <Declaration><![CDATA[PROPERTY ACCELERATION : LREAL]]></Declaration>
-      <Get Name="Get" Id="{3054c935-a52e-4a17-b16d-80f546af0a9e}">
+    <Property Name="JOG_BACKWARD" Id="{e8a66241-f20c-4925-bac9-a08bba1a6bea}" FolderPath="PROPERTIES\Manual Movement\">
+      <Declaration><![CDATA[PROPERTY JOG_BACKWARD : BOOL]]></Declaration>
+      <Set Name="Set" Id="{b9fa8448-f9a3-424f-9623-4eab127f4f46}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-<<<<<<< HEAD
-          <ST><![CDATA[ACCELERATION := MOTION_ACCELERATION;]]></ST>
-=======
-          <ST><![CDATA[At_PLim := _DATALINK.LIMIT_PLUS;]]></ST>
->>>>>>> refs/remotes/origin/master
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{4b56bcd7-6f1f-45a6-949f-6262d89f5925}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[MOTION_ACCELERATION := ABS(ACCELERATION);]]></ST>
+          <ST><![CDATA[MANUAL_BACKWARD := JOG_BACKWARD;]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Property Name="OVERRIDE" Id="{a0c37e34-6a03-4d8b-b247-57f156cb0e4a}" FolderPath="PROPERTIES\Energise\">
-      <Declaration><![CDATA[PROPERTY OVERRIDE : LREAL]]></Declaration>
-      <Set Name="Set" Id="{38c0088a-e11e-4aee-9e1a-7a170fa6711c}">
+    <Property Name="JOG_FORWARD" Id="{c34817ca-d677-42df-8479-dbe86987a5f1}" FolderPath="PROPERTIES\Manual Movement\">
+      <Declaration><![CDATA[PROPERTY JOG_FORWARD : BOOL]]></Declaration>
+      <Set Name="Set" Id="{6a50d427-ddaa-445d-b1c2-39967349e8c7}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[IF OVERRIDE > 100.0 THEN
-	_FBPOWER.Override := 100;
-ELSIF OVERRIDE < 0.0 THEN 
-	_FBPOWER.Override := 0.0;
-ELSE
-	_FBPOWER.Override := OVERRIDE;
+          <ST><![CDATA[MANUAL_FORWARD := JOG_FORWARD;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="JOG_VELOCITY" Id="{e5decd01-c35f-4a11-bcae-088b310b36f4}" FolderPath="PROPERTIES\Manual Movement\">
+      <Declaration><![CDATA[PROPERTY JOG_VELOCITY : LREAL]]></Declaration>
+      <Get Name="Get" Id="{ce24b319-b2db-41eb-9059-5e95b8f93bca}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[JOG_VELOCITY := _FBJOG.Velocity;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{97a9861f-db88-422b-ae17-54b0299fb703}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IF JOG_VELOCITY > 0.0 THEN
+	_FBJOG.Velocity := JOG_VELOCITY;
 END_IF]]></ST>
         </Implementation>
       </Set>
-      <Get Name="Get" Id="{a2460e8c-69e9-4d5e-b195-31e9e38593f7}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[Override := _FBPOWER.Override;]]></ST>
-        </Implementation>
-      </Get>
-    </Property>
-<<<<<<< HEAD
-    <Property Name="CALIBRATE_AT_LIMIT" Id="{a17cb1b1-5830-4e4e-a533-f651e3521e4a}" FolderPath="PROPERTIES\Homing\">
-      <Declaration><![CDATA[PROPERTY CALIBRATE_AT_LIMIT : BOOL]]></Declaration>
-      <Set Name="Set" Id="{67b3f453-7da8-45a8-b207-c796791e1a35}">
-        <Declaration><![CDATA[VAR
-END_VAR
-=======
-    <Property Name="Is_Error" Id="{c1f25efa-1356-4238-aa85-8cc51ce21937}" FolderPath="Properties\">
-      <Declaration><![CDATA[PROPERTY Is_Error : BOOL
->>>>>>> refs/remotes/origin/master
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[AXIS.CALIBRATE_AT_LIMIT := CALIBRATE_AT_LIMIT;]]></ST>
-        </Implementation>
-      </Set>
-      <Get Name="Get" Id="{aaa61d76-6a7d-4e5d-adcb-25f852f6ec8b}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[CALIBRATE_AT_LIMIT := AXIS.CALIBRATE_AT_LIMIT;]]></ST>
-        </Implementation>
-      </Get>
-    </Property>
-    <Property Name="DECELERATION" Id="{a5385963-f9d9-4451-8d6a-bce5e7a124f7}" FolderPath="PROPERTIES\Dynamics\">
-      <Declaration><![CDATA[PROPERTY DECELERATION : LREAL]]></Declaration>
-      <Set Name="Set" Id="{156e8f67-f84e-4754-93c1-c70cf4076f8b}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[MOTION_DECELERATION := ABS(DECELERATION);]]></ST>
-        </Implementation>
-      </Set>
-      <Get Name="Get" Id="{9af5c377-9e55-4453-be2e-b35cb43892f4}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[DECELERATION := MOTION_DECELERATION;]]></ST>
-        </Implementation>
-      </Get>
     </Property>
     <Property Name="MODE" Id="{a62840ac-3dd8-4372-9706-e8320ce9a2ea}" FolderPath="PROPERTIES\Info\">
       <Declaration><![CDATA[PROPERTY MODE : E_ACTUATIONSTATE]]></Declaration>
@@ -702,40 +747,56 @@ END_CASE
 ]]></ST>
       </Implementation>
     </Method>
-    <Property Name="DISABLE_LIMITS" Id="{ad730af9-4e8f-43b3-8056-5b951585711f}" FolderPath="PROPERTIES\Limits\">
-      <Declaration><![CDATA[PROPERTY DISABLE_LIMITS : BOOL]]></Declaration>
-      <Set Name="Set" Id="{d053b59e-c319-4356-8162-d5e67027010c}">
-        <Declaration><![CDATA[VAR
+    <Method Name="MOVE_BY" Id="{11a2157a-0644-49f9-9760-54a8391d4cb6}" FolderPath="METHODS\PTP\">
+      <Declaration><![CDATA[METHOD MOVE_BY : DINT
+VAR_INPUT
+	DISTANCE : LREAL;
+	VELOCITY : LREAL;
 END_VAR
 ]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[AXIS.LIMITS_DISABLED := DISABLE_LIMITS;]]></ST>
-        </Implementation>
-      </Set>
-      <Get Name="Get" Id="{f8e7c494-9ce5-417c-a66a-88d4773fa49b}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-<<<<<<< HEAD
-          <ST><![CDATA[DISABLE_LIMITS := AXIS.LIMITS_DISABLED;]]></ST>
-=======
-          <ST><![CDATA[Current_Velocity := _DATALINK.NC_INTERFACE.NcToPlc.ActVelo;]]></ST>
->>>>>>> refs/remotes/origin/master
-        </Implementation>
-      </Get>
-    </Property>
-    <Property Name="AXIS_ERROR_ID" Id="{b0e57887-6304-4ec6-a4a5-23560c934b83}" FolderPath="PROPERTIES\Error\">
-      <Declaration><![CDATA[PROPERTY AXIS_ERROR_ID : UDINT]]></Declaration>
-      <Get Name="Get" Id="{1950f2f9-6058-4016-80b5-0a2dbab6b34a}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[AXIS_ERROR_ID := AXIS.NC_INTERFACE.NcToPlc.ErrorCode;]]></ST>
-        </Implementation>
-      </Get>
-    </Property>
+      <Implementation>
+        <ST><![CDATA[CASE STATE OF 
+	E_ACTUATIONSTATE.E_PTP_ACTUATION, E_ACTUATIONSTATE.E_PTP_ACTUATION_EXECUTING:
+		_FBMOVEREL(
+			Axis:= AXIS.NC_INTERFACE, 
+			Execute:= TRUE, 
+			Distance:= DISTANCE, 
+			Velocity:= VELOCITY, 
+			Acceleration:= ACCELERATION, 
+			Deceleration:= DECELERATION, 
+			Jerk:= JERK );
+		IF _FBMOVEREL.Error THEN
+			_FBMOVEREL(
+				Axis:= AXIS.NC_INTERFACE, 
+				Execute:= FALSE );
+			STATE := E_ACTUATIONSTATE.E_PTP_ACTUATION;
+			MOVE_BY := 1;
+			RETURN;
+		ELSIF _FBMOVEREL.CommandAborted THEN
+			_FBMOVEREL(
+				Axis:= AXIS.NC_INTERFACE, 
+				Execute:= FALSE );
+			STATE := E_ACTUATIONSTATE.E_PTP_ACTUATION;
+			MOVE_BY := 2;
+			RETURN;
+		ELSIF _FBMOVEREL.Done THEN
+			_FBMOVEREL(
+				Axis:= AXIS.NC_INTERFACE, 
+				Execute:= FALSE );
+			STATE := E_ACTUATIONSTATE.E_PTP_ACTUATION;
+			MOVE_BY := -1;
+			RETURN;
+		ELSE
+			STATE := E_ACTUATIONSTATE.E_PTP_ACTUATION_EXECUTING;
+			MOVE_BY := 0;
+			RETURN;
+		END_IF
+	ELSE
+		MOVE_BY := 99;
+		RETURN;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="MOVE_TO" Id="{b7304d59-518b-4958-872b-880b2fcc8681}" FolderPath="METHODS\PTP\">
       <Declaration><![CDATA[METHOD MOVE_TO : DINT
 VAR_INPUT
@@ -786,94 +847,42 @@ END_VAR
 END_CASE]]></ST>
       </Implementation>
     </Method>
-    <Property Name="IS_MOVING" Id="{b90d697a-f3b5-485f-9564-467eec03f710}" FolderPath="PROPERTIES\Info\">
-      <Declaration><![CDATA[PROPERTY IS_MOVING : BOOL]]></Declaration>
-      <Get Name="Get" Id="{a96e262b-3afe-405b-be7a-a159f6d6f265}">
+    <Property Name="OVERRIDE" Id="{a0c37e34-6a03-4d8b-b247-57f156cb0e4a}" FolderPath="PROPERTIES\Energise\">
+      <Declaration><![CDATA[PROPERTY OVERRIDE : LREAL]]></Declaration>
+      <Get Name="Get" Id="{a2460e8c-69e9-4d5e-b195-31e9e38593f7}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-<<<<<<< HEAD
-          <ST><![CDATA[AXIS.NC_INTERFACE.ReadStatus();
-IS_MOVING := AXIS.NC_INTERFACE.Status.Moving;]]></ST>
-=======
-          <ST><![CDATA[Is_LimitsNormallyClosed := _NORMCLOSEDLIMIT;]]></ST>
->>>>>>> refs/remotes/origin/master
+          <ST><![CDATA[Override := _FBPOWER.Override;]]></ST>
         </Implementation>
       </Get>
-    </Property>
-    <Method Name="DEACTIVATE_TOUCHPROBE" Id="{bd768da4-c133-454d-b17b-30bb73b693af}" FolderPath="METHODS\Touch Probe\">
-      <Declaration><![CDATA[METHOD DEACTIVATE_TOUCHPROBE : DINT
-VAR_INPUT
+      <Set Name="Set" Id="{38c0088a-e11e-4aee-9e1a-7a170fa6711c}">
+        <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[_FBTPROBE_ABORT(
-	Axis:= AXIS.NC_INTERFACE, 
-	TriggerInput:= AXIS.PROBE, 
-	Execute:= TRUE );
-IF _FBTPROBE_ABORT.Error THEN
-	_FBTPROBE_ABORT(
-		Axis:= AXIS.NC_INTERFACE, 
-		TriggerInput:= AXIS.PROBE, 
-		Execute:= FALSE );
-	DEACTIVATE_TOUCHPROBE := 1;
-	RETURN;
-ELSIF _FBTPROBE_ABORT.DONE THEN
-	_FBTPROBE_ABORT(
-		Axis:= AXIS.NC_INTERFACE, 
-		TriggerInput:= AXIS.PROBE, 
-		Execute:= FALSE );
-	DEACTIVATE_TOUCHPROBE := -1;
-	RETURN; 
+        <Implementation>
+          <ST><![CDATA[IF OVERRIDE > 100.0 THEN
+	_FBPOWER.Override := 100;
+ELSIF OVERRIDE < 0.0 THEN 
+	_FBPOWER.Override := 0.0;
 ELSE
-	DEACTIVATE_TOUCHPROBE := 0;
-	RETURN; 
+	_FBPOWER.Override := OVERRIDE;
 END_IF]]></ST>
-      </Implementation>
-    </Method>
-    <Property Name="JOG_FORWARD" Id="{c34817ca-d677-42df-8479-dbe86987a5f1}" FolderPath="PROPERTIES\Manual Movement\">
-      <Declaration><![CDATA[PROPERTY JOG_FORWARD : BOOL]]></Declaration>
-      <Set Name="Set" Id="{6a50d427-ddaa-445d-b1c2-39967349e8c7}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[MANUAL_FORWARD := JOG_FORWARD;]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Property Name="SET_VELOCITY" Id="{c7f442ee-c82b-4daa-ac67-89bc68a996ad}" FolderPath="PROPERTIES\External Set Point\">
-      <Declaration><![CDATA[PROPERTY SET_VELOCITY : LREAL]]></Declaration>
-      <Set Name="Set" Id="{c97c8e54-f7c6-4825-a329-542f12bcf87f}">
+    <Property Name="POSITION" Id="{e9240379-0d3f-460d-a1ca-556158fba142}" FolderPath="PROPERTIES\Info\">
+      <Declaration><![CDATA[PROPERTY POSITION : LREAL]]></Declaration>
+      <Get Name="Get" Id="{84d22463-85b6-4517-9be1-5c0ce399f58a}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[SETPOINT_VELOCITY := SET_VELOCITY;]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="JERK" Id="{cb777aea-8341-4cfb-886c-3b992bf2805e}" FolderPath="PROPERTIES\Dynamics\">
-      <Declaration><![CDATA[PROPERTY JERK : LREAL]]></Declaration>
-      <Set Name="Set" Id="{186a8563-d1b2-425c-aab0-084bc9363ed3}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[MOTION_JERK := ABS(JERK);]]></ST>
-        </Implementation>
-      </Set>
-      <Get Name="Get" Id="{73886a02-9ccd-4299-80e8-e103e46ef155}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[JERK := MOTION_JERK;]]></ST>
+          <ST><![CDATA[POSITION := AXIS.NC_INTERFACE.NcToPlc.ActPos;]]></ST>
         </Implementation>
       </Get>
     </Property>
-<<<<<<< HEAD
     <Method Name="RESET" Id="{d8664777-e864-4c39-ad25-758cd93392c9}" FolderPath="METHODS\">
       <Declaration><![CDATA[METHOD RESET : DINT
 VAR_INPUT
@@ -897,219 +906,60 @@ ELSIF _FBRESET.Done THEN
 	RETURN;
 ELSE 
 	RESET := 0;
-=======
-    <Method Name="EndJog" Id="{f21288cf-b112-46ca-b37c-f646b77c1acd}" FolderPath="Methods\Manual Motion\">
-      <Declaration><![CDATA[{attribute '''NORMAL__COMMENT' := '
-	Y:2016		M:05	D:20
-	D: Terminates the manual motion of the actuation device.
-'}
-(*
-	Y:2016		M:05	D:20
-	D: Terminates the manual motion of the actuation device.
-*)
-METHOD EndJog : DINT
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[_M_JOG(
-	Axis:= _DATALINK.NC_INTERFACE, 
-	JogForward:= FALSE, 
-	JogBackwards:= FALSE, 
-	Mode:= MC_JOGMODE_CONTINOUS, 
-	Velocity:= _VELOCITY, 
-	Acceleration:= _ACCELERATION, 
-	Deceleration:= _DECELERATION, 
-	Jerk:= _JERK );
-IF _M_JOG.Error THEN
-	EndJog := 1;
-	RETURN;
-ELSE
-	EndJog := -1;
->>>>>>> refs/remotes/origin/master
 	RETURN;
 END_IF]]></ST>
       </Implementation>
     </Method>
-    <Method Name="HOME" Id="{dee511b4-9809-441b-982b-bcc08994dd70}" FolderPath="METHODS\PTP\">
-      <Declaration><![CDATA[METHOD HOME : DINT
-VAR_INPUT
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[CASE STATE OF 
-	E_ACTUATIONSTATE.E_PTP_ACTUATION, E_ACTUATIONSTATE.E_PTP_ACTUATION_EXECUTING:
-		DISABLE_LIMITS := TRUE;
-		IF AXIS.CALIBRATE_AT_LIMIT THEN
-			IF AXIS.CALIBRATE_AT_MINUS THEN
-				_FBHOME.bCalibrationCam := AXIS.HW_NOT XOR AXIS.LIMITS_INVERTED;
-			ELSE
-				_FBHOME.bCalibrationCam := AXIS.HW_POT XOR AXIS.LIMITS_INVERTED;
-			END_IF
-		ELSE
-			_FBHOME.bCalibrationCam := AXIS.HW_HOME;
-		END_IF
-		_FBHOME(
-			Axis:= AXIS.NC_INTERFACE, 
-			Execute:= TRUE, 
-			Position:= , 
-			HomingMode:= MC_DEFAULTHOMING, 
-			bCalibrationCam:= );
-		IF _FBHOME.Error THEN
-			_FBHOME(
-				Axis:= AXIS.NC_INTERFACE, 
-				Execute:= FALSE);
-			STATE := E_ACTUATIONSTATE.E_PTP_ACTUATION;
-			DISABLE_LIMITS := FALSE;
-			HOME := 1;
-			RETURN;
-		ELSIF _FBHOME.CommandAborted THEN
-			_FBHOME(
-				Axis:= AXIS.NC_INTERFACE, 
-				Execute:= FALSE);
-			STATE := E_ACTUATIONSTATE.E_PTP_ACTUATION;
-			DISABLE_LIMITS := FALSE;
-			HOME := 2;
-			RETURN;
-		ELSIF _FBHOME.Done THEN
-			_FBHOME(
-				Axis:= AXIS.NC_INTERFACE, 
-				Execute:= FALSE);
-			STATE := E_ACTUATIONSTATE.E_PTP_ACTUATION;
-			DISABLE_LIMITS := FALSE;
-			HOME := -1;
-			RETURN;
-		ELSE
-			STATE := E_ACTUATIONSTATE.E_PTP_ACTUATION_EXECUTING;
-			HOME := 0;
-			RETURN;
-		END_IF
-END_CASE
-]]></ST>
-      </Implementation>
-    </Method>
-    <Property Name="JOG_VELOCITY" Id="{e5decd01-c35f-4a11-bcae-088b310b36f4}" FolderPath="PROPERTIES\Manual Movement\">
-      <Declaration><![CDATA[PROPERTY JOG_VELOCITY : LREAL]]></Declaration>
-      <Set Name="Set" Id="{97a9861f-db88-422b-ae17-54b0299fb703}">
+    <Property Name="SET_DIRECTION" Id="{0196644e-ede5-4c5a-b747-9ab8cad38a06}" FolderPath="PROPERTIES\External Set Point\">
+      <Declaration><![CDATA[PROPERTY SET_DIRECTION : DINT]]></Declaration>
+      <Set Name="Set" Id="{881e7a67-9ab5-4b74-afc8-783af4708402}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[IF JOG_VELOCITY > 0.0 THEN
-	_FBJOG.Velocity := JOG_VELOCITY;
+          <ST><![CDATA[IF SET_DIRECTION >= 1 THEN
+	SETPOINT_DIRECTION := 1;
+ELSIF SET_DIRECTION <= -1 THEN
+	SETPOINT_DIRECTION := -1;
+ELSE
+	SETPOINT_DIRECTION := 0;
 END_IF]]></ST>
         </Implementation>
       </Set>
-      <Get Name="Get" Id="{ce24b319-b2db-41eb-9059-5e95b8f93bca}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[JOG_VELOCITY := _FBJOG.Velocity;]]></ST>
-        </Implementation>
-      </Get>
     </Property>
-    <Property Name="JOG_BACKWARD" Id="{e8a66241-f20c-4925-bac9-a08bba1a6bea}" FolderPath="PROPERTIES\Manual Movement\">
-      <Declaration><![CDATA[PROPERTY JOG_BACKWARD : BOOL]]></Declaration>
-      <Set Name="Set" Id="{b9fa8448-f9a3-424f-9623-4eab127f4f46}">
-        <Declaration><![CDATA[VAR
+    <Property Name="SET_POSITION" Id="{150bc695-13e1-47a1-b095-f21af1248eb7}" FolderPath="PROPERTIES\External Set Point\">
+      <Declaration><![CDATA[PROPERTY SET_POSITION : LREAL]]></Declaration>
+      <Set Name="Set" Id="{6a5fd028-642a-42bb-b7e8-0ae154b4af59}">
+        <Declaration><![CDATA[
+VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[MANUAL_BACKWARD := JOG_BACKWARD;]]></ST>
+          <ST><![CDATA[SETPOINT_POSITION := SET_POSITION;]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Property Name="POSITION" Id="{e9240379-0d3f-460d-a1ca-556158fba142}" FolderPath="PROPERTIES\Info\">
-      <Declaration><![CDATA[PROPERTY POSITION : LREAL]]></Declaration>
-      <Get Name="Get" Id="{84d22463-85b6-4517-9be1-5c0ce399f58a}">
+    <Property Name="SET_VELOCITY" Id="{c7f442ee-c82b-4daa-ac67-89bc68a996ad}" FolderPath="PROPERTIES\External Set Point\">
+      <Declaration><![CDATA[PROPERTY SET_VELOCITY : LREAL]]></Declaration>
+      <Set Name="Set" Id="{c97c8e54-f7c6-4825-a329-542f12bcf87f}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[POSITION := AXIS.NC_INTERFACE.NcToPlc.ActPos;]]></ST>
+          <ST><![CDATA[SETPOINT_VELOCITY := SET_VELOCITY;]]></ST>
         </Implementation>
-      </Get>
+      </Set>
     </Property>
-    <Method Name="HALT" Id="{ecb6ab0b-0272-4ace-98d2-656919179f10}" FolderPath="METHODS\">
-      <Declaration><![CDATA[METHOD HALT : DINT
-VAR_INPUT
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[_FBHALT(
-	Axis:= AXIS.NC_INTERFACE, 
-	Execute:= TRUE, 
-	Deceleration:= DECELERATION, 
-	Jerk:= JERK );
-IF _FBHALT.Error THEN
-	_FBHALT(
-		Axis:= AXIS.NC_INTERFACE, 
-		Execute:= FALSE );
-	HALT := 1;
-	RETURN;
-ELSIF _FBHALT.CommandAborted THEN
-	_FBHALT(
-		Axis:= AXIS.NC_INTERFACE, 
-		Execute:= FALSE );
-	HALT := 2;
-	RETURN;
-ELSIF _FBHALT.Done THEN
-	_FBHALT(
-		Axis:= AXIS.NC_INTERFACE, 
-		Execute:= FALSE );
-	HALT := -1;
-	RETURN;
-ELSE
-	HALT := 0;
-	RETURN;
-END_IF]]></ST>
-      </Implementation>
-    </Method>
-    <Property Name="AT_NEGATIVE_LIMIT" Id="{eec3977a-e09b-4c34-a0f9-43d8d980a464}" FolderPath="PROPERTIES\Limits\">
-      <Declaration><![CDATA[PROPERTY AT_NEGATIVE_LIMIT : BOOL]]></Declaration>
-      <Get Name="Get" Id="{690de9f4-42c9-4d9d-a9f5-2a0a74e28986}">
+    <Property Name="VELOCITY" Id="{42bb9eb9-614f-4780-9c22-ebd5dba0a5a9}" FolderPath="PROPERTIES\Info\">
+      <Declaration><![CDATA[PROPERTY VELOCITY : LREAL]]></Declaration>
+      <Get Name="Get" Id="{92ac77b6-3e3a-4b33-82dd-51825636d1e3}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[AT_NEGATIVE_LIMIT := AXIS.HW_NOT;]]></ST>
+          <ST><![CDATA[VELOCITY := AXIS.NC_INTERFACE.NcToPlc.ActVelo;]]></ST>
         </Implementation>
       </Get>
     </Property>
-    <Method Name="DEACTIVATE_EXTERNAL_SETPOINT" Id="{fd87bd24-71c9-4e15-83ae-58e61096ec20}" FolderPath="METHODS\External Set Point\">
-      <Declaration><![CDATA[METHOD DEACTIVATE_EXTERNAL_SETPOINT : DINT
-VAR_INPUT
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[CASE STATE OF 
-	E_ACTUATIONSTATE.E_SETPOINT_ACTUATION_ACTIVATED:
-		_FBEXTDN(
-			Axis:= AXIS.NC_INTERFACE, 
-			Execute:= TRUE );
-		IF _FBEXTDN.Error THEN
-			_FBEXTDN(
-				Axis:= AXIS.NC_INTERFACE, 
-				Execute:= FALSE );
-			STATE := E_ACTUATIONSTATE.E_SETPOINT_ACTUATION_ACTIVATED;
-			DEACTIVATE_EXTERNAL_SETPOINT := 1;
-			RETURN;
-		ELSIF _FBEXTDN.Done THEN
-			_FBEXTDN(
-				Axis:= AXIS.NC_INTERFACE, 
-				Execute:= FALSE );
-			STATE := E_ACTUATIONSTATE.E_SETPOINT_ACTUATION;
-			DEACTIVATE_EXTERNAL_SETPOINT := -1;
-			RETURN;
-		ELSE
-			STATE := E_ACTUATIONSTATE.E_SETPOINT_ACTUATION_ACTIVATED;
-			DEACTIVATE_EXTERNAL_SETPOINT := 0;
-			RETURN;
-		END_IF
-	ELSE 
-		DEACTIVATE_EXTERNAL_SETPOINT := 99;
-		RETURN;
-END_CASE]]></ST>
-      </Implementation>
-    </Method>
   </POU>
 </TcPlcObject>
