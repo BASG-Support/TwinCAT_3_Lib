@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4019.2">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
   <POU Name="C_SERIALCOMM_PORT" Id="{4e04354b-0238-4af2-9700-d58f6f2a81a4}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK C_SERIALCOMM_PORT IMPLEMENTS I_SERIALCONTROLLER
 VAR_INPUT
@@ -10,11 +10,13 @@ VAR
 	//Software Buffer
 		_txbuffer 		: ComBuffer;
 		_rxbuffer		: ComBuffer;	
+	//Internal Memory Buffer
+		_buffer 	: ARRAY[0..3000] OF BYTE;
 	C_LINECONTROL 	: SerialLineControl;
 	C_SendData 		: SendData;
 	C_ReceiveData	: ReceiveData;
 	_prefix, _suffix: STRING(15);
-	_timeout 		: TIME := T#100MS;
+	_timeout 		: TIME := T#500MS;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -22,17 +24,17 @@ END_VAR
     </Implementation>
     <Folder Name="Properties" Id="{527a4af9-292e-4e17-b518-6a41f46b8a91}" />
     <Folder Name="Methods" Id="{8f5898b1-49dd-4b6a-8a29-ef1dffc37d29}" />
-    <Method Name="FastBackgroundTask" Id="{36ad9a45-66b3-485f-9e4d-b0cad0792f89}">
-      <Declaration><![CDATA[METHOD FastBackgroundTask : DINT
+    <Method Name="UPDATE_BUFFER" Id="{36ad9a45-66b3-485f-9e4d-b0cad0792f89}">
+      <Declaration><![CDATA[METHOD UPDATE_BUFFER : DINT
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[{warning 'Hardware function is not implemented in Serial Comm base class'}
-;]]></ST>
+UPDATE_BUFFER := 0;
+RETURN;]]></ST>
       </Implementation>
     </Method>
-    <Property Name="Prefix" Id="{384c528f-f7fc-4df3-a005-bb3804a0b3ee}" FolderPath="Properties\">
-      <Declaration><![CDATA[{warning 'add property implementation'}
-PROPERTY Prefix : STRING(15)
+    <Property Name="RECEIVE_PREFIX" Id="{384c528f-f7fc-4df3-a005-bb3804a0b3ee}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY RECEIVE_PREFIX : STRING(15)
 ]]></Declaration>
       <Set Name="Set" Id="{37ec1fd1-2f33-4239-80f9-9b05ca3a5aa4}">
         <Declaration><![CDATA[VAR
@@ -51,8 +53,8 @@ END_VAR
         </Implementation>
       </Get>
     </Property>
-    <Method Name="Send" Id="{3eb09680-9cfa-425f-b5f0-18dadaa85f69}" FolderPath="Methods\">
-      <Declaration><![CDATA[METHOD Send : DINT
+    <Method Name="SEND" Id="{3eb09680-9cfa-425f-b5f0-18dadaa85f69}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD SEND : DINT
 VAR_INPUT
 	ptr_data 	: PVOID;
 	length		: UDINT;
@@ -74,13 +76,12 @@ ELSE
 END_IF]]></ST>
       </Implementation>
     </Method>
-    <Method Name="Receive" Id="{810adef9-b34c-4f5a-9e46-6acf5bc716df}" FolderPath="Methods\">
-      <Declaration><![CDATA[METHOD Receive : DINT
+    <Method Name="RECEIVE" Id="{810adef9-b34c-4f5a-9e46-6acf5bc716df}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD RECEIVE : DINT
 VAR_INPUT
 	ptr_data 	: PVOID;
 END_VAR
 VAR
-	_buffer 	: ARRAY[0..3000] OF BYTE;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF LEN(_prefix) > 0 THEN
@@ -116,9 +117,8 @@ ELSE
 END_IF]]></ST>
       </Implementation>
     </Method>
-    <Property Name="TimeOut" Id="{bc87036c-275e-440d-8811-8ecad8d1b588}">
-      <Declaration><![CDATA[{warning 'add property implementation'}
-PROPERTY TimeOut : TIME
+    <Property Name="TIMEOUT" Id="{bc87036c-275e-440d-8811-8ecad8d1b588}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY TIMEOUT : TIME
 ]]></Declaration>
       <Get Name="Get" Id="{c0a741ee-d22f-4425-91b2-b00ac0e44f37}">
         <Declaration><![CDATA[VAR
@@ -137,16 +137,15 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
-    <Property Name="Suffix" Id="{d004c93a-e11d-438c-9906-d3ef808796b8}" FolderPath="Properties\">
-      <Declaration><![CDATA[{warning 'add property implementation'}
-PROPERTY Suffix : STRING(15)
+    <Property Name="RECEIVE_SUFFIX" Id="{d004c93a-e11d-438c-9906-d3ef808796b8}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY RECEIVE_SUFFIX : STRING(15)
 ]]></Declaration>
       <Get Name="Get" Id="{2d6c18a7-6d66-416f-b01b-d6ec0a451a95}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[Suffix := _suffix;]]></ST>
+          <ST><![CDATA[RECEIVE_SUFFIX := _suffix;]]></ST>
         </Implementation>
       </Get>
       <Set Name="Set" Id="{87c3cf67-019d-4a8e-85e4-db8e759b91c8}">
@@ -154,7 +153,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[_suffix := Suffix;]]></ST>
+          <ST><![CDATA[_suffix := RECEIVE_SUFFIX;]]></ST>
         </Implementation>
       </Set>
     </Property>

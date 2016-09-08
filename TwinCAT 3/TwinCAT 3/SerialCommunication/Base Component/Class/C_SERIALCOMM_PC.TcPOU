@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4019.2">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
   <POU Name="C_SERIALCOMM_PC" Id="{580a166b-08ad-475e-bc5e-6db98bee5c74}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK C_SERIALCOMM_PC EXTENDS C_SERIALCOMM_PORT
 VAR_INPUT
@@ -14,8 +14,8 @@ END_VAR
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Method Name="FastBackgroundTask" Id="{2b72e314-ba4c-4da8-8cfa-d4374b9c4505}">
-      <Declaration><![CDATA[METHOD FastBackgroundTask : DINT
+    <Method Name="UPDATE_BUFFER" Id="{2b72e314-ba4c-4da8-8cfa-d4374b9c4505}">
+      <Declaration><![CDATA[METHOD UPDATE_BUFFER : DINT
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[{message 'PC type Comm Port implemented'}
@@ -25,7 +25,15 @@ C_LINECONTROL(
 	pComOut:= ADR(_hwTxBuffer), 
 	SizeComIn:= SIZEOF(_hwRxBuffer), 
 	TxBuffer:= _txbuffer, 
-	RxBuffer:= _rxbuffer);]]></ST>
+	RxBuffer:= _rxbuffer);
+		
+IF C_LINECONTROL.Error THEN
+	UPDATE_BUFFER := 1;
+	RETURN;
+ELSE
+	UPDATE_BUFFER := -1;
+	RETURN;
+END_IF]]></ST>
       </Implementation>
     </Method>
   </POU>
