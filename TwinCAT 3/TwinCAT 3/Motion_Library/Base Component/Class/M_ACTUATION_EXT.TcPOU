@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <POU Name="M_ACTUATION_EXT" Id="{3e3ce1e2-176b-4389-b8a6-6008c12ac8f5}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK M_ACTUATION_EXT EXTENDS M_ACTUATION
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="HOME_HARDSTOP" Id="{4c17fcde-eeaa-432e-9484-3dee83a26f23}">
+      <Declaration><![CDATA[METHOD HOME_HARDSTOP : DINT
+VAR_INPUT
+	TOLERANCE : LREAL := 5.0;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE STATE OF 
+	E_ACTUATIONSTATE.E_PTP_ACTUATION, E_ACTUATIONSTATE.E_PTP_ACTUATION_EXECUTING:
+		DISABLE_LIMITS := TRUE;
+		_FBHOME.bCalibrationCam := LAG_ERROR > TOLERANCE;
+		_FBHOME(
+			Axis:= AXIS.NC_INTERFACE, 
+			Execute:= TRUE, 
+			Position:= , 
+			HomingMode:= MC_DEFAULTHOMING, 
+			bCalibrationCam:= );
+		IF _FBHOME.Error THEN
+			_FBHOME(
+				Axis:= AXIS.NC_INTERFACE, 
+				Execute:= FALSE);
+			STATE := E_ACTUATIONSTATE.E_PTP_ACTUATION;
+			DISABLE_LIMITS := FALSE;
+			HOME := 1;
+			RETURN;
+		ELSIF _FBHOME.CommandAborted THEN
+			_FBHOME(
+				Axis:= AXIS.NC_INTERFACE, 
+				Execute:= FALSE);
+			STATE := E_ACTUATIONSTATE.E_PTP_ACTUATION;
+			DISABLE_LIMITS := FALSE;
+			HOME := 2;
+			RETURN;
+		ELSIF _FBHOME.Done THEN
+			_FBHOME(
+				Axis:= AXIS.NC_INTERFACE, 
+				Execute:= FALSE);
+			STATE := E_ACTUATIONSTATE.E_PTP_ACTUATION;
+			DISABLE_LIMITS := FALSE;
+			HOME := -1;
+			RETURN;
+		ELSE
+			STATE := E_ACTUATIONSTATE.E_PTP_ACTUATION_EXECUTING;
+			HOME := 0;
+			RETURN;
+		END_IF
+END_CASE
+]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="LAG_ERROR" Id="{cf998aa2-c95f-47ca-a28f-e39e55b92be0}">
+      <Declaration><![CDATA[PROPERTY LAG_ERROR : LREAL]]></Declaration>
+      <Get Name="Get" Id="{831cbe81-ab68-457f-aaa5-52a9e4635a2d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[LAG_ERROR := AXIS.NC_INTERFACE.NcToPlc.PosDiff;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+  </POU>
+</TcPlcObject>
