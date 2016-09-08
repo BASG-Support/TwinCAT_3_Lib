@@ -71,12 +71,6 @@
 			</Tasks>
 		</System>
 		<Plc>
-			<Project GUID="{2EB64C17-FD89-48AC-922E-0985F9888B05}" Name="SerialCommunication" PrjFilePath="SerialCommunication\SerialCommunication.plcProj" TmcFilePath="SerialCommunication\SerialCommunication.tmc" ReloadTmc="true" AmsPort="851" TargetArchiveSettings="#x0000" FileArchiveSettings="#x0000">
-				<Instance Id="#x01010010" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
-					<Name>SerialCommunication Instance</Name>
-					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
-				</Instance>
-			</Project>
 			<Project GUID="{8D406A80-2E75-466F-84CE-D02B49BECCA8}" Name="Motion_Library" PrjFilePath="Motion_Library\Motion_Library.plcProj" TmcFilePath="Motion_Library\Motion_Library.tmc" ReloadTmc="true" AmsPort="852" TargetArchiveSettings="#x0002" FileArchiveSettings="#x0000">
 				<Instance Id="#x01010020" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
 					<Name>Motion_Library Instance</Name>
@@ -126,6 +120,12 @@
 					<TaskPouOids>
 						<TaskPouOid Prio="20" OTCID="#x01010031"/>
 					</TaskPouOids>
+				</Instance>
+			</Project>
+			<Project GUID="{2EB64C17-FD89-48AC-922E-0985F9888B05}" Name="SerialComm_Library" PrjFilePath="SerialComm_Library\SerialComm_Library.plcProj" TmcFilePath="SerialComm_Library\SerialComm_Library.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e">
+				<Instance Id="#x01010010" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
+					<Name>SerialComm_Library Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 				</Instance>
 			</Project>
 		</Plc>
