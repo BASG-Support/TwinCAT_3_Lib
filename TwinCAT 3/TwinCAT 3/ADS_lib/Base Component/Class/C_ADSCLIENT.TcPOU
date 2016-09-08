@@ -1,0 +1,222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <POU Name="C_ADSCLIENT" Id="{f51f5904-7a1b-4c26-bcb2-4890facaa716}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK C_ADSCLIENT
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	_AMSID 		: STRING(23);
+	_AMSPORT	: UINT := 851;	
+	_TIMEOUT	: TIME := T#5S;
+	
+	_FBREAD		: ADSREAD;
+	_FBWRITE	: ADSWRITE;
+	_FBRDWRT	: ADSRDWRT;
+	_FBSETCTRL	: ADSWRTCTL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="METHODS" Id="{40b40827-b13c-4b25-a752-de8816e38e5e}" />
+    <Folder Name="PROPERTIES" Id="{fe8d61b2-db1d-4922-abd5-6e7764674d50}" />
+    <Method Name="CREATE_HANDLE" Id="{f9e1699a-7766-4bf6-8d67-76ed36e0a424}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD CREATE_HANDLE : DINT
+VAR_INPUT
+	VARIABLE_NAME 	: STRING(255);
+	HANDLE_OUT		: POINTER TO UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_FBRDWRT(
+	NETID:= NET_ID, 
+	PORT:= PORT, 
+	IDXGRP:= 16#F003, 
+	IDXOFFS:= 0, 
+	WRITELEN:= LEN(VARIABLE_NAME), 
+	READLEN:= 4, 
+	SRCADDR:= ADR(VARIABLE_NAME), 
+	DESTADDR:= HANDLE_OUT, 
+	WRTRD:= TRUE, 
+	TMOUT:= TIMEOUT, 
+	BUSY=> , 
+	ERR=> , 
+	ERRID=> );
+IF _FBRDWRT.ERR THEN
+	 _FBRDWRT( WRTRD:= FALSE );
+	 CREATE_HANDLE := 1;
+	 RETURN;
+ELSIF NOT _FBRDWRT.BUSY THEN
+	 _FBRDWRT( WRTRD:= FALSE );
+	 CREATE_HANDLE := -1;
+	 RETURN;
+ELSE
+	 CREATE_HANDLE := 0;
+	 RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="NET_ID" Id="{0bff90f3-1ce2-4191-b09a-f15eaae289a6}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY NET_ID : STRING(23)]]></Declaration>
+      <Get Name="Get" Id="{6838f6e2-346c-459e-8e99-2fc0690ba13d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[NET_ID := _AMSID;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{46edbb30-7b93-4efe-a64e-c6154c60f815}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_AMSID := NET_ID;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="PORT" Id="{8ed5770d-7ba6-46d5-9188-94b6d863db55}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY PORT : UINT]]></Declaration>
+      <Get Name="Get" Id="{0bfd75d3-9f8e-4186-8c49-764fb9bac664}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[PORT := _AMSPORT;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{ce0f6bc2-2788-4b57-8e05-75b7bdf3814a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_AMSPORT := PORT;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="READ_BY_HANDLE" Id="{931c1035-208e-4848-bd8c-eac77d224ab6}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD READ_BY_HANDLE : DINT
+VAR_INPUT
+	HANDLE 		: UDINT;
+	LENGTH 		: UDINT;
+	POINTER_OUT	: PVOID;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_FBREAD(
+	NETID:= _AMSID, 
+	PORT:= _AMSPORT, 
+	IDXGRP:= 16#F005, 
+	IDXOFFS:= HANDLE, 
+	LEN:= LENGTH, 
+	DESTADDR:= POINTER_OUT, 
+	READ:= TRUE, 
+	TMOUT:= TIMEOUT, 
+	BUSY=> , 
+	ERR=> , 
+	ERRID=> );
+IF _FBREAD.ERR THEN
+	_FBREAD( READ:= FALSE );
+	READ_BY_HANDLE := 1;
+	RETURN;
+ELSIF NOT _FBREAD.BUSY THEN
+	_FBREAD( READ:= FALSE );
+	READ_BY_HANDLE := -1;
+	RETURN;
+ELSE
+	READ_BY_HANDLE := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="RELEASE_HANDLE" Id="{04026377-2dab-4a83-8d7f-1b1bd610fa4e}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD RELEASE_HANDLE : DINT
+VAR_INPUT
+	HANDLE : UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_FBWRITE(
+	NETID:= NET_ID, 
+	PORT:= PORT,
+	IDXGRP:= 16#F006, 
+	IDXOFFS:= 0, 
+	LEN:= 4, 
+	SRCADDR:= ADR(HANDLE), 
+	WRITE:= TRUE, 
+	TMOUT:= TIMEOUT, 
+	BUSY=> , 
+	ERR=> , 
+	ERRID=> );
+IF _FBWRITE.ERR THEN
+	_FBWRITE( WRITE:= FALSE );
+	RELEASE_HANDLE := 1;
+	RETURN;
+ELSIF NOT _FBWRITE.BUSY THEN
+	_FBWRITE( WRITE:= FALSE );
+	RELEASE_HANDLE := -1;
+	RETURN;
+ELSE
+	RELEASE_HANDLE := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="TIMEOUT" Id="{376d2b8e-8b1b-4f90-b1f8-d6a607e903a1}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY TIMEOUT : TIME]]></Declaration>
+      <Get Name="Get" Id="{dc37f934-1988-437f-b2cf-77968012ae93}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[TIMEOUT := _TIMEOUT;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{fc13d2c8-7692-4c7a-85c4-9d109fc3f32d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_TIMEOUT := TIMEOUT;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="WRITE_BY_HANDLE" Id="{cf1d9e22-b3b1-43c0-a56b-0398b26a9adc}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD WRITE_BY_HANDLE : DINT
+VAR_INPUT
+	HANDLE 		: UDINT;
+	LENGTH 		: UDINT;
+	POINTER_IN	: PVOID;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_FBWRITE(
+	NETID:= _AMSID, 
+	PORT:= _AMSPORT, 
+	IDXGRP:= 16#F005, 
+	IDXOFFS:= HANDLE,
+	LEN:= LENGTH, 
+	SRCADDR:= POINTER_IN, 
+	WRITE:= TRUE, 
+	TMOUT:= TIMEOUT, 
+	BUSY=> , 
+	ERR=> , 
+	ERRID=> );
+IF _FBWRITE.ERR THEN
+	_FBWRITE( WRITE:= FALSE );
+	WRITE_BY_HANDLE := 1;
+	RETURN;
+ELSIF NOT _FBWRITE.BUSY THEN
+	_FBWRITE( WRITE:= FALSE );
+	WRITE_BY_HANDLE := -1;
+	RETURN;
+ELSE
+	WRITE_BY_HANDLE := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>
