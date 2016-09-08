@@ -5,7 +5,7 @@
     <FileVersion>1.0.0.0</FileVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{2eb64c17-fd89-48ac-922e-0985f9888b05}</ProjectGuid>
-    <Name>SerialCommunication</Name>
+    <Name>SerialComm_Library</Name>
     <ProgramVersion>3.1.4020.10</ProgramVersion>
     <Application>{51416b3f-1c2c-4a09-a214-5bfdb065fa44}</Application>
     <TypeSystem>{5225d859-7e86-412d-87ac-a0be09ccf330}</TypeSystem>
@@ -71,15 +71,15 @@ Number of serial com channels can be specified in the Parameter list.</Descripti
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="SerialCommunication.tmc">
+    <None Include="SerialComm_Library.tmc">
       <SubType>Content</SubType>
     </None>
   </ItemGroup>
   <ProjectExtensions>
     <PlcProjectOptions>
       <XmlArchive>
-        <Data>
-          <o xml:space="preserve" t="OptionKey">
+  <Data>
+    <o xml:space="preserve" t="OptionKey">
       <v n="Name">"&lt;ProjectRoot&gt;"</v>
       <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
         <v>{8F99A816-E488-41E4-9FA3-846536012284}</v>
@@ -121,6 +121,8 @@ Number of serial com channels can be specified in the Parameter list.</Descripti
           <v n="Name">"{C70B7845-2722-4a9b-A0EA-88C877A4B36F}"</v>
           <d n="SubKeys" t="Hashtable" />
           <d n="Values" t="Hashtable" ckt="String">
+            <v>EnableMaxAuthenticationTrials</v>
+            <v>true</v>
             <v>MaxAuthenticationTrials</v>
             <v>3</v>
             <v>UserList</v>
@@ -173,8 +175,6 @@ Number of serial com channels can be specified in the Parameter list.</Descripti
                 <v>d41d8cd98f00b204e9800998ecf8427e</v>
               </d>
             </o>
-            <v>EnableMaxAuthenticationTrials</v>
-            <v>true</v>
           </d>
         </o>
         <v>{192FAD59-8248-4824-A8DE-9177C94C195A}</v>
@@ -204,22 +204,22 @@ Number of serial com channels can be specified in the Parameter list.</Descripti
       </d>
       <d n="Values" t="Hashtable" />
     </o>
-        </Data>
-        <TypeList>
-          <Type n="ArrayList">System.Collections.ArrayList</Type>
-          <Type n="Boolean">System.Boolean</Type>
-          <Type n="Group">{daecd4be-1e2b-4335-a125-4a1ac83ea49f}</Type>
-          <Type n="GroupList">{bf4dffda-f055-446d-9d7a-5f126720896b}</Type>
-          <Type n="Guid">System.Guid</Type>
-          <Type n="Hashtable">System.Collections.Hashtable</Type>
-          <Type n="Int32">System.Int32</Type>
-          <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
-          <Type n="String">System.String</Type>
-          <Type n="User">{cd83029e-13b0-491e-9e4b-921adda0d86b}</Type>
-          <Type n="UserAuthentication">{3635a671-97f5-41bb-9e29-0ebb9795975c}</Type>
-          <Type n="UserList">{9fe6b547-6bc8-4f11-b589-b517860c5891}</Type>
-        </TypeList>
-      </XmlArchive>
+  </Data>
+  <TypeList>
+    <Type n="ArrayList">System.Collections.ArrayList</Type>
+    <Type n="Boolean">System.Boolean</Type>
+    <Type n="Group">{daecd4be-1e2b-4335-a125-4a1ac83ea49f}</Type>
+    <Type n="GroupList">{bf4dffda-f055-446d-9d7a-5f126720896b}</Type>
+    <Type n="Guid">System.Guid</Type>
+    <Type n="Hashtable">System.Collections.Hashtable</Type>
+    <Type n="Int32">System.Int32</Type>
+    <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
+    <Type n="String">System.String</Type>
+    <Type n="User">{cd83029e-13b0-491e-9e4b-921adda0d86b}</Type>
+    <Type n="UserAuthentication">{3635a671-97f5-41bb-9e29-0ebb9795975c}</Type>
+    <Type n="UserList">{9fe6b547-6bc8-4f11-b589-b517860c5891}</Type>
+  </TypeList>
+</XmlArchive>
     </PlcProjectOptions>
   </ProjectExtensions>
   <!-- 
