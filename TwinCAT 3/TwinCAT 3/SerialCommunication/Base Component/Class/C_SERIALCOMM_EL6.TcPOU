@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <POU Name="C_SERIALCOMM_EL6" Id="{d8ebae4b-5429-44ab-95ab-60e002b19f0f}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK C_SERIALCOMM_EL6 EXTENDS C_SERIALCOMM_PORT
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	_hwRxBuffer		AT %I* : EL6inData22B;
+	_hwTxBuffer		AT %Q* : EL6outData22B;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="UPDATE_BUFFER" Id="{e8e24661-1946-404e-81cc-392f7b282ea5}">
+      <Declaration><![CDATA[METHOD UPDATE_BUFFER : DINT
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[{message 'PC type Comm Port implemented'}
+C_LINECONTROL(
+	Mode:= SERIALLINEMODE_EL6_22B, 
+	pComIn:= ADR(_hwRxBuffer), 
+	pComOut:= ADR(_hwTxBuffer), 
+	SizeComIn:= SIZEOF(_hwRxBuffer), 
+	TxBuffer:= _txbuffer, 
+	RxBuffer:= _rxbuffer);
+	
+IF C_LINECONTROL.Error THEN
+	UPDATE_BUFFER := 1;
+	RETURN;
+ELSE
+	UPDATE_BUFFER := -1;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

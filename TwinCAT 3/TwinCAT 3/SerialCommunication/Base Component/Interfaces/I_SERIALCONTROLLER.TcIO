@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <Itf Name="I_SERIALCONTROLLER" Id="{9bbed68e-90bf-49b5-80e8-9936eebff057}">
+    <Declaration><![CDATA[INTERFACE I_SERIALCONTROLLER
+]]></Declaration>
+    <Folder Name="Properties" Id="{462344d6-7dc5-40ad-9ce7-cf0104857418}" />
+    <Folder Name="Methods" Id="{d0205f32-4297-4cf1-98c6-69734cd31a8e}" />
+    <Method Name="RECEIVE" Id="{07ff3417-c579-44dd-a007-f6c3636c4451}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD RECEIVE : DINT
+VAR_INPUT
+	ptr_data 	: PVOID;
+END_VAR
+VAR
+END_VAR]]></Declaration>
+    </Method>
+    <Property Name="TIMEOUT" Id="{61471b07-56b1-46fd-9654-dfd549263133}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY TIMEOUT : TIME
+]]></Declaration>
+      <Get Name="Get" Id="{1bd1c8cf-7a08-4698-bd5b-9962efd67142}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{33e0de57-2880-499f-9869-1cbf2860e86b}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Method Name="SEND" Id="{6fdd4c8a-41d3-4568-b6f6-ee5c6a4f5495}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD SEND : DINT
+VAR_INPUT
+	ptr_data 	: PVOID;
+	length		: UDINT;
+END_VAR]]></Declaration>
+    </Method>
+    <Property Name="RECEIVE_PREFIX" Id="{76375013-ad80-4115-81e3-b600750c1f0a}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY RECEIVE_PREFIX : STRING(15)
+]]></Declaration>
+      <Set Name="Set" Id="{968823fc-4486-4207-a202-10ddd0639262}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+      <Get Name="Get" Id="{ae6ef125-2705-49d4-ae6a-19d96a72281f}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="RECEIVE_SUFFIX" Id="{ded13619-117a-4cd3-ae8b-5707d4b4335b}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY RECEIVE_SUFFIX : STRING(15)
+]]></Declaration>
+      <Set Name="Set" Id="{ebbebcec-ead2-424b-8834-d74815ca1cea}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+      <Get Name="Get" Id="{f96874e5-3f25-41c7-bf4a-870b3bb0b8fd}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="FastBackgroundTask" Id="{ff46bd2e-628d-4fd8-90ca-4fa24e16cf47}">
+      <Declaration><![CDATA[METHOD FastBackgroundTask : DINT
+]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>
