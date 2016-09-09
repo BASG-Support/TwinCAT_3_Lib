@@ -14,9 +14,9 @@
     <Implicit_Jitter_Distribution>{f65ac840-06fb-4b29-acab-5ac6a4432c4f}</Implicit_Jitter_Distribution>
     <LibraryReferences>{906347f0-807a-4640-955a-0aea20737750}</LibraryReferences>
     <Company>Chua Siang Poh</Company>
-    <Released>true</Released>
+    <Released>false</Released>
     <Title>Stream_lib</Title>
-    <ProjectVersion>1.0</ProjectVersion>
+    <ProjectVersion>1.1</ProjectVersion>
     <DefaultNamespace>Stream_lib</DefaultNamespace>
     <Placeholder>Stream_lib</Placeholder>
     <Author>Chua Siang Poh</Author>
@@ -37,24 +37,28 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Base Component" />
-    <Folder Include="Interface" />
+    <Folder Include="Base Component\Class" />
+    <Folder Include="Base Component\Class\Binary" />
+    <Folder Include="Base Component\Class\Stream" />
+    <Folder Include="Base Component\Datatype" />
+    <Folder Include="Base Component\Interface" />
     <Folder Include="Project Information" />
     <Folder Include="Version" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Base Component\C_BINARYREADER.TcPOU">
+    <Compile Include="Base Component\Class\Binary\C_BINARYREADER.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Base Component\C_BINARYWRITER.TcPOU">
+    <Compile Include="Base Component\Class\Binary\C_BINARYWRITER.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Base Component\C_BINARYSTREAM.TcPOU">
+    <Compile Include="Base Component\Class\Stream\C_BINARYSTREAM.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Base Component\E_STREAMSEEKTYPE.TcDUT">
+    <Compile Include="Base Component\Datatype\E_STREAMSEEKTYPE.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Interface\I_STREAM.TcIO">
+    <Compile Include="Base Component\Interface\I_STREAM.TcIO">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Project Information\F_GetCompany.TcPOU">
