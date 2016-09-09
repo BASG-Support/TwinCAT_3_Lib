@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <POU Name="C_SQLITE" Id="{a7ee5403-6d43-4885-8669-cfa9297b2c15}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK C_SQLITE EXTENDS C_DBADAPTOR
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	_FBADDCONN		: FB_DBConnectionAdd;
+	_FBSQLDELETE 	: FB_DBRecordDelete;
+	_FBSQLINSERT 	: FB_DBRecordInsert_EX;
+	_FBSQLSELECT 	: FB_DBRecordArraySelect;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="METHODS" Id="{e654c67b-c57e-4f3d-a34c-33451736c15b}">
+      <Folder Name="SQL" Id="{a1eb873f-d914-4db2-ae6d-e7813fe3a398}" />
+    </Folder>
+    <Method Name="SQL_DELETE" Id="{14ba833c-692c-4c6b-bf26-b30e6177eab6}" FolderPath="METHODS\SQL\">
+      <Declaration><![CDATA[{attribute 'object_name' := 'SQL_Delete'}
+METHOD SQL_DELETE : DINT
+VAR_INPUT
+	SQL 	: POINTER TO T_SQL_COMMAND;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_FBSQLDELETE(
+	sNetID:= sAmsNetId, 
+	hDBID:= DB_ID, 
+	pCmdAddr:= SQL, 
+	cbCmdSize:= GET_SQL_COMMAND_LENGTH(SQL), 
+	bExecute:= TRUE, 
+	tTimeout:= _TIMEOUT );
+IF _FBSQLDELETE.bError THEN
+	_FBSQLDELETE(bExecute:= FALSE);
+	SQL_Delete := 1;
+	RETURN;
+ELSIF NOT _FBSQLDELETE.bBusy THEN
+	_FBSQLDELETE(bExecute:= FALSE);
+	SQL_Delete := -1;
+	RETURN;
+ELSE
+	SQL_Delete := 0;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SQL_INSERT" Id="{813d7971-78c7-4d45-8f56-becb63644dad}" FolderPath="METHODS\SQL\">
+      <Declaration><![CDATA[{attribute 'object_name' := 'SQL_Insert'}
+METHOD SQL_INSERT : DINT
+VAR_INPUT
+	SQL : POINTER TO T_SQL_COMMAND;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_FBSQLINSERT(
+	sNetID:= sAmsNetId, 
+	hDBID:= DB_ID, 
+	pCmdAddr:= SQL, 
+	cbCmdSize:= GET_SQL_COMMAND_LENGTH(SQL), 
+	bExecute:= TRUE, 
+	tTimeout:= _TIMEOUT );
+IF _FBSQLINSERT.bError THEN
+	_FBSQLINSERT(bExecute:= FALSE);
+	SQL_Insert := 1;
+	RETURN;
+ELSIF NOT _FBSQLINSERT.bBusy THEN
+	_FBSQLINSERT(bExecute:= FALSE);
+	SQL_Insert := -1;
+	RETURN;
+ELSE
+	SQL_Insert := 0;
+	RETURN;
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SQL_SELECT" Id="{878a5881-e6d5-4326-bd4d-c9c7cade3cd3}" FolderPath="METHODS\SQL\">
+      <Declaration><![CDATA[{attribute 'object_name' := 'SQL_Select'}
+METHOD SQL_SELECT : DINT
+VAR_INPUT
+	SQL_PTR				: POINTER TO T_SQL_COMMAND;
+	START_INDEX			: UDINT;
+	ROWS_TO_READ		: UDINT;
+	PTR_DATA_OUT		: PVOID;
+	DATA_SIZE			: UDINT;
+	DATABASE_ROWS		: POINTER TO UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_FBSQLSELECT(
+	sNetID:= sAmsNetId, 
+	hDBID:= DB_ID, 
+	pCmdAddr:= SQL_PTR, 
+	cbCmdSize:= GET_SQL_COMMAND_LENGTH(SQL_PTR), 
+	nStartIndex:= START_INDEX, 
+	nRecordCount:= ROWS_TO_READ, 
+	pDestAddr:= PTR_DATA_OUT, 
+	cbRecordArraySize:= DATA_SIZE, 
+	bExecute:= TRUE, 
+	tTimeout:= _TIMEOUT );
+IF _FBSQLSELECT.bError THEN
+	_FBSQLSELECT(bExecute:= FALSE);
+	SQL_Select := 1;
+	RETURN;
+ELSIF NOT _FBSQLSELECT.bBusy THEN
+	DATABASE_ROWS^ := _FBSQLSELECT.nRecords;
+	_FBSQLSELECT(bExecute:= FALSE);
+	SQL_Select := -1;
+	RETURN;
+ELSE 
+	SQL_Select := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CREATE_CONNECTION" Id="{a87967c6-5945-4b2d-b200-fc867ecb11b3}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD CREATE_CONNECTION : DINT
+VAR_INPUT
+	URL					: STRING(255);
+	TABLE				: STRING(255);
+	NAME				: STRING(255);
+	Database_Handle_Out : POINTER TO UDINT;	
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_FBADDCONN(
+	sNetID:= sAmsNetId, 
+	eDBType:= eDBType_SQLite, 
+	eDBValueType:= eDBValue_Bytes, 
+	sDBServer:= NAME, 
+	sDBUrl:= URL, 
+	sDBTable:= TABLE, 
+	bExecute:= TRUE, 
+	tTimeout:= _TIMEOUT, 
+	bBusy=> , 
+	bError=> , 
+	nErrID=> , 
+	hDBID=> );
+IF _FBADDCONN.bError THEN
+	_FBADDCONN(bExecute:= FALSE);
+	CREATE_CONNECTION := 1;
+	RETURN; 
+ELSIF NOT _FBADDCONN.bBusy THEN
+	Database_Handle_Out^ := _FBADDCONN.hDBID;
+	_FBADDCONN(bExecute:= FALSE);
+	CREATE_CONNECTION := -1;
+	RETURN; 
+ELSE
+	CREATE_CONNECTION := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

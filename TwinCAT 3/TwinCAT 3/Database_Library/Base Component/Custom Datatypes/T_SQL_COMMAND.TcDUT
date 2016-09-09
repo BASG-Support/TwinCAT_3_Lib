@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <DUT Name="T_SQL_COMMAND" Id="{fb807c32-ed03-4898-811c-a8fbefb15aeb}">
+    <Declaration><![CDATA[TYPE T_SQL_COMMAND : STRING(GVL_DATABASE_LIB.MAX_SQL_LENGTH); END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>
