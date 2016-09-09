@@ -1,0 +1,185 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <POU Name="C_DBADAPTOR" Id="{abccab33-d3de-45b2-a197-271df6c757eb}" SpecialFunc="None">
+    <Declaration><![CDATA[//{attribute 'hide_all_locals'}
+FUNCTION_BLOCK PUBLIC C_DBADAPTOR
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	sAmsNetId	: STRING(23) := '';
+	
+	DB_ID		: UDINT := 0;
+	isOpened	: BOOL := FALSE;
+	
+	_TIMEOUT	: TIME := T#3S;
+	
+	_FBOPENCONN	: FB_DBConnectionOpen;
+	_FBCLOSECONN: FB_DBConnectionClose;
+	_FBRELOAD	: FB_DBReloadConfig;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[;]]></ST>
+    </Implementation>
+    <Folder Name="PROPERTIES" Id="{4c642565-5fbc-460a-bfc4-7c66f40b38d7}" />
+    <Folder Name="METHODS" Id="{dab8b99c-53ed-4dab-93fe-aa733c990147}" />
+    <Method Name="REACTIVATE_CONFIGURATION" Id="{054042db-8860-4416-bcf9-1bb77c029830}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD REACTIVATE_CONFIGURATION : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_FBRELOAD(
+	sNetID:= sAmsNetID, 
+	bExecute:= TRUE, 
+	tTimeout:= _TIMEOUT, 
+	bBusy=> , 
+	bError=> , 
+	nErrID=> );
+IF _FBRELOAD.bError THEN
+	_FBRELOAD(bExecute:= FALSE);
+	REACTIVATE_CONFIGURATION := 1;
+	RETURN;
+ELSIF NOT _FBRELOAD.bBusy THEN
+	_FBRELOAD(bExecute:= FALSE);
+	REACTIVATE_CONFIGURATION := -1;
+	RETURN;
+ELSE
+	REACTIVATE_CONFIGURATION := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CLOSE" Id="{090301b5-d7a0-4c7e-83a9-c565563887ff}" FolderPath="METHODS\">
+      <Declaration><![CDATA[{attribute 'object_name' := 'Close'}
+METHOD CLOSE : DINT
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF isOpened THEN
+	_FBCLOSECONN(
+		sNetID:= sAmsNetID, 
+		hDBID:= DB_ID, 
+		bExecute:= TRUE, 
+		tTimeout:= _TIMEOUT );
+	IF _FBCLOSECONN.bError THEN 
+		_FBCLOSECONN(
+			sNetID:= sAmsNetId, 
+			hDBID:= DB_ID, 
+			bExecute:= FALSE, 
+			tTimeout:= _TIMEOUT );
+		Close := 1;
+		RETURN;
+	ELSIF NOT _FBCLOSECONN.bBusy THEN
+		_FBCLOSECONN(
+			sNetID:= sAmsNetId, 
+			hDBID:= DB_ID, 
+			bExecute:= FALSE, 
+			tTimeout:= _TIMEOUT );
+		Close := -1;
+		RETURN;
+	ELSE
+		Close := 0;
+		RETURN;
+	END_IF
+ELSE
+	CLOSE := 2;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="HANDLE" Id="{2b638ac0-d6c5-47cc-b866-28fbc85952e8}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY HANDLE : UDINT]]></Declaration>
+      <Set Name="Set" Id="{c3f4c1c1-af3d-42c5-9395-5b3e9cae6b5c}">
+        <Declaration><![CDATA[
+VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[DB_ID := HANDLE;]]></ST>
+        </Implementation>
+      </Set>
+      <Get Name="Get" Id="{e1953f73-2bee-435e-9374-1c6118cacf07}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[HANDLE := DB_ID;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="CONNECTION_OPENED" Id="{43e68e3b-c3e9-432b-b317-5c077e4148ba}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY CONNECTION_OPENED : BOOL]]></Declaration>
+      <Get Name="Get" Id="{98c5fc93-02f5-4076-97dd-a03a23e5c8f3}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CONNECTION_OPENED := isOpened;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="OPEN" Id="{98cf4f32-e65d-4442-aa7e-5703dadb3f78}" FolderPath="METHODS\">
+      <Declaration><![CDATA[{attribute 'object_name' := 'Open'}
+METHOD OPEN : DINT
+VAR_INPUT
+	DATABASE_HANDLE : UDINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT isOpened THEN
+	_FBOPENCONN(
+		sNetID:= sAmsNetId, 
+		hDBID:= DATABASE_HANDLE, 
+		bExecute:= TRUE, 
+		tTimeout:= _TIMEOUT );
+	IF _FBOPENCONN.bError THEN  
+		_FBOPENCONN(
+			sNetID:= sAmsNetId, 
+			hDBID:= DB_ID, 
+			bExecute:= FALSE, 
+			tTimeout:= _TIMEOUT );
+		OPEN := 1;
+		RETURN;
+	ELSIF NOT _FBOPENCONN.bBusy THEN
+		_FBOPENCONN(
+			sNetID:= sAmsNetId, 
+			hDBID:= DB_ID, 
+			bExecute:= FALSE, 
+			tTimeout:= _TIMEOUT );
+		isOpened := TRUE;
+		DB_ID := DATABASE_HANDLE;
+		Open := -1;
+		RETURN;
+	ELSE
+		Open := 0;
+		RETURN;
+	END_IF
+ELSE
+	OPEN := 2;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="TIMEOUT" Id="{e714d72f-15b2-42b7-bd8d-0287408d9a43}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY TIMEOUT : TIME
+]]></Declaration>
+      <Get Name="Get" Id="{0aa313e0-09b3-4dfd-8325-becba9fb2057}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[TimeOut := _TIMEOUT;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{4911bcf8-c03d-4056-a48b-b3ec1b70e513}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_TIMEOUT := TimeOut;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+  </POU>
+</TcPlcObject>

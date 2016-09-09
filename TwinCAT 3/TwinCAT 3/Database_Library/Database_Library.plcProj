@@ -40,16 +40,19 @@
     </PlaceholderReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Custom Datatypes\DB_FunctionResult.TcDUT">
+    <Compile Include="Base Component\Class\C_DBADAPTOR.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Custom Datatypes\DB_State.TcDUT">
+    <Compile Include="Base Component\Class\C_SQLITE.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DBAdaptor.TcPOU">
+    <Compile Include="Base Component\Custom Datatypes\GVL_DATABASE_LIB.TcGVL">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Interfaces\ITF_DBAdaptor.TcIO">
+    <Compile Include="Base Component\Custom Datatypes\T_SQL_COMMAND.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base Component\Function\GET_SQL_COMMAND_LENGTH.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Version\Global_Version.TcGVL">
@@ -57,8 +60,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Custom Datatypes" />
-    <Folder Include="Interfaces" />
+    <Folder Include="Base Component" />
+    <Folder Include="Base Component\Class" />
+    <Folder Include="Base Component\Custom Datatypes" />
+    <Folder Include="Base Component\Function" />
     <Folder Include="Version" />
   </ItemGroup>
   <ProjectExtensions>

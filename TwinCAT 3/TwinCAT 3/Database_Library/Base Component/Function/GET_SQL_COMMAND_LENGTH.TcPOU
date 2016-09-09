@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <POU Name="GET_SQL_COMMAND_LENGTH" Id="{90942390-50fa-42bc-92ba-b7f1e29f8304}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION GET_SQL_COMMAND_LENGTH : UDINT
+VAR_INPUT
+	COMMAND : POINTER TO T_SQL_COMMAND;
+END_VAR
+VAR
+	_I 		: UDINT;
+	_TEST 	: POINTER TO BYTE;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[_TEST := COMMAND;
+FOR _I := 0 TO (GVL_DATABASE_LIB.MAX_SQL_LENGTH) BY 1 DO
+	IF _TEST[_I] = 0 THEN
+		GET_SQL_COMMAND_LENGTH := _I;
+		RETURN;
+	END_IF
+END_FOR]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>
