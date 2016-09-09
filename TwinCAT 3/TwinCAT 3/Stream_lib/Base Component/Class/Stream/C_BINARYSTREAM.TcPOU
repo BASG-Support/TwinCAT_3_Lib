@@ -167,7 +167,7 @@ END_VAR
         <ST><![CDATA[CASE SeekStyle OF 
 	//Offsets from the beginning of the stream
 	E_STREAMSEEKTYPE.Origin:
-		IF Offset > _PERMISSIBLE_LIMIT THEN
+		IF Offset > _MEMSIZE THEN
 			Seek := 1;
 			RETURN;
 		ELSE
@@ -177,17 +177,17 @@ END_VAR
 		END_IF
 	//Offsets from the end of the stream
 	E_STREAMSEEKTYPE.End:
-		IF Offset > _PERMISSIBLE_LIMIT THEN
+		IF Offset > _MEMSIZE THEN
 			Seek := 1;
 			RETURN;
 		ELSE
-			_POSITION := (_PERMISSIBLE_LIMIT) - Offset;
+			_POSITION := (_MEMSIZE) - Offset;
 			Seek := -1;
 			RETURN;
 		END_IF
 	//Offsets from the current position of the stream
 	E_STREAMSEEKTYPE.Current:
-		IF _POSITION + Offset > _PERMISSIBLE_LIMIT THEN
+		IF _POSITION + Offset > _MEMSIZE THEN
 			Seek := 1;
 			RETURN;
 		ELSE
