@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
+  <DUT Name="DB_State" Id="{10f05811-40c5-4e6b-bd08-57c2c117ac8f}">
+    <Declaration><![CDATA[TYPE DB_State :
+(
+	DB_Idle := -1,
+	DB_Busy_Write,
+	DB_Busy_Read,
+	DB_Error
+);
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

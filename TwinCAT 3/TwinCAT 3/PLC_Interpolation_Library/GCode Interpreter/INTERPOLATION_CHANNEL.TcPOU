@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <POU Name="INTERPOLATION_CHANNEL" Id="{2e1b9381-959d-4132-ba73-f2ce2033eb6b}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FINAL INTERPOLATION_CHANNEL
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	MAIN_AXIS 	: ARRAY [1..MAX_DIMENSIONS] OF AXIS_REF;
+	fbPower 	: ARRAY [1..MAX_DIMENSIONS] OF MC_POWER;
+	fbReset 	: ARRAY [1..MAX_DIMENSIONS] OF MC_RESET;
+	fbHome		: ARRAY	[1..MAX_DIMENSIONS] OF MC_HOME;
+	fbMoveA 	: ARRAY [1..MAX_DIMENSIONS] OF MC_MOVEABSOLUTE;
+	fbMoveR 	: ARRAY [1..MAX_DIMENSIONS] OF MC_MOVERELATIVE;
+	fbJog		: ARRAY [1..MAX_DIMENSIONS] OF MC_JOG;
+	fbHalt	 	: ARRAY [1..MAX_DIMENSIONS] OF MC_HALT;
+	i			: INT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[;]]></ST>
+    </Implementation>
+    <Folder Name="METHODS" Id="{4fcb1728-4744-4de1-b939-2bcfb603dbb5}" />
+    <Method Name="On" Id="{2eadc50f-77c2-4654-a9d0-914f8d2cc33b}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD PUBLIC On : Interpolation_FunctionResult
+VAR_INPUT
+	AXIS 		: INT;
+	ENABLE_FW	: BOOL;
+	ENABLE_BW	: BOOL;
+	OVERRIDE 	: LREAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF AXIS > MAX_DIMENSIONS OR AXIS < 1 THEN 
+	On := Interpolation_FunctionResult.Interpolation_OutOfBounds;
+ELSE
+	fbPower[AXIS](
+		Axis:= AXIS[AXIS].AXIS, 
+		Enable:= TRUE, 
+		Enable_Positive:= ENABLE_FW, 
+		Enable_Negative:= ENABLE_BW, 
+		Override:= OVERRIDE );
+	IF fbPower[AXIS].Error THEN
+		On := Interpolation_FunctionResult.Interpolation_Error;
+	ELSIF fbPower[AXIS].Status THEN
+		On := Interpolation_FunctionResult.Interpolation_OK;
+	ELSE
+		On := Interpolation_FunctionResult.Interpolation_Busy;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="On_All" Id="{71f9300c-93a2-402f-8b26-f7ee252b372f}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD PUBLIC On_All : Interpolation_FunctionResult
+VAR_INPUT
+END_VAR
+VAR
+	n : INT;
+	m : INT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[m := 0;
+FOR n := 1 TO MAX_DIMENSIONS BY 1 DO
+		fbPower[n](
+		Axis:= MAIN_AXIS[n], 
+		Enable:= TRUE, 
+		Enable_Positive:= TRUE, 
+		Enable_Negative:= TRUE, 
+		Override:= 100 );
+	IF fbPower[n].Error THEN
+		On_All := Interpolation_FunctionResult.Interpolation_Error;
+	ELSIF fbPower[n].Status THEN
+		m := m + 1;
+	END_IF
+END_FOR
+IF m >= MAX_DIMENSIONS THEN
+	On_All := Interpolation_FunctionResult.Interpolation_OK;;
+ELSE
+	On_All := Interpolation_FunctionResult.Interpolation_Busy;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ASSIGN" Id="{8de43c7d-1f8c-489f-86b6-46c8e0371568}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD PUBLIC ASSIGN : Interpolation_FunctionResult
+VAR_INPUT
+	X : INT;
+	Y : INT;
+	Z : INT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF X < 1 OR X > MAX_DIMENSIONS THEN
+	ASSIGN := Interpolation_FunctionResult.Interpolation_OutOfBounds;
+END_IF
+IF Y < 1 OR Y > MAX_DIMENSIONS THEN
+	ASSIGN := Interpolation_FunctionResult.Interpolation_OutOfBounds;
+END_IF
+IF Z < 1 OR Z > MAX_DIMENSIONS THEN
+	ASSIGN := Interpolation_FunctionResult.Interpolation_OutOfBounds;
+END_IF
+IF X = Y OR Y = Z OR Z = X THEN
+	ASSIGN := Interpolation_FunctionResult.Interpolation_Assignment_Cannot_Be_Same;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

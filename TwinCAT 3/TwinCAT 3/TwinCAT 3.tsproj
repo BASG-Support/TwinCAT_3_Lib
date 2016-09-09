@@ -83,9 +83,9 @@
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 				</Instance>
 			</Project>
-			<Project GUID="{787018B7-2A45-42DD-81FD-35555ECC1A05}" Name="SqliteAdaptor" PrjFilePath="SqliteAdaptor\SqliteAdaptor.plcProj" TmcFilePath="SqliteAdaptor\SqliteAdaptor.tmc" ReloadTmc="true" AmsPort="856" FileArchiveSettings="#x000e">
+			<Project GUID="{787018B7-2A45-42DD-81FD-35555ECC1A05}" Name="Database_Library" PrjFilePath="Database_Library\Database_Library.plcProj" TmcFilePath="Database_Library\Database_Library.tmc" ReloadTmc="true" AmsPort="856" FileArchiveSettings="#x000e">
 				<Instance Id="#x01010060" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
-					<Name>SqliteAdaptor Instance</Name>
+					<Name>Database_Library Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 				</Instance>
 			</Project>
@@ -95,15 +95,6 @@
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<TaskPouOids>
 						<TaskPouOid Prio="20" OTCID="#x01010071"/>
-					</TaskPouOids>
-				</Instance>
-			</Project>
-			<Project GUID="{C7E4B4B5-DCFD-4291-A02A-F693F2AFD2CA}" Name="PLC_Interpolation" PrjFilePath="PLC_Interpolation\PLC_Interpolation.plcproj" TmcFilePath="PLC_Interpolation\PLC_Interpolation.tmc" ReloadTmc="true" AmsPort="858" FileArchiveSettings="#x000e">
-				<Instance Id="#x01010080" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
-					<Name>PLC_Interpolation Instance</Name>
-					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
-					<TaskPouOids>
-						<TaskPouOid Prio="20" OTCID="#x01010081"/>
 					</TaskPouOids>
 				</Instance>
 			</Project>

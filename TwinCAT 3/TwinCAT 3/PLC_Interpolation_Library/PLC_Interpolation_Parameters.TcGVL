@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.36">
-  <GVL Name="PLC_Interpolation_Parameters" Id="{e191df13-0972-4bb0-9175-ad1b9d379ce0}" ParameterList="True">
-    <Declaration><![CDATA[VAR_GLOBAL CONSTANT
-	MAX_DIMENSIONS : INT := 3; (*Valid values are 1, 2, 3*)
-END_VAR]]></Declaration>
-  </GVL>
-</TcPlcObject>

@@ -3,30 +3,24 @@
   <PropertyGroup>
     <FileVersion>1.0.0.0</FileVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{b5cae539-cf43-4436-af96-2165ab476f5c}</ProjectGuid>
-    <Name>PLC_Interpolation_Library</Name>
+    <ProjectGuid>{787018b7-2a45-42dd-81fd-35555ecc1a05}</ProjectGuid>
+    <Name>Database_Library</Name>
     <ProgramVersion>3.1.4020.10</ProgramVersion>
-    <Application>{fd91263b-f80a-4115-a883-283e507f6647}</Application>
-    <TypeSystem>{22903609-ada4-49c0-af81-5a8add73fe4a}</TypeSystem>
-    <Implicit_Task_Info>{6ee4b622-4b81-4fec-9269-a1746241e741}</Implicit_Task_Info>
-    <Implicit_KindOfTask>{91ef67f7-a6cd-4f2c-a12f-387b97ae7917}</Implicit_KindOfTask>
-    <Implicit_Jitter_Distribution>{7138ae16-5873-43d6-a381-fe02847d9240}</Implicit_Jitter_Distribution>
-    <LibraryReferences>{d84fe2ca-65dd-4dd7-babb-315fb5db9b99}</LibraryReferences>
-    <Company>Chua Siang Poh</Company>
+    <Application>{6c3c1616-f64f-4544-b132-352cd38cba50}</Application>
+    <TypeSystem>{477d7e34-8cee-46eb-97a5-7aaa65c42bf2}</TypeSystem>
+    <Implicit_Task_Info>{443a4bd8-bd32-40ff-bcce-2524798b026a}</Implicit_Task_Info>
+    <Implicit_KindOfTask>{0db9a8a5-8379-4d78-8c90-512d8af7202b}</Implicit_KindOfTask>
+    <Implicit_Jitter_Distribution>{8f3044b0-9acf-44c5-9167-865557f351ac}</Implicit_Jitter_Distribution>
+    <LibraryReferences>{3df23d2f-2960-46a5-b0fc-5a339e9fe49f}</LibraryReferences>
+    <Company>Siang Poh</Company>
     <Released>True</Released>
-    <Title>PLC_Interpolation_Library</Title>
+    <Title>Sqlite_Adaptor</Title>
     <ProjectVersion>1.0</ProjectVersion>
-    <Author>Chua Siang Poh</Author>
-    <Description>A simple library to enable you to use the NCI package to do PLC interpolation.</Description>
   </PropertyGroup>
   <ItemGroup>
-    <PlaceholderReference Include="Tc2_MC2">
-      <DefaultResolution>Tc2_MC2, * (Beckhoff Automation GmbH)</DefaultResolution>
-      <Namespace>Tc2_MC2</Namespace>
-    </PlaceholderReference>
-    <PlaceholderReference Include="Tc2_PlcInterpolation">
-      <DefaultResolution>Tc2_PlcInterpolation, * (Beckhoff Automation GmbH)</DefaultResolution>
-      <Namespace>Tc2_PlcInterpolation</Namespace>
+    <PlaceholderReference Include="Tc2_Database">
+      <DefaultResolution>Tc2_Database, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_Database</Namespace>
     </PlaceholderReference>
     <PlaceholderReference Include="Tc2_Standard">
       <DefaultResolution>Tc2_Standard, * (Beckhoff Automation GmbH)</DefaultResolution>
@@ -46,42 +40,26 @@
     </PlaceholderReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="GCode Interpreter" />
-    <Folder Include="GCode Interpreter\Custom Datatypes" />
-    <Folder Include="PLC Interpolation" />
-    <Folder Include="Version" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="GCode Interpreter\Custom Datatypes\Interpolation_FunctionResult.TcDUT">
+    <Compile Include="Custom Datatypes\DB_FunctionResult.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="GCode Interpreter\Custom Datatypes\POSITION.TcDUT">
+    <Compile Include="Custom Datatypes\DB_State.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="GCode Interpreter\INTERPOLATION_CHANNEL.TcPOU">
+    <Compile Include="DBAdaptor.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="GCode Interpreter\PLC_Interpolation_Parameters.TcGVL">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="PLC Interpolation\Interpolation_FunctionResult_1.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="PLC Interpolation\MAIN.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="PLC Interpolation\NCIChannel.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="PLC Interpolation\NCITable.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="PLC Interpolation\NCI_REF.TcDUT">
+    <Compile Include="Interfaces\ITF_DBAdaptor.TcIO">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Version\Global_Version.TcGVL">
       <SubType>Code</SubType>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Custom Datatypes" />
+    <Folder Include="Interfaces" />
+    <Folder Include="Version" />
   </ItemGroup>
   <ProjectExtensions>
     <PlcProjectOptions>
@@ -90,19 +68,6 @@
           <o xml:space="preserve" t="OptionKey">
       <v n="Name">"&lt;ProjectRoot&gt;"</v>
       <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
-        <v>{FE9F63D4-9E34-43ce-9322-D46747A00F33}</v>
-        <o>
-          <v n="Name">"{FE9F63D4-9E34-43ce-9322-D46747A00F33}"</v>
-          <d n="SubKeys" t="Hashtable" />
-          <d n="Values" t="Hashtable" ckt="String">
-            <v>SourceDownloadContent</v>
-            <v>1</v>
-            <v>SourceDownloadContent2</v>
-            <a cet="Guid">
-              <v>b0b53f83-af78-49aa-8133-0063f476bd7c</v>
-            </a>
-          </d>
-        </o>
         <v>{29BD8D0C-3586-4548-BB48-497B9A01693F}</v>
         <o>
           <v n="Name">"{29BD8D0C-3586-4548-BB48-497B9A01693F}"</v>
@@ -125,12 +90,6 @@
             <v>IR0whWr8bwfABwAAAXCU0gAAAABQAgAAAyHS1QAAAAABAAAAAAAAAAEaUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwACTHsAZgA5ADUAYgBiADQAMgA2AC0ANQA1ADIANAAtADQAYgA0ADUALQA5ADQAMAAwAC0AZgBiADAAZgAyAGUANwA3AGUANQAxAGIAfQADCE4AYQBtAGUABDJUAHcAaQBuAEMAQQBUACAAMwAuADEAIABCAHUAaQBsAGQAIAA0ADAAMgAwAC4AMQAwAAUWUAByAG8AZgBpAGwAZQBEAGEAdABhAAZMewAxADYAZQA1ADUAYgA2ADAALQA3ADAANAAzAC0ANABhADYAMwAtAGIANgA1AGIALQA2ADEANAA3ADEAMwA4ADcAOABkADQAMgB9AAcSTABpAGIAcgBhAHIAaQBlAHMACEx7ADMAYgBmAGQANQA0ADUAOQAtAGIAMAA3AGYALQA0AGQANgBlAC0AYQBlADEAYQAtAGEAOAAzADMANQA2AGEANQA1ADEANAAyAH0ACUx7ADkAYwA5ADUAOAA5ADYAOAAtADIAYwA4ADUALQA0ADEAYgBiAC0AOAA4ADcAMQAtADgAOQA1AGYAZgAxAGYAZQBkAGUAMQBhAH0ACg5WAGUAcgBzAGkAbwBuAAsGaQBuAHQADApVAHMAYQBnAGUADQpUAGkAdABsAGUADhpWAGkAcwB1AEUAbABlAG0ATQBlAHQAZQByAA8OQwBvAG0AcABhAG4AeQAQDFMAeQBzAHQAZQBtABESVgBpAHMAdQBFAGwAZQBtAHMAEjBWAGkAcwB1AEUAbABlAG0AcwBTAHAAZQBjAGkAYQBsAEMAbwBuAHQAcgBvAGwAcwATKFYAaQBzAHUARQBsAGUAbQBzAFcAaQBuAEMAbwBuAHQAcgBvAGwAcwAUJFYAaQBzAHUARQBsAGUAbQBUAGUAeAB0AEUAZABpAHQAbwByABUiVgBpAHMAdQBOAGEAdABpAHYAZQBDAG8AbgB0AHIAbwBsABYUdgBpAHMAdQBpAG4AcAB1AHQAcwAXDHMAeQBzAHQAZQBtABgYVgBpAHMAdQBFAGwAZQBtAEIAYQBzAGUAGSZEAGUAdgBQAGwAYQBjAGUAaABvAGwAZABlAHIAcwBVAHMAZQBkABoIYgBvAG8AbAAbIlAAbAB1AGcAaQBuAEMAbwBuAHMAdAByAGEAaQBuAHQAcwAcTHsANAAzAGQANQAyAGIAYwBlAC0AOQA0ADIAYwAtADQANABkADcALQA5AGUAOQA0AC0AMQBiAGYAZABmADMAMQAwAGUANgAzAGMAfQAdHEEAdABMAGUAYQBzAHQAVgBlAHIAcwBpAG8AbgAeFFAAbAB1AGcAaQBuAEcAdQBpAGQAHxZTAHkAcwB0AGUAbQAuAEcAdQBpAGQAIEhhAGYAYwBkADUANAA0ADYALQA0ADkAMQA0AC0ANABmAGUANwAtAGIAYgA3ADgALQA5AGIAZgBmAGUAYgA3ADAAZgBkADEANwAhFFUAcABkAGEAdABlAEkAbgBmAG8AIkx7AGIAMAAzADMANgA2AGEAOAAtAGIANQBjADAALQA0AGIAOQBhAC0AYQAwADAAZQAtAGUAYgA4ADYAMAAxADEAMQAwADQAYwAzAH0AIw5VAHAAZABhAHQAZQBzACRMewAxADgANgA4AGYAZgBjADkALQBlADQAZgBjAC0ANAA1ADMAMgAtAGEAYwAwADYALQAxAGUAMwA5AGIAYgA1ADUANwBiADYAOQB9ACVMewBhADUAYgBkADQAOABjADMALQAwAGQAMQA3AC0ANAAxAGIANQAtAGIAMQA2ADQALQA1AGYAYwA2AGEAZAAyAGIAOQA2AGIANwB9ACYWTwBiAGoAZQBjAHQAcwBUAHkAcABlACdUVQBwAGQAYQB0AGUATABhAG4AZwB1AGEAZwBlAE0AbwBkAGUAbABGAG8AcgBDAG8AbgB2AGUAcgB0AGkAYgBsAGUATABpAGIAcgBhAHIAaQBlAHMAKBBMAGkAYgBUAGkAdABsAGUAKRRMAGkAYgBDAG8AbQBwAGEAbgB5ACoeVQBwAGQAYQB0AGUAUAByAG8AdgBpAGQAZQByAHMAKzhTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEgAYQBzAGgAdABhAGIAbABlACwSdgBpAHMAdQBlAGwAZQBtAHMALUg2AGMAYgAxAGMAZABlADEALQBkADUAZABjAC0ANABhADMAYgAtADkAMAA1ADQALQAyADEAZgBhADcANQA2AGEAMwBmAGEANAAuKEkAbgB0AGUAcgBmAGEAYwBlAFYAZQByAHMAaQBvAG4ASQBuAGYAbwAvTHsAYwA2ADEAMQBlADQAMAAwAC0ANwBmAGIAOQAtADQAYwAzADUALQBiADkAYQBjAC0ANABlADMAMQA0AGIANQA5ADkANgA0ADMAfQAwGE0AYQBqAG8AcgBWAGUAcgBzAGkAbwBuADEYTQBpAG4AbwByAFYAZQByAHMAaQBvAG4AMgxMAGUAZwBhAGMAeQAzMEwAYQBuAGcAdQBhAGcAZQBNAG8AZABlAGwAVgBlAHIAcwBpAG8AbgBJAG4AZgBvADQaQwBvAG0AcABhAHQAaQBiAGkAbABpAHQAeQDQAAIaA9ADAS0E0AUGGgbQBwgaAUUHCQjQAAkaBEUKCwQDAAAABQAAAAgAAAAAAAAA0AwLrQIAAADQDQEtDtAPAS0Q0AAJGgRFCgsEAwAAAAUAAAAIAAAAKAAAANAMC60BAAAA0A0BLRHQDwEtENAACRoERQoLBAMAAAAFAAAACAAAAAAAAADQDAutAgAAANANAS0S0A8BLRDQAAkaBEUKCwQDAAAABQAAAAgAAAAoAAAA0AwLrQIAAADQDQEtE9APAS0Q0AAJGgRFCgsEAwAAAAUAAAAIAAAAAAAAANAMC60CAAAA0A0BLRTQDwEtENAACRoERQoLBAMAAAAFAAAACAAAAAAAAADQDAutAgAAANANAS0V0A8BLRDQAAkaBEUKCwQDAAAABQAAAAgAAAAAAAAA0AwLrQIAAADQDQEtFtAPAS0X0AAJGgRFCgsEAwAAAAUAAAAIAAAAKAAAANAMC60EAAAA0A0BLRjQDwEtENAZGq0BRRscAdAAHBoCRR0LBAMAAAAFAAAACAAAAAAAAADQHh8tINAhIhoCRSMkAtAAJRoFRQoLBAMAAAADAAAAAAAAAAoAAADQJgutAAAAANADAS0n0CgBLRHQKQEtENAAJRoFRQoLBAMAAAADAAAAAAAAAAoAAADQJgutAQAAANADAS0n0CgBLRHQKQEtEJoqKwFFAAEC0AABLSzQAAEtF9AAHy0t0C4vGgPQMAutAQAAANAxC60RAAAA0DIarQDQMy8aA9AwC60CAAAA0DELrQMAAADQMhqtANA0Gq0A</v>
           </d>
         </o>
-        <v>{A3BBA713-63D7-4de6-BEC2-E3BAAD8789F8}</v>
-        <o>
-          <v n="Name">"{A3BBA713-63D7-4de6-BEC2-E3BAAD8789F8}"</v>
-          <d n="SubKeys" t="Hashtable" />
-          <d n="Values" t="Hashtable" />
-        </o>
         <v>{C70B7845-2722-4a9b-A0EA-88C877A4B36F}</v>
         <o>
           <v n="Name">"{C70B7845-2722-4a9b-A0EA-88C877A4B36F}"</v>
@@ -144,7 +103,7 @@
             <o t="UserList">
               <a n="Users" cet="User">
                 <o>
-                  <v n="Id">{9bf1d56c-5334-4716-afe0-4b817a923af1}</v>
+                  <v n="Id">{f8517650-aaea-42cd-b982-8e7745eca5d1}</v>
                   <v n="Name">"Owner"</v>
                   <v n="FullName">""</v>
                   <v n="Description">""</v>
@@ -160,24 +119,24 @@
             <o t="GroupList">
               <a n="Groups" cet="Group">
                 <o>
-                  <v n="Id">{e60837ab-70ae-41db-ade6-13fd25586cb1}</v>
-                  <v n="Name">"Owner"</v>
-                  <v n="Description">""</v>
-                  <v n="IsEveryoneGroup">false</v>
-                  <v n="IsOwnerGroup">true</v>
-                  <l n="UserMembers" t="ArrayList" cet="Guid">
-                    <v>9bf1d56c-5334-4716-afe0-4b817a923af1</v>
-                  </l>
-                  <l n="GroupMembers" t="ArrayList" />
-                </o>
-                <o>
-                  <v n="Id">{886312a1-047d-4bba-99a7-2310e15bef41}</v>
+                  <v n="Id">{9536acf0-50e3-42cb-987f-07a3eb221785}</v>
                   <v n="Name">"Everyone"</v>
                   <v n="Description">""</v>
                   <v n="IsEveryoneGroup">true</v>
                   <v n="IsOwnerGroup">false</v>
                   <l n="UserMembers" t="ArrayList" cet="Guid">
-                    <v>9bf1d56c-5334-4716-afe0-4b817a923af1</v>
+                    <v>f8517650-aaea-42cd-b982-8e7745eca5d1</v>
+                  </l>
+                  <l n="GroupMembers" t="ArrayList" />
+                </o>
+                <o>
+                  <v n="Id">{f7026334-3853-4a5d-80db-fc4231a34865}</v>
+                  <v n="Name">"Owner"</v>
+                  <v n="Description">""</v>
+                  <v n="IsEveryoneGroup">false</v>
+                  <v n="IsOwnerGroup">true</v>
+                  <l n="UserMembers" t="ArrayList" cet="Guid">
+                    <v>f8517650-aaea-42cd-b982-8e7745eca5d1</v>
                   </l>
                   <l n="GroupMembers" t="ArrayList" />
                 </o>
@@ -186,7 +145,7 @@
             <v>UserAuthentication</v>
             <o t="UserAuthentication">
               <d n="UserToPasswordHash" t="Hashtable" ckt="Guid" cvt="String">
-                <v>9bf1d56c-5334-4716-afe0-4b817a923af1</v>
+                <v>f8517650-aaea-42cd-b982-8e7745eca5d1</v>
                 <v>d41d8cd98f00b204e9800998ecf8427e</v>
               </d>
             </o>
@@ -226,7 +185,6 @@
           <Type n="Group">{daecd4be-1e2b-4335-a125-4a1ac83ea49f}</Type>
           <Type n="GroupList">{bf4dffda-f055-446d-9d7a-5f126720896b}</Type>
           <Type n="Guid">System.Guid</Type>
-          <Type n="Guid[]">System.Guid[]</Type>
           <Type n="Hashtable">System.Collections.Hashtable</Type>
           <Type n="Int32">System.Int32</Type>
           <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>

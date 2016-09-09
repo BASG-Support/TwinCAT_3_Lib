@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <POU Name="NCITable" Id="{39df6223-76ff-44a1-bd5a-f99611d1d1ef}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK NCITable
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	nciTable : ST_NciFeedGroupTable;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[;]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>
