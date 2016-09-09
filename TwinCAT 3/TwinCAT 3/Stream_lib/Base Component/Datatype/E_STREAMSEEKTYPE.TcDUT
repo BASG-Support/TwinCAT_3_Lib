@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4019.2">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
   <DUT Name="E_STREAMSEEKTYPE" Id="{8af1dfd2-3bc9-411e-815a-f28cc258cce5}">
     <Declaration><![CDATA[{attribute 'qualified_only'}
 {attribute 'strict'}

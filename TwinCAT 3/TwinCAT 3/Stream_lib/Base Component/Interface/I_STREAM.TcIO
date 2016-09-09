@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4019.2">
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
   <Itf Name="I_STREAM" Id="{5953bfdd-a48b-492a-8c79-c85297f262b9}">
     <Declaration><![CDATA[INTERFACE I_STREAM
 ]]></Declaration>
