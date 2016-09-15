@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <DUT Name="S_MODBUS_REGISTER" Id="{b5fb5a1b-7ef2-4dc8-94e9-b2a13eab5986}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE S_MODBUS_REGISTER :
+STRUCT
+	REGISTER_SPACE	: E_MODBUS_REGISTERTYPE;
+	REGISTER_OFFSET	: WORD;
+	REGISTER_SIZE	: WORD;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

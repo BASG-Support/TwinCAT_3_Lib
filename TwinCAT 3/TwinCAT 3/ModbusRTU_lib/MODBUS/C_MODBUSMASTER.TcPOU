@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <POU Name="C_MODBUSMASTER" Id="{09ccf608-eae3-4c02-beb1-d8aa07df38ad}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK C_MODBUSMASTER
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	_FBMASTER : ModbusRtuMaster_PcCOM;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="HOLDING_REGISTER_READ" Id="{09857dcf-65f7-46c6-bd76-90e304d87afb}">
+      <Declaration><![CDATA[METHOD HOLDING_REGISTER_READ : DINT
+VAR_INPUT
+	ID : USINT(1..247);
+	
+	REGISTER 		: S_MODBUS_REGISTER;
+	
+	buffer_ptr_out 	: PVOID;
+	buffer_size 	: UINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_FBMASTER.UnitID := ID;
+_FBMASTER.Quantity := REGISTER.REGISTER_SIZE;
+_FBMASTER.MBAddr := F_TO_MODBUS_REGISTER(REGISTER);
+
+_FBMASTER.Execute := TRUE;
+
+_FBMASTER.pMemoryAddr := buffer_ptr_out;
+_FBMASTER.cbLength := buffer_size;
+
+_FBMASTER.Execute := TRUE;
+_FBMASTER.ReadRegs();
+
+IF _FBMASTER.Error THEN
+	_FBMASTER.Execute := FALSE;
+	_FBMASTER.ReadRegs();
+	HOLDING_REGISTER_READ := 1;
+	RETURN;
+ELSIF NOT _FBMASTER.BUSY THEN
+	_FBMASTER.Execute := FALSE;
+	_FBMASTER.ReadRegs();
+	HOLDING_REGISTER_READ := -1;
+	RETURN;
+ELSE
+	HOLDING_REGISTER_READ := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="HOLDING_REGISTER_WRITE" Id="{6ce2bf31-49cb-49df-bce6-b2d50b02b3ce}">
+      <Declaration><![CDATA[METHOD HOLDING_REGISTER_WRITE : DINT
+VAR_INPUT
+	ID : USINT(1..247);
+	
+	REGISTER 		: S_MODBUS_REGISTER;
+	
+	buffer_ptr_out 	: PVOID;
+	buffer_size 	: UINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_FBMASTER.UnitID := ID;
+
+_FBMASTER.Quantity := REGISTER.REGISTER_SIZE;
+_FBMASTER.MBAddr := F_TO_MODBUS_REGISTER(REGISTER);
+
+_FBMASTER.pMemoryAddr := buffer_ptr_out;
+_FBMASTER.cbLength := buffer_size;
+
+_FBMASTER.Execute := TRUE;
+_FBMASTER.WriteRegs();
+
+IF _FBMASTER.Error THEN
+	_FBMASTER.Execute := FALSE;
+	_FBMASTER.WriteRegs();
+	HOLDING_REGISTER_WRITE := 1;
+	RETURN;
+ELSIF NOT _FBMASTER.BUSY THEN
+	_FBMASTER.Execute := FALSE;
+	_FBMASTER.WriteRegs();
+	HOLDING_REGISTER_WRITE := -1;
+	RETURN;
+ELSE
+	HOLDING_REGISTER_WRITE := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>
