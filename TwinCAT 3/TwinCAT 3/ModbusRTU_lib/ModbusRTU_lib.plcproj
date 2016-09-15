@@ -13,6 +13,12 @@
     <Implicit_KindOfTask>{a5231fb2-4977-47d5-a9b3-a1e93d7450a1}</Implicit_KindOfTask>
     <Implicit_Jitter_Distribution>{b2283c1f-225f-4e3a-9c50-aa82bd1b7dd7}</Implicit_Jitter_Distribution>
     <LibraryReferences>{47c44379-6c2b-4199-91f1-e6d5385f380a}</LibraryReferences>
+    <Company>Chua Siang Poh</Company>
+    <Released>false</Released>
+    <Title>ModbusRTU_lib</Title>
+    <ProjectVersion>1.0.0</ProjectVersion>
+    <DefaultNamespace>ModbusRTU_lib</DefaultNamespace>
+    <Author>Chua Siang Poh</Author>
   </PropertyGroup>
   <ItemGroup>
     <PlaceholderReference Include="Tc2_ModbusRTU">
@@ -57,8 +63,8 @@
   <ProjectExtensions>
     <PlcProjectOptions>
       <XmlArchive>
-  <Data>
-    <o xml:space="preserve" t="OptionKey">
+        <Data>
+          <o xml:space="preserve" t="OptionKey">
       <v n="Name">"&lt;ProjectRoot&gt;"</v>
       <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
         <v>{8F99A816-E488-41E4-9FA3-846536012284}</v>
@@ -116,14 +122,14 @@
       </d>
       <d n="Values" t="Hashtable" />
     </o>
-  </Data>
-  <TypeList>
-    <Type n="Boolean">System.Boolean</Type>
-    <Type n="Hashtable">System.Collections.Hashtable</Type>
-    <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
-    <Type n="String">System.String</Type>
-  </TypeList>
-</XmlArchive>
+        </Data>
+        <TypeList>
+          <Type n="Boolean">System.Boolean</Type>
+          <Type n="Hashtable">System.Collections.Hashtable</Type>
+          <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
+          <Type n="String">System.String</Type>
+        </TypeList>
+      </XmlArchive>
     </PlcProjectOptions>
   </ProjectExtensions>
 </Project>
