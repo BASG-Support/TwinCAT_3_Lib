@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <POU Name="F_TO_MODBUS_REGISTER" Id="{ef5d189e-35e3-460b-bff2-ac8839f9c8f1}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION F_TO_MODBUS_REGISTER : WORD
+VAR_INPUT
+	S_INFO : S_MODBUS_REGISTER;
+END_VAR
+VAR
+	ADDRESS_SPACE : POINTER TO WORD;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[ADDRESS_SPACE := ADR(S_INFO.REGISTER_SPACE);
+F_TO_MODBUS_REGISTER := ADDRESS_SPACE^ + S_INFO.REGISTER_OFFSET;]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

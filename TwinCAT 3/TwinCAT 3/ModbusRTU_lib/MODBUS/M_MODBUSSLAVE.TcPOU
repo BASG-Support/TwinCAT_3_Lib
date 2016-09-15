@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <POU Name="M_MODBUSSLAVE" Id="{223d5cf5-b74b-4cd8-b512-ae387b6f3c23}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK M_MODBUSSLAVE
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	_ENABLE : BOOL := FALSE;
+	_FBSLAVE : ModbusRtuSlave_PcCOM;
+	
+	_MBINPUT 	: ARRAY[0..255] OF WORD;
+	_MBOUTPUT 	: ARRAY[0..255] OF WORD;
+	_MBMEMORY 	: ARRAY[0..255] OF WORD;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF _ENABLE THEN
+	_FBSLAVE(
+		AdrInputs:= ADR(_MBINPUT), 
+		SizeInputBytes:= SIZEOF(_MBINPUT), 
+		AdrOutputs:= ADR(_MBOUTPUT), 
+		SizeOutputBytes:= SIZEOF(_MBOUTPUT), 
+		AdrMemory:= ADR(_MBMEMORY), 
+		SizeMemoryBytes:= SIZEOF(_MBMEMORY), 
+		ErrorId=> );
+END_IF]]></ST>
+    </Implementation>
+    <Property Name="ENABLE" Id="{cef8f683-8592-44e2-97b8-8a48f73d8582}">
+      <Declaration><![CDATA[PROPERTY ENABLE : BOOL]]></Declaration>
+      <Get Name="Get" Id="{06745bcc-189f-4814-8b65-d72cbfcbd0ee}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ENABLE := _ENABLE;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{c4f01f8a-6a0f-4227-9644-a8ea21839e60}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_ENABLE := ENABLE;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="FB_init" Id="{7c627f09-e8ec-417e-909f-705bb8db10e8}">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode : BOOL;  // if TRUE, the instance afterwards gets moved into the copy code (online change)
+
+	DeviceID : UINT(1..247);
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_FBSLAVE.UnitID := DeviceID;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="ID" Id="{ddd00962-b084-4d3c-b23c-a99e977a4862}">
+      <Declaration><![CDATA[PROPERTY ID : UINT(1..247)]]></Declaration>
+      <Get Name="Get" Id="{2c9d694a-4215-4e45-bb3a-b99e80303216}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ID := _FBSLAVE.UnitID;
+]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{9a34f3ad-d965-43fe-97d8-aa9c60b81c79}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_FBSLAVE.UnitID := ID;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="INPUTS" Id="{9a2041dd-2395-4579-b59b-b4506e5b8c4d}">
+      <Declaration><![CDATA[PROPERTY INPUTS : POINTER TO BYTE]]></Declaration>
+      <Get Name="Get" Id="{438cb3d1-aa45-4f4b-ae2a-1c33a949e524}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[INPUTS := ADR(_MBINPUT);]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="MEMORY" Id="{4fa84482-7b1e-49db-9453-e7c7cc215098}">
+      <Declaration><![CDATA[PROPERTY MEMORY : POINTER TO BYTE]]></Declaration>
+      <Get Name="Get" Id="{c1ee03c1-e3b4-409f-9df5-f21af0b6a2f2}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[MEMORY := ADR(_MBMEMORY);]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="OUTPUTS" Id="{8d40b398-4c37-4d58-9bb3-01853b8def71}">
+      <Declaration><![CDATA[PROPERTY OUTPUTS : POINTER TO BYTE]]></Declaration>
+      <Get Name="Get" Id="{aea7b795-aa13-4964-a1ca-a75b62cec49b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[OUTPUTS := ADR(_MBOUTPUT);]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+  </POU>
+</TcPlcObject>

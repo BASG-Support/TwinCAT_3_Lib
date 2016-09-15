@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <DUT Name="E_MODBUS_REGISTERTYPE" Id="{714fb2f6-5ef5-49a1-bccd-e5b5dc285317}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE E_MODBUS_REGISTERTYPE :  
+(
+	E_MODBUS_INPUT := 0,
+	E_MODBUS_OUTPUT := 16#800,
+	E_MODBUS_MEMORY := 16#4000
+) WORD;
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>
