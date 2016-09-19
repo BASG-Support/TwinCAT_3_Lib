@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <DUT Name="S_UA_SERVERNAMESPACE" Id="{4e415016-090f-4281-96a0-2821927dff0e}">
+    <Declaration><![CDATA[TYPE S_UA_SERVERNAMESPACE :
+STRUCT
+	NAMESPACE 	: STRING(255);
+	HANDLE		: UINT;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

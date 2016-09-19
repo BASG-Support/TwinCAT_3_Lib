@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <POU Name="GET_BECKHOFF_OPCUA_NAMESPACE" Id="{6dbc28d7-c158-4161-b6f4-bb25967d16e1}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION GET_BECKHOFF_OPCUA_NAMESPACE : STRING(255)
+VAR_INPUT
+	HOSTNAME : STRING(255);
+	NODENAME : STRING(255);
+END_VAR
+VAR
+	//urn:hostname:BeckhoffAutomation:Ua:PLC1
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[GET_BECKHOFF_OPCUA_NAMESPACE := CONCAT('urn:', CONCAT(HOSTNAME, CONCAT(':BeckhoffAutomation:Ua:',NODENAME)));]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>
