@@ -9,7 +9,7 @@ VAR_INPUT
 	
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[F_GetTitle := "ModbusRTU_lib";
+      <ST><![CDATA[F_GetTitle := "OpcUa_Lib";
 ]]></ST>
     </Implementation>
   </POU>

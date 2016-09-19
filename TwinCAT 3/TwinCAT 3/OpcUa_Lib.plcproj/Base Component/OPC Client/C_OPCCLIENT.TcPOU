@@ -1,0 +1,307 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <POU Name="C_OPCCLIENT" Id="{838450ac-693b-4f7b-871f-7adaf621ee7a}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK C_OPCCLIENT
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	_FBCONNECT 		: UA_Connect;
+	_FBDISCONNECT 	: UA_Disconnect;
+	_FBNAMESPACE	: UA_GetNamespaceIndex;
+	_FBGETHANDLE	: UA_NodeGetHandle;
+	_FBRELEASEHANDLE: UA_NodeReleaseHandle;
+	_FBREAD 		: UA_Read;
+	_FBWRITE 		: UA_Write;
+	
+	_HNDL			: DWORD;
+	_SESSIONINFO	: ST_UASessionConnectInfo;
+	_SERVERNAMESPACE: S_UA_SERVERNAMESPACE;
+	
+	_INTERNALSTATE 	: DINT;
+	_NAMESPACEHANDLE: DWORD;
+	_NAMESPACEARRAY	: ARRAY[0..15] OF STRING(255);
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="METHODS" Id="{f81af944-679f-4038-a589-c7550c76d187}" />
+    <Folder Name="PROPERTIES" Id="{d1b10aed-d1d3-497e-ab7f-c568289c02c9}" />
+    <Method Name="CONNECT" Id="{9cd5a715-dbe2-41a5-81ff-0c05ce47f8ce}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD CONNECT : DINT
+VAR_INPUT
+	SERVER : STRING(255);
+END_VAR
+VAR
+	NODE : ST_UANodeId;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _HNDL <> 0 THEN
+	CONNECT := 1;
+	RETURN;
+END_IF
+
+_SESSIONINFO.eSecurityMode := E_UASecurityMsgMode.eUASecurityMsgMode_None;
+_SESSIONINFO.eSecurityPolicyUri := E_UASecurityPolicy.eUASecurityPolicy_None;
+_SESSIONINFO.eTransportProfileUri := E_UATransportProfile.eUATransportProfileUri_UATcp;
+_SESSIONINFO.tConnectTimeout := T#1M;
+_SESSIONINFO.tSessionTimeout := T#1M;
+
+_FBCONNECT(
+	Execute:= TRUE, 
+	ServerUrl:= SERVER, 
+	SessionConnectInfo:= _SESSIONINFO, 
+	Timeout:= , 
+	ConnectionHdl=>  );
+IF _FBCONNECT.Error THEN
+	_FBCONNECT(Execute:= FALSE);
+	CONNECT := 2;
+	RETURN;
+ELSIF _FBCONNECT.Done THEN
+	_FBCONNECT(Execute:= FALSE);
+	_HNDL := _FBCONNECT.ConnectionHdl;
+	CONNECT := -1;
+	RETURN;
+ELSE
+	CONNECT := 0;
+	RETURN;
+END_IF
+]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="CONNECTED" Id="{f881f1f3-7f97-4c48-b923-222cdc7684e8}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY CONNECTED : BOOL]]></Declaration>
+      <Get Name="Get" Id="{54434773-de20-47be-8240-5b9b923f7cc4}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CONNECTED := _HNDL <> 0;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="DISCONNECT" Id="{16491ff5-ba33-498a-84b7-47ba8c5a49c7}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD DISCONNECT : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_FBDISCONNECT(
+	Execute:= TRUE, 
+	ConnectionHdl:= _HNDL, 
+	Timeout:= , 
+	Done=> , 
+	Busy=> , 
+	Error=> , 
+	ErrorID=> );
+IF _FBDISCONNECT.Error THEN
+	_FBDISCONNECT(Execute:= FALSE);
+	DISCONNECT := 1;
+	RETURN;
+ELSIF _FBDISCONNECT.Done THEN
+	_HNDL := 0;
+	_FBDISCONNECT(Execute:= FALSE);
+	DISCONNECT := -1;
+	RETURN;
+ELSE
+	DISCONNECT := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GENERATE_HANDLE" Id="{a4cf6be3-6d8e-4a76-9f71-234c444e4e52}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD GENERATE_HANDLE : DINT
+VAR_INPUT
+	NAME 		: STRING(255);
+	IS_NUMERIC_ID	: BOOL;
+	HANDLE_PTR_OUT	: POINTER TO DWORD;
+END_VAR
+VAR
+	NODE : ST_UANodeId;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF HANDLE_PTR_OUT = 0 THEN
+	GENERATE_HANDLE := 1;
+	RETURN;
+END_IF
+
+IF IS_NUMERIC_ID THEN
+	NODE.eIdentifierType := E_UAIdentifierType.eUAIdentifierType_Numeric;
+ELSE
+	NODE.eIdentifierType := E_UAIdentifierType.eUAIdentifierType_String;
+END_IF
+NODE.nNamespaceIndex := _SERVERNAMESPACE.HANDLE;
+NODE.sIdentifier := NAME;
+
+_FBGETHANDLE(
+	Execute:= TRUE, 
+	ConnectionHdl:= _HNDL, 
+	NodeID:= NODE, 
+	Timeout:= );
+IF _FBGETHANDLE.Error THEN
+	_FBGETHANDLE(Execute:= FALSE);
+	GENERATE_HANDLE := 2;
+	RETURN;
+ELSIF _FBGETHANDLE.Done THEN
+	HANDLE_PTR_OUT^ := _FBGETHANDLE.NodeHdl;
+	_FBGETHANDLE(Execute:= FALSE);
+	GENERATE_HANDLE := -1;
+	RETURN;
+ELSE
+	GENERATE_HANDLE := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="NAMESPACE" Id="{acf6fe45-878e-4c64-a603-f314623cd323}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY NAMESPACE : STRING(255)]]></Declaration>
+      <Get Name="Get" Id="{4e792ccd-cdd2-4e9b-adb1-8699807a86a3}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[NAMESPACE := _SERVERNAMESPACE.NAMESPACE;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="READ" Id="{404743a7-d5cb-460e-ba91-f454f768c0cf}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD READ : DINT
+VAR_INPUT
+	HANDLE 			: DWORD;
+	DATA_PTR_OUT	: PVOID;
+	DATA_SIZE		: UDINT;
+END_VAR
+VAR
+	ADDITIONAL_INFO	: ST_UANodeAdditionalInfo;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[ADDITIONAL_INFO.nIndexRangeCount := 0;
+ADDITIONAL_INFO.eAttributeID := E_UAAttributeID.eUAAI_Value;
+
+_FBREAD(
+	Execute:= TRUE, 
+	ConnectionHdl:= _HNDL, 
+	NodeHdl:= HANDLE, 
+	stNodeAddInfo:= ADDITIONAL_INFO, 
+	pVariable:= DATA_PTR_OUT, 
+	cbData:= DATA_SIZE, 
+	Timeout:= , 
+	cbData_R=> );
+IF _FBREAD.Error THEN
+	_FBREAD(Execute:= FALSE); 
+	READ := 1;
+	RETURN;
+ELSIF _FBREAD.Done THEN
+	_FBREAD(Execute:= FALSE); 
+	READ := -1;
+	RETURN;
+ELSE
+	READ := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="READ_RANGE" Id="{02479917-6057-43f3-b87a-d42a5c2e8e5d}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD READ_RANGE : DINT
+VAR_INPUT
+	HANDLE 			: DWORD;
+	START			: UDINT;
+	END				: UDINT;
+	DATA_PTR_OUT	: PVOID;
+	DATA_SIZE		: UDINT;
+END_VAR
+VAR
+	ADDITIONAL_INFO	: ST_UANodeAdditionalInfo;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[ADDITIONAL_INFO.nIndexRangeCount := 1;
+ADDITIONAL_INFO.eAttributeID := E_UAAttributeID.eUAAI_Value;
+ADDITIONAL_INFO.stIndexRange[1].nStartIndex := START;
+ADDITIONAL_INFO.stIndexRange[1].nEndIndex := END;
+
+_FBREAD(
+	Execute:= TRUE, 
+	ConnectionHdl:= _HNDL, 
+	NodeHdl:= HANDLE, 
+	stNodeAddInfo:= ADDITIONAL_INFO, 
+	pVariable:= DATA_PTR_OUT, 
+	cbData:= DATA_SIZE, 
+	Timeout:= , 
+	cbData_R=> );
+IF _FBREAD.Error THEN
+	_FBREAD(Execute:= FALSE); 
+	READ_RANGE := 1;
+	RETURN;
+ELSIF _FBREAD.Done THEN
+	_FBREAD(Execute:= FALSE); 
+	READ_RANGE := -1;
+	RETURN;
+ELSE
+	READ_RANGE := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="RELEASE_HANDLE" Id="{fd5f1153-559c-4e1a-bdd8-c2f89fdc041a}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD RELEASE_HANDLE : DINT
+VAR_INPUT
+	HANDLE : DWORD;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_FBRELEASEHANDLE(
+	Execute:= TRUE, 
+	ConnectionHdl:= _HNDL, 
+	NodeHdl:= HANDLE, 
+	Timeout:= , 
+	Done=> , 
+	Busy=> , 
+	Error=> , 
+	ErrorID=> );
+IF _FBRELEASEHANDLE.Error THEN
+	_FBRELEASEHANDLE(Execute:= FALSE);
+	RELEASE_HANDLE := 1;
+	RETURN;
+ELSIF _FBRELEASEHANDLE.Done THEN
+	_FBRELEASEHANDLE(Execute:= FALSE);
+	RELEASE_HANDLE := -1;
+	RETURN;
+ELSE
+	RELEASE_HANDLE := 0;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="RESOLVE_NAMESPACE" Id="{e6889642-ad25-468a-9580-c08761e40609}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD RESOLVE_NAMESPACE : DINT
+VAR_INPUT
+	NAMESPACE : STRING(255);
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_FBNAMESPACE(
+	Execute:= TRUE, 
+	ConnectionHdl:= _HNDL, 
+	NamespaceUri:= NAMESPACE, 
+	Timeout:= );
+IF _FBNAMESPACE.Error THEN
+	_FBNAMESPACE(Execute:= FALSE);
+	RESOLVE_NAMESPACE := 1;
+	RETURN;
+ELSIF _FBNAMESPACE.Done THEN
+	_SERVERNAMESPACE.NAMESPACE := NAMESPACE;
+	_SERVERNAMESPACE.HANDLE := _FBNAMESPACE.NamespaceIndex;
+	_FBNAMESPACE(Execute:= FALSE);
+	RESOLVE_NAMESPACE := -1;
+	RETURN;
+ELSE
+	RESOLVE_NAMESPACE := 0;
+	RETURN;
+END_IF
+	]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

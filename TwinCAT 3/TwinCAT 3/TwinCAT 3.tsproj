@@ -128,6 +128,12 @@
 					</TaskPouOids>
 				</Instance>
 			</Project>
+			<Project GUID="{D9704A47-FD77-40D6-BCDC-1234701CBFB8}" Name="OpcUa_Lib" PrjFilePath="OpcUa_Lib.plcproj\OpcUa_Lib.plcproj" TmcFilePath="OpcUa_Lib.plcproj\OpcUa_Lib.tmc" ReloadTmc="true" AmsPort="858" FileArchiveSettings="#x000e">
+				<Instance Id="#x01010080" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
+					<Name>OpcUa_Lib Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+				</Instance>
+			</Project>
 		</Plc>
 	</Project>
 </TcSmProject>
