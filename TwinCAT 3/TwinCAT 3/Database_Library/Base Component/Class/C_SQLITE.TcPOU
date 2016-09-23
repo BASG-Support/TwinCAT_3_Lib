@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
   <POU Name="C_SQLITE" Id="{a7ee5403-6d43-4885-8669-cfa9297b2c15}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK C_SQLITE EXTENDS C_DBADAPTOR
+    <Declaration><![CDATA[FUNCTION_BLOCK C_SQLCLIENT EXTENDS C_DBADAPTOR
 VAR_INPUT
 END_VAR
 VAR_OUTPUT
@@ -20,7 +20,7 @@ END_VAR
       <Folder Name="SQL" Id="{a1eb873f-d914-4db2-ae6d-e7813fe3a398}" />
     </Folder>
     <Method Name="SQL_EXECUTE_NONQUERY" Id="{813d7971-78c7-4d45-8f56-becb63644dad}" FolderPath="METHODS\SQL\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'SQL_Insert'}
+      <Declaration><![CDATA[{attribute 'object_name' := 'SQL_EXECUTE_NONQUERY'}
 METHOD SQL_EXECUTE_NONQUERY : DINT
 VAR_INPUT
 	SQL : POINTER TO T_SQL_COMMAND;
@@ -50,7 +50,7 @@ END_IF
       </Implementation>
     </Method>
     <Method Name="SQL_EXECUTE_QUERY" Id="{878a5881-e6d5-4326-bd4d-c9c7cade3cd3}" FolderPath="METHODS\SQL\">
-      <Declaration><![CDATA[{attribute 'object_name' := 'SQL_Select'}
+      <Declaration><![CDATA[{attribute 'object_name' := 'SQL_EXECUTE_QUERY'}
 METHOD SQL_EXECUTE_QUERY : DINT
 VAR_INPUT
 	SQL_PTR				: POINTER TO T_SQL_COMMAND;
