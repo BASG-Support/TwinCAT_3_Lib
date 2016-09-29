@@ -468,7 +468,7 @@ END_VAR
 				_FBHOME.bCalibrationCam := AXIS.HW_POT XOR AXIS.LIMITS_INVERTED;
 			END_IF
 		ELSE
-			_FBHOME.bCalibrationCam := AXIS.HW_HOME;
+			_FBHOME.bCalibrationCam := AXIS.HW_HOME XOR AXIS.HW_HOME_INVERTED;
 		END_IF
 		_FBHOME(
 			Axis:= AXIS.NC_INTERFACE, 
@@ -563,6 +563,25 @@ END_VAR
           <ST><![CDATA[ID := AXIS.NC_INTERFACE.NcToPlc.AxisId;]]></ST>
         </Implementation>
       </Get>
+    </Property>
+    <Property Name="INVERT_CALIBRATION_SIGNAL" Id="{fa9d1fef-49e2-44e3-aaa6-114649bd856f}" FolderPath="PROPERTIES\Homing\">
+      <Declaration><![CDATA[PROPERTY INVERT_CALIBRATION_SIGNAL : BOOL]]></Declaration>
+      <Get Name="Get" Id="{fb26dc04-b9d8-477b-bcbe-7c143d79f36d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[INVERT_CALIBRATION_SIGNAL := AXIS.HW_HOME_INVERTED;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{37498c44-dc45-475b-a2c5-72f17c1ae33a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AXIS.HW_HOME_INVERTED := INVERT_CALIBRATION_SIGNAL;]]></ST>
+        </Implementation>
+      </Set>
     </Property>
     <Property Name="INVERT_LIMITS" Id="{5ce0e497-6e1f-4022-adcd-d4a0aa6b2849}" FolderPath="PROPERTIES\Limits\">
       <Declaration><![CDATA[PROPERTY INVERT_LIMITS : BOOL]]></Declaration>
