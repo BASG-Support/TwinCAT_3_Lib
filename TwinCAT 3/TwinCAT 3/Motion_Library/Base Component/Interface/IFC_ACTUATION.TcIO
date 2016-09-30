@@ -156,6 +156,15 @@ END_VAR
         <Declaration><![CDATA[]]></Declaration>
       </Get>
     </Property>
+    <Property Name="INVERT_CALIBRATION_SIGNAL" Id="{e3f71531-938b-45db-8972-f072bfff9c6d}" FolderPath="PROPERTIES\Homing\">
+      <Declaration><![CDATA[PROPERTY INVERT_CALIBRATION_SIGNAL : BOOL]]></Declaration>
+      <Get Name="Get" Id="{16940361-5c93-4c90-9f1c-124178279aba}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{b179ae3f-3c5d-4d6f-928a-f28b77e08db8}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
     <Property Name="INVERT_LIMITS" Id="{f70f6a59-e41f-4443-8561-ab2c6009ac68}" FolderPath="PROPERTIES\Limits\">
       <Declaration><![CDATA[PROPERTY INVERT_LIMITS : BOOL]]></Declaration>
       <Get Name="Get" Id="{ae89735c-4435-405e-aed8-d9dab257fda4}">
