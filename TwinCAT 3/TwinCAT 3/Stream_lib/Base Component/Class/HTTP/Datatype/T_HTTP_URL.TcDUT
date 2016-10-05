@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <DUT Name="T_HTTP_URL" Id="{45ff549d-ffdf-4b30-9a35-a35e287c6f47}">
+    <Declaration><![CDATA[TYPE T_HTTP_URL : STRING(GVL_HTTP_PARAMETERS.MAX_HTTP_URL_LENGTH); END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

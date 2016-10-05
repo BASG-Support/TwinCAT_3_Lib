@@ -1,0 +1,509 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <POU Name="C_HTTP_REQUEST" Id="{21eaf148-a822-4ebd-98bb-640058d2bcb1}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK C_HTTP_REQUEST EXTENDS C_HTTP_MESSAGE
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	_REQUEST 		: E_HTTP_VERB;
+	
+	_URL 			: T_HTTP_URL;
+	
+	_VERSION_MAJOR 	: UDINT := 1;
+	_VERSION_MINOR 	: UDINT := 1;
+	
+	_HOST 				: STRING(255);
+(*                    	
+    _ACCEPT_CHARSET 	: STRING(255);
+    _ACCEPT_ENCODING	: STRING(255);
+    _ACCEPT_LANGUAGE	: STRING(255);
+    _AUTHORIZATION		: STRING(255);
+    _EXPECT				: STRING(255);
+    _FROM 				: STRING(255);
+    _IF_MATCH 			: STRING(255);
+    _IF_MODIFIED_SINCE 	: STRING(255);
+    _IF_NONE_MATCH 		: STRING(255);
+    _IF_RANGE 			: STRING(255);
+    _IF_UNMODIFIED_SINCE: STRING(255);
+    _MAX_FORWARDS 		: STRING(255);
+    _PROXY_AUTHORIZATION: STRING(255);
+    _RANGE 				: STRING(255);
+    _REFERER 			: STRING(255);
+    _TE 				: STRING(255);
+    _USER_AGENT 		: STRING(255);
+*)
+	_BODY			: T_HTTP_BODY;
+	_BODY_STREAM	: C_HTTPSTREAM;
+	
+	_PARSER 		: C_HTTPSTREAM;
+	_PARSE_STATE	: UDINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="METHODS" Id="{284b8572-4f1d-4655-b4c3-6e98df199d5c}">
+      <Folder Name="Constructor" Id="{92ce8f6d-c681-4078-a723-3b3a8d0bec61}" />
+    </Folder>
+    <Folder Name="PROPERTIES" Id="{47089fd9-f921-474b-ba0b-bb93d3968cdb}">
+      <Folder Name="BODY" Id="{c2cf9596-5d70-4874-bba7-42225f32af87}" />
+      <Folder Name="HEADER" Id="{991f1aa7-28fa-41fc-87a1-81a0f41847b7}" />
+      <Folder Name="REQUEST" Id="{4725fc08-2756-41f7-9b12-8e5c3314bf75}" />
+    </Folder>
+    <Method Name="FB_init" Id="{40b179d2-e6dc-4df6-9aa0-86cc65fc86e3}" FolderPath="METHODS\Constructor\">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode : BOOL;  // if TRUE, the instance afterwards gets moved into the copy code (online change)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_BODY_STREAM.NEW(ADR(_BODY), SIZEOF(_BODY));]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GET_BODY" Id="{d0a3baa0-e0e1-4f27-bddc-88235e4d4180}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD GET_BODY : I_STREAM
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[GET_BODY := _BODY_STREAM;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GET_BYTE" Id="{0d8147ef-4e16-4d04-9ce6-f823801d7b27}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD GET_BYTE : DINT
+VAR_INPUT
+	STREAM : I_STREAM;
+END_VAR
+VAR 
+	_TERMINATOR 	: STRING(2) := '$R$N';
+	HTTP_MESSAGE	: STRING(255);
+
+	LENGTH 			: DINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF STREAM = 0 THEN
+	GET_BYTE := 1;
+	RETURN;
+END_IF
+
+THIS^._CONTENT_LENGTH := _BODY_STREAM.POSITION;
+
+//INSERT VERB
+	CASE THIS^._REQUEST OF 
+	E_HTTP_VERB.E_HTTP_REQUEST_GET:
+		HTTP_MESSAGE := 'GET';
+	E_HTTP_VERB.E_HTTP_REQUEST_CONNECT:
+		HTTP_MESSAGE := 'CONNECT';
+	E_HTTP_VERB.E_HTTP_REQUEST_DELETE:
+		HTTP_MESSAGE := 'DELETE';
+	E_HTTP_VERB.E_HTTP_REQUEST_HEAD:
+		HTTP_MESSAGE := 'HEAD';
+	E_HTTP_VERB.E_HTTP_REQUEST_OPTIONS:
+		HTTP_MESSAGE := 'OPTIONS';
+	E_HTTP_VERB.E_HTTP_REQUEST_POST:
+		HTTP_MESSAGE := 'POST';
+	E_HTTP_VERB.E_HTTP_REQUEST_PUT:
+		HTTP_MESSAGE := 'PUT';
+	E_HTTP_VERB.E_HTTP_REQUEST_TRACE:
+		HTTP_MESSAGE := 'TRACE';
+	END_CASE
+	IF STREAM.WRITE(ADR(HTTP_MESSAGE), LEN(HTTP_MESSAGE)) > 0 THEN
+		GET_BYTE := 10;
+		RETURN;
+	END_IF
+	
+//INSERT SPACE 
+	HTTP_MESSAGE := ' ';
+	IF STREAM.WRITE(ADR(HTTP_MESSAGE), LEN(HTTP_MESSAGE)) > 0 THEN
+		GET_BYTE := 11;
+		RETURN;
+	END_IF
+	
+//INSERT URL
+	IF STREAM.WRITE(ADR(_URL), GET_URL_LENGTH(ADR(_URL))) > 0 THEN
+		GET_BYTE := 12;
+		RETURN;
+	END_IF
+	HTTP_MESSAGE := ' ';
+	IF STREAM.WRITE(ADR(HTTP_MESSAGE), LEN(HTTP_MESSAGE)) > 0 THEN
+		GET_BYTE := 12;
+		RETURN;
+	END_IF
+	
+//INSERT VERSION
+	HTTP_MESSAGE := 'HTTP/';	
+	IF STREAM.WRITE(ADR(HTTP_MESSAGE), LEN(HTTP_MESSAGE)) > 0 THEN
+		GET_BYTE := 13;
+		RETURN;
+	END_IF
+	HTTP_MESSAGE := UDINT_TO_STRING(_VERSION_MAJOR);
+	IF STREAM.WRITE(ADR(HTTP_MESSAGE), LEN(HTTP_MESSAGE)) > 0 THEN
+		GET_BYTE := 13;
+		RETURN;
+	END_IF
+	HTTP_MESSAGE := '.';
+	IF STREAM.WRITE(ADR(HTTP_MESSAGE), LEN(HTTP_MESSAGE)) > 0 THEN
+		GET_BYTE := 13;
+		RETURN;
+	END_IF
+	HTTP_MESSAGE := UDINT_TO_STRING(_VERSION_MINOR);
+	IF STREAM.WRITE(ADR(HTTP_MESSAGE), LEN(HTTP_MESSAGE)) > 0 THEN
+		GET_BYTE := 13;
+		RETURN;
+	END_IF
+
+//INSERT TERMINATOR
+	HTTP_MESSAGE := '$R$N';
+	IF STREAM.WRITE(ADR(HTTP_MESSAGE), LEN(HTTP_MESSAGE)) > 0 THEN
+		GET_BYTE := 14;
+		RETURN;
+	END_IF
+	
+//INSERT STANDARD HEADERS
+	HTTP_MESSAGE := 'Host: ';
+	IF STREAM.WRITE(ADR(HTTP_MESSAGE), LEN(HTTP_MESSAGE)) > 0 THEN
+		GET_BYTE := 21;
+		RETURN;
+	END_IF
+	IF STREAM.WRITE(ADR(_HOST), LEN(_HOST)) > 0 THEN
+		GET_BYTE := 21;
+		RETURN;
+	END_IF
+	IF STREAM.WRITE(ADR(_TERMINATOR), LEN(_TERMINATOR)) > 0 THEN
+		GET_BYTE := 21;
+		RETURN;
+	END_IF	
+
+//INSERT COMMON HEADERS	
+	IF SUPER^.GET_BYTE(STREAM) > 0 THEN
+		GET_BYTE := 22;
+		RETURN;
+	END_IF
+	
+	{warning 'Not all stander headers implemented.'}
+
+//INSERT USER HEADERS
+	{warning 'User header not implemented yet.'}
+
+//INSERT EXTRA TERMINATOR
+	HTTP_MESSAGE := '$R$N';
+	IF STREAM.WRITE(ADR(HTTP_MESSAGE), LEN(HTTP_MESSAGE)) > 0 THEN
+		GET_BYTE := 29;
+		RETURN;
+	END_IF
+	
+//INSERT BODY
+	IF STREAM.WRITE(ADR(_BODY), _BODY_STREAM.POSITION) > 0 THEN
+		GET_BYTE := 31;
+		RETURN;
+	END_IF
+	
+GET_BYTE := -1;
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="HOST" Id="{cfd36984-cd79-4ba6-ae66-bd58209e6f38}" FolderPath="PROPERTIES\HEADER\">
+      <Declaration><![CDATA[PROPERTY HOST : STRING(255)]]></Declaration>
+      <Get Name="Get" Id="{14102f84-32ec-4595-a797-cf1d0bf42db6}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[HOST := _HOST;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{237cee36-6692-4bdd-b058-eba2b2e9e7ca}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_HOST := HOST;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="PARSE" Id="{e8172b9f-c4a1-43d6-99ac-343a17a4bb18}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD PARSE : DINT
+VAR_INPUT
+	PTR_DATA : PVOID;
+	DATA_SIZE: UDINT;
+END_VAR
+VAR	
+
+	_SPACE		: BYTE := 32; // ' '
+	_FRONTSLASH	: BYTE := 47; // '/'
+	_PERIOD		: BYTE := 46; // '.'
+	_HEADDELIMIT: BYTE := 58; // ':'
+	_CRLF		: ARRAY [0..1] OF BYTE := [13, 10];
+	_CRLFCRLF	: ARRAY [0..3] OF BYTE := [13, 10, 13, 10];
+	_LOCATION 	: UDINT;
+	
+	_VERB 		: ARRAY[0..80] OF BYTE;
+	_VERBSTRING : STRING(10);
+	
+	_VERSIONSTRING : STRING(10);
+	
+	_HEADERSTRING	: STRING(255);
+	//_HEADERWRITER	: C_STREAMWRITER;
+	_SEGMENTBREAK	: UDINT;
+	
+	_ENDOFBODY	: BYTE := 0;
+	STREAM: INT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF PTR_DATA = 0 OR DATA_SIZE = 0 THEN
+	PARSE := 1;
+	RETURN;
+END_IF
+
+CASE _PARSE_STATE OF
+0:
+	//Initialise
+		_PARSER.Close();
+		IF _PARSER.NEW(PTR_DATA, DATA_SIZE) > 0 THEN
+			PARSE := 1;
+			RETURN;
+		END_IF
+	//Parse Verb
+		IF _PARSER.FIND(ADR(_SPACE), 1, ADR(_LOCATION)) < 0 THEN
+			_PARSER.READ(ADR(_VERB), _LOCATION);
+			CASE _LOCATION OF 
+			3:
+				_VERBSTRING := 'GET';
+				IF MEMCMP(ADR(_VERBSTRING), ADR(_VERB), _LOCATION) <> 0 THEN
+					_VERBSTRING := 'PUT';
+					IF MEMCMP(ADR(_VERBSTRING), ADR(_VERB), _LOCATION) <> 0 THEN
+						PARSE := 13;
+						RETURN;
+					END_IF
+					_REQUEST := E_HTTP_VERB.E_HTTP_REQUEST_PUT;
+				END_IF
+				_REQUEST := E_HTTP_VERB.E_HTTP_REQUEST_GET;
+			4:
+				_VERBSTRING := 'POST';
+				IF MEMCMP(ADR(_VERBSTRING), ADR(_VERB), _LOCATION) <> 0 THEN
+					_VERBSTRING := 'HEAD';
+					IF MEMCMP(ADR(_VERBSTRING), ADR(_VERB), _LOCATION) <> 0 THEN
+						PARSE := 14;
+						RETURN;
+					END_IF
+					_REQUEST := E_HTTP_VERB.E_HTTP_REQUEST_HEAD;
+				END_IF
+				_REQUEST := E_HTTP_VERB.E_HTTP_REQUEST_POST;
+			5:
+				_VERBSTRING := 'TRACE';
+				IF MEMCMP(ADR(_VERBSTRING), ADR(_VERB), _LOCATION) <> 0 THEN
+					PARSE := 15;
+					RETURN;
+				END_IF
+				_REQUEST := E_HTTP_VERB.E_HTTP_REQUEST_TRACE;
+			6:
+				_VERBSTRING := 'DELETE';
+				IF MEMCMP(ADR(_VERBSTRING), ADR(_VERB), _LOCATION) <> 0 THEN
+					PARSE := 16;
+					RETURN;
+				END_IF
+				_REQUEST := E_HTTP_VERB.E_HTTP_REQUEST_DELETE;
+			7:
+				_VERBSTRING := 'OPTIONS';
+				IF MEMCMP(ADR(_VERBSTRING), ADR(_VERB), _LOCATION) <> 0 THEN
+					_VERBSTRING := 'CONNECT';
+					IF MEMCMP(ADR(_VERBSTRING), ADR(_VERB), _LOCATION) <> 0 THEN
+						PARSE := 17;
+						RETURN;
+					END_IF
+					_REQUEST := E_HTTP_VERB.E_HTTP_REQUEST_CONNECT;
+				END_IF
+				_REQUEST := E_HTTP_VERB.E_HTTP_REQUEST_OPTIONS;
+			ELSE
+				_PARSE_STATE := 0;
+				PARSE := 10;
+				RETURN;
+			END_CASE
+			_PARSER.SEEK(1, E_STREAMSEEKTYPE.Current);
+		ELSE
+			_PARSE_STATE := 0;
+			PARSE := 1;
+			RETURN;
+		END_IF
+		
+	//Parse URL
+		IF _PARSER.FIND(ADR(_SPACE), 1, ADR(_LOCATION)) < 0 THEN
+			MEMSET(ADR(_URL), 0, SIZEOF(_URL));
+			IF _PARSER.READ(ADR(THIS^._URL), _LOCATION) > 0 THEN
+				_PARSE_STATE := 0;
+				Parse := 20;
+				RETURN;
+			END_IF
+			IF _PARSER.SEEK(1, E_STREAMSEEKTYPE.Current) > 0 THEN
+				_PARSE_STATE := 0;
+				Parse := 21;
+				RETURN;
+			END_IF
+		ELSE
+			_PARSE_STATE := 0;
+			PARSE := 2;
+			RETURN;
+		END_IF
+		
+	//Parse Version
+		_VERSIONSTRING := 'HTTP/';
+		IF _PARSER.FIND(ADR(_VERSIONSTRING), 5, ADR(_LOCATION)) > 0 THEN
+			_PARSE_STATE := 0;
+			PARSE := 30;
+			RETURN;
+		ELSE
+			IF _PARSER.SEEK(_LOCATION + 5, E_STREAMSEEKTYPE.Current) > 0 THEN
+				_PARSE_STATE := 0;
+				PARSE := 31;
+				RETURN;
+			END_IF
+		END_IF
+		IF _PARSER.FIND(ADR(_PERIOD), 1, ADR(_LOCATION)) < 0 THEN
+			MEMSET(ADR(_VERSIONSTRING), 0, SIZEOF(_VERSIONSTRING));
+			IF _PARSER.READ(ADR(_VERSIONSTRING), _LOCATION) > 0 THEN
+				_PARSE_STATE := 0;
+				PARSE := 32;
+				RETURN;
+			END_IF
+			THIS^._VERSION_MAJOR := STRING_TO_UDINT(_VERSIONSTRING);
+			IF _PARSER.SEEK(1, E_STREAMSEEKTYPE.Current) > 0 THEN
+				_PARSE_STATE := 0;
+				PARSE := 33;
+				RETURN;
+			END_IF
+		ELSE
+			_PARSE_STATE := 0;
+			PARSE := 34;
+			RETURN;
+		END_IF
+		IF _PARSER.FIND(ADR(_CRLF), 2, ADR(_LOCATION)) < 0 THEN
+			MEMSET(ADR(_VERSIONSTRING), 0, SIZEOF(_VERSIONSTRING));
+			IF _PARSER.READ(ADR(_VERSIONSTRING), _LOCATION) > 0 THEN
+				_PARSE_STATE := 0;
+				PARSE := 35;
+				RETURN;
+			END_IF
+			THIS^._VERSION_MINOR := STRING_TO_UDINT(_VERSIONSTRING);
+			IF _PARSER.SEEK(2, E_STREAMSEEKTYPE.Current) > 0 THEN
+				_PARSE_STATE := 0;
+				PARSE := 36;
+				RETURN;
+			END_IF
+		ELSE
+			_PARSE_STATE := 0;
+			PARSE := 37;
+			RETURN;
+		END_IF
+		_PARSE_STATE := _PARSE_STATE + 1;
+		PARSE := 0;
+		RETURN;
+	_SEGMENTBREAK := 0;
+1:
+	{warning 'Implementation is not complete'}
+	//Parse Headers
+		WHILE TRUE DO 
+			IF _PARSER.FIND(ADR(_CRLF), 2, ADR(_LOCATION)) < 0 THEN	
+				IF _LOCATION = 0 THEN // Implies double CRLF is reached, ie. end of header
+					EXIT;
+				END_IF
+				MEMSET(ADR(_HEADERSTRING), 0, SIZEOF(_HEADERSTRING));
+				IF _PARSER.READ(ADR(_HEADERSTRING), _LOCATION) > 0 THEN
+					_PARSE_STATE := 0;
+					PARSE := 52;
+					RETURN;
+				END_IF
+				IF _PARSER.SEEK(2, E_STREAMSEEKTYPE.Current) > 0 THEN
+					_PARSE_STATE := 0;
+					PARSE := 53;
+					RETURN;
+				END_IF
+			ELSE
+				_PARSE_STATE := 0;
+				PARSE := 5; 
+				RETURN;
+			END_IF
+			_SEGMENTBREAK := _SEGMENTBREAK + 1;
+			IF _SEGMENTBREAK > 250 THEN
+				_SEGMENTBREAK := 0;
+				PARSE := 0;
+				RETURN;
+			END_IF
+		END_WHILE
+			
+		IF _PARSER.SEEK(2, E_STREAMSEEKTYPE.Current) > 0 THEN
+			_PARSE_STATE := 0;
+			PARSE := 51;
+			RETURN;
+		ELSE
+			_PARSE_STATE := _PARSE_STATE + 1;
+			RETURN;
+		END_IF
+2:
+	//Parse Body
+		MEMSET(ADR(THIS^._BODY), 0, SIZEOF(_BODY));
+		IF _PARSER.FIND(ADR(_ENDOFBODY), 1, ADR(_LOCATION)) < 0 THEN
+			IF _PARSER.READ(ADR(THIS^._BODY), _LOCATION) > 0 THEN
+				_PARSE_STATE := 0;
+				PARSE := 60;
+				RETURN;
+			ELSE 
+				_PARSE_STATE := 0;
+				PARSE := -1;
+				RETURN;
+			END_IF
+		ELSE
+			_PARSE_STATE := 0;
+			PARSE := 6;
+			RETURN;
+		END_IF
+END_CASE
+
+//Basic return, BUSY
+PARSE := 0;
+RETURN;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="URL" Id="{740e2b8d-0533-4a88-bf51-e8faa1fcb12d}" FolderPath="PROPERTIES\REQUEST\">
+      <Declaration><![CDATA[PROPERTY URL : T_HTTP_URL]]></Declaration>
+      <Get Name="Get" Id="{20ff21e5-3bbc-4832-92db-f658f673b4db}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[URL := _URL;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{6bb6e0fe-2fc1-42f7-9a94-61835febfeb5}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_URL := URL;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="VERB" Id="{2736c457-c95b-4bbe-99c9-89114f897344}" FolderPath="PROPERTIES\REQUEST\">
+      <Declaration><![CDATA[PROPERTY VERB : E_HTTP_VERB]]></Declaration>
+      <Get Name="Get" Id="{f705274c-949c-4f4d-ae4d-8666077a0171}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[VERB := _REQUEST;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{a367047b-a5b5-44bd-a06e-56786bf49090}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_REQUEST := VERB;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+  </POU>
+</TcPlcObject>

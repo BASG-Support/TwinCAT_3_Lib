@@ -1,0 +1,225 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <POU Name="C_HTTP_RESPONSE" Id="{58ba029f-3d8d-42d5-9651-b07e24cc0f6e}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK C_HTTP_RESPONSE EXTENDS C_HTTP_MESSAGE
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	_CODEGROUP 		: E_HTTP_CODEGROUP := E_HTTP_CODEGROUP.E_GROUP_SUCCESS;
+	_CODE			: UDINT := 0;
+	
+	_CODEMESSAGE	: STRING(255);
+	
+	_VERSION_MAJOR 	: UDINT := 1;
+	_VERSION_MINOR 	: UDINT := 1;
+	
+(*
+	_ACCEPT_RANGES		: STRING(255);
+	_AGE				: STRING(255);
+	_E_TAG				: STRING(255);
+	_LOCATION			: STRING(255);
+	_PROXY_AUTHENTICATE	: STRING(255);
+	_RETRY_AFTER		: STRING(255);
+	_SERVER				: STRING(255);
+	_SET_COOKIE			: STRING(255);
+	_VARY				: STRING(255);
+	_WWW_AUTHENTICATE	: STRING(255);
+*)
+
+	_BODY 			: T_HTTP_BODY;
+	_BODY_STREAM	: C_HTTPSTREAM;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="METHODS" Id="{2ea6cc5b-d9eb-4430-b4e6-94d4c9225800}">
+      <Folder Name="Constructor" Id="{4eb8e21e-cc9e-439c-85c0-17edafb011b6}" />
+    </Folder>
+    <Folder Name="PROPERTIES" Id="{60144fe0-ed30-4983-833e-78096d21aaf7}" />
+    <Method Name="FB_init" Id="{73accf44-c593-4d0f-9d91-d3ae96f871f5}" FolderPath="METHODS\Constructor\">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode : BOOL;  // if TRUE, the instance afterwards gets moved into the copy code (online change)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_BODY_STREAM.NEW(ADR(_BODY), SIZEOF(_BODY));]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GET_BYTE" Id="{7ecb6f6a-b6d2-449f-9972-4473953f340a}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD GET_BYTE : DINT
+VAR_INPUT
+	STREAM : I_STREAM;
+END_VAR
+VAR 
+	_RETURNCODE 	: UDINT;	
+
+	_TERMINATOR 	: STRING(2) := '$R$N';
+	_SPACE			: STRING(1) := ' ';
+	
+	HTTP_MESSAGE	: STRING(255);
+
+	LENGTH 			: DINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF STREAM = 0 THEN
+	GET_BYTE := 1;
+	RETURN;
+END_IF
+
+THIS^._CONTENT_LENGTH := _BODY_STREAM.POSITION;
+
+//INSERT VERSION
+	HTTP_MESSAGE := 'HTTP/';
+	IF STREAM.WRITE(ADR(HTTP_MESSAGE), LEN(HTTP_MESSAGE)) > 0 THEN
+		GET_BYTE := 10;
+		RETURN;
+	END_IF
+	HTTP_MESSAGE := UDINT_TO_STRING(_VERSION_MAJOR);
+	IF STREAM.WRITE(ADR(HTTP_MESSAGE), LEN(HTTP_MESSAGE)) > 0 THEN
+		GET_BYTE := 11;
+		RETURN;
+	END_IF
+	HTTP_MESSAGE := '.';
+	IF STREAM.WRITE(ADR(HTTP_MESSAGE), LEN(HTTP_MESSAGE)) > 0 THEN
+		GET_BYTE := 12;
+		RETURN;
+	END_IF
+	HTTP_MESSAGE := UDINT_TO_STRING(_VERSION_MINOR);
+	IF STREAM.WRITE(ADR(HTTP_MESSAGE), LEN(HTTP_MESSAGE)) > 0 THEN
+		GET_BYTE := 13;
+		RETURN;
+	END_IF
+	
+	IF STREAM.WRITE(ADR(_SPACE), LEN(_SPACE)) > 0 THEN
+		GET_BYTE := 14;
+		RETURN;
+	END_IF	
+//RESPONSE CODE
+	_RETURNCODE := _CODEGROUP; 
+	_RETURNCODE := _RETURNCODE + _CODE;
+	HTTP_MESSAGE := UDINT_TO_STRING(_RETURNCODE);
+	IF STREAM.WRITE(ADR(HTTP_MESSAGE), LEN(HTTP_MESSAGE)) > 0 THEN
+		GET_BYTE := 21;
+		RETURN;
+	END_IF
+	
+	IF STREAM.WRITE(ADR(_SPACE), LEN(_SPACE)) > 0 THEN
+		GET_BYTE := 20;
+		RETURN;
+	END_IF
+	
+//RESPONSE MESSAGE
+	IF STREAM.WRITE(ADR(_CODEMESSAGE), LEN(_CODEMESSAGE)) > 0 THEN
+		GET_BYTE := 22;
+		RETURN;
+	END_IF
+
+//INSERT TERMINATOR
+	HTTP_MESSAGE := '$R$N';
+	IF STREAM.WRITE(ADR(HTTP_MESSAGE), LEN(HTTP_MESSAGE)) > 0 THEN
+		GET_BYTE := 23;
+		RETURN;
+	END_IF
+	
+//INSERT STANDARD HEADERS
+	
+	IF SUPER^.GET_BYTE(STREAM) > 0 THEN
+		GET_BYTE := 31;
+		RETURN;
+	END_IF
+	
+	{warning 'Not all stander headers implemented.'}
+
+//INSERT USER HEADERS
+	{warning 'User header not implemented yet.'}
+
+//INSERT TERMINATOR
+	HTTP_MESSAGE := '$R$N';
+	IF STREAM.WRITE(ADR(HTTP_MESSAGE), LEN(HTTP_MESSAGE)) > 0 THEN
+		GET_BYTE := 30;
+		RETURN;
+	END_IF
+	
+//INSERT BODY
+	IF STREAM.WRITE(ADR(_BODY), _BODY_STREAM.POSITION) > 0 THEN
+		GET_BYTE := 41;
+		RETURN;
+	END_IF
+	
+GET_BYTE := -1;
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GET_STREAM" Id="{f0a03535-f2fb-43a6-bd08-053de51d5635}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD GET_STREAM : I_STREAM
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[GET_STREAM := _BODY_STREAM;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="RESPONSE_CODE" Id="{1f3e0ae2-a856-4e83-ba30-bf3d5a39d414}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY RESPONSE_CODE : UDINT]]></Declaration>
+      <Get Name="Get" Id="{1d03cae9-9167-44ab-bfc3-3a662ad3b3f4}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[RESPONSE_CODE := _CODE;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{259f5e96-18aa-40d6-85e4-3840b59afa76}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_CODE := RESPONSE_CODE;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="RESPONSE_MESSAGE" Id="{888c9080-1ebb-4e50-b072-92ceb7cd258e}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY RESPONSE_MESSAGE : STRING(255)]]></Declaration>
+      <Get Name="Get" Id="{3bc935ad-870d-4c56-87e7-37cc7556abd9}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[RESPONSE_MESSAGE := _CODEMESSAGE;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{9d346d3d-41e4-4ed7-9d6d-f229572fe0ef}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_CODEMESSAGE := RESPONSE_MESSAGE;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="RESPONSE_TYPE" Id="{88e715ea-9021-4064-9f80-f03bc66de19c}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY RESPONSE_TYPE : E_HTTP_CODEGROUP]]></Declaration>
+      <Get Name="Get" Id="{57cec065-96f3-4ef6-b61f-6d18b57a6680}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[RESPONSE_TYPE := THIS^._CODEGROUP;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{f8ec6e6c-e140-4dc0-b633-e2f61817c0bd}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[THIS^._CODEGROUP := RESPONSE_TYPE; ]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+  </POU>
+</TcPlcObject>

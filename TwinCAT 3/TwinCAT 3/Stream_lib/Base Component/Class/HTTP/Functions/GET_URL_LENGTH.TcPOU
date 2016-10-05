@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <POU Name="GET_URL_LENGTH" Id="{a4d54a33-97c4-42cc-a11b-20fb83602c25}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION GET_URL_LENGTH : UDINT
+VAR_INPUT
+	PTR_URL : POINTER TO BYTE;
+END_VAR
+VAR
+	I : UDINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[FOR I := 0 TO GVL_HTTP_PARAMETERS.MAX_HTTP_URL_LENGTH BY 1 DO
+	IF PTR_URL[I] = 0 THEN
+		GET_URL_LENGTH := I;
+		RETURN;
+	END_IF
+END_FOR
+GET_URL_LENGTH := 0;
+RETURN;]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

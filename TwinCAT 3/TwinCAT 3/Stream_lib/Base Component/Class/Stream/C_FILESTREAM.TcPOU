@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <POU Name="C_FILESTREAM" Id="{868113e9-8e12-4781-9e2b-e91775c410c3}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK C_FILESTREAM IMPLEMENTS I_STREAM
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	_FBFILEEND 	: FB_EOF;
+	
+	_EOF		: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="METHODS" Id="{35ae3688-c1ba-4ab6-9691-5e2a37d1473f}">
+      <Folder Name="internal" Id="{f47aacf0-827c-4cec-89be-2983a45bcbb3}" />
+    </Folder>
+    <Folder Name="PROPERTIES" Id="{567d9482-0c3b-4a26-aae2-77f6dcd4d07f}" />
+    <Property Name="BufferSize" Id="{5e0edf25-e344-4b67-9170-d7e206ff8138}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY BufferSize : UDINT
+]]></Declaration>
+      <Get Name="Get" Id="{70af55e5-f36e-4667-95b9-ab7ab3376cb6}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Close" Id="{feedee6e-b7d2-47b2-8266-43ac3488eba5}" FolderPath="METHODS\">
+      <Declaration><![CDATA[{warning 'add method implementation'}
+METHOD Close : DINT
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="EndOfStream" Id="{7a7e303e-68b8-4f77-9db9-b4bc38c0e1a1}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY EndOfStream : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{52b85168-d4ee-4185-a992-6f29cde07604}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[EndOfStream := _EOF;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="FB_exit" Id="{7237a66a-65b2-4387-9023-259b12722442}" FolderPath="METHODS\internal\">
+      <Declaration><![CDATA[METHOD FB_exit : BOOL
+VAR_INPUT
+	bInCopyCode : BOOL; // if TRUE, the exit method is called for exiting an instance that is copied afterwards (online change).
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT bInCopyCode THEN
+    CLOSE();
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="IsValid" Id="{8efb6633-30c9-4a15-8b68-3e28ba944550}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY IsValid : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{3a666d81-9f5a-44ac-8a6a-50efd65a3834}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Peek" Id="{3eb32106-c5ac-4672-9cc6-142d130b7368}" FolderPath="METHODS\">
+      <Declaration><![CDATA[{warning 'add method implementation'}
+METHOD Peek : DINT
+VAR_INPUT
+	ptr_DataOut	: POINTER TO BYTE;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Position" Id="{3a079de7-e6d1-44e5-ad13-b99a30cd9102}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY Position : UDINT
+]]></Declaration>
+      <Get Name="Get" Id="{b6a803cb-3f0a-4ef1-a74a-9687c600aa74}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Read" Id="{0419e475-9e94-4c3c-baa1-a3c655adce8a}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD Read : DINT
+VAR_INPUT
+	ptr_DataOut	: PVOID;
+	Length	: UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_FBFILEEND(
+	sNetId:= , 
+	hFile:= , 
+	bExecute:= , 
+	tTimeout:= , 
+	bBusy=> , 
+	bError=> , 
+	nErrId=> , 
+	bEOF=> );]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Seek" Id="{e8515e6a-2984-4dc7-99e7-24f586d2d346}" FolderPath="METHODS\">
+      <Declaration><![CDATA[{warning 'add method implementation'}
+METHOD Seek : DINT
+VAR_INPUT
+	Offset	: UDINT;
+	SeekStyle	: E_STREAMSEEKTYPE;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Write" Id="{4cf2735d-3eea-45d4-b92b-84e92bdd1b28}" FolderPath="METHODS\">
+      <Declaration><![CDATA[{warning 'add method implementation'}
+METHOD Write : DINT
+VAR_INPUT
+	ptr_DataIn	: PVOID;
+	Length	: UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

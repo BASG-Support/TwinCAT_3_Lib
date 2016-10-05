@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <DUT Name="E_HTTP_CODEGROUP" Id="{98fc9ef7-65d9-4a97-9ad3-3350ad367a56}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE E_HTTP_CODEGROUP :
+(
+	E_GROUP_INFOMATION := 100,
+	E_GROUP_SUCCESS := 200,
+	E_GROUP_REDIRECTION := 300,
+	E_GROUP_CLIENTERROR := 400,
+	E_GROUP_SERVERERROR := 500
+)UDINT;
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

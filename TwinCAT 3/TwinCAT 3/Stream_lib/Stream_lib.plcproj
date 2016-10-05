@@ -39,6 +39,11 @@
     <Folder Include="Base Component" />
     <Folder Include="Base Component\Class" />
     <Folder Include="Base Component\Class\Binary" />
+    <Folder Include="Base Component\Class\HTTP" />
+    <Folder Include="Base Component\Class\HTTP\Datatype" />
+    <Folder Include="Base Component\Class\HTTP\Functions" />
+    <Folder Include="Base Component\Class\HTTP\Message" />
+    <Folder Include="Base Component\Class\HTTP\Message\Base" />
     <Folder Include="Base Component\Class\Stream" />
     <Folder Include="Base Component\Datatype" />
     <Folder Include="Base Component\Interface" />
@@ -52,7 +57,46 @@
     <Compile Include="Base Component\Class\Binary\C_BINARYWRITER.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Base Component\Class\HTTP\Datatype\E_HTTP_CODEGROUP.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base Component\Class\HTTP\Datatype\E_HTTP_CONNECTION.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base Component\Class\HTTP\Datatype\E_HTTP_VERB.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base Component\Class\HTTP\Datatype\T_HTTP_BODY.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base Component\Class\HTTP\Datatype\T_HTTP_URL.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base Component\Class\HTTP\Functions\GET_URL_LENGTH.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base Component\Class\HTTP\GVL_HTTP_PARAMETERS.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base Component\Class\HTTP\Message\Base\C_HTTP_MESSAGE.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base Component\Class\HTTP\Message\C_HTTP_HEADER.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base Component\Class\HTTP\Message\C_HTTP_REQUEST.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base Component\Class\HTTP\Message\C_HTTP_RESPONSE.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Base Component\Class\Stream\C_BINARYSTREAM.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base Component\Class\Stream\C_FILESTREAM.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Base Component\Class\Stream\C_HTTPSTREAM.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Base Component\Datatype\E_STREAMSEEKTYPE.TcDUT">
@@ -85,8 +129,8 @@
   <ProjectExtensions>
     <PlcProjectOptions>
       <XmlArchive>
-  <Data>
-    <o xml:space="preserve" t="OptionKey">
+        <Data>
+          <o xml:space="preserve" t="OptionKey">
       <v n="Name">"&lt;ProjectRoot&gt;"</v>
       <d n="SubKeys" t="Hashtable" ckt="String" cvt="OptionKey">
         <v>{192FAD59-8248-4824-A8DE-9177C94C195A}</v>
@@ -138,14 +182,14 @@
       </d>
       <d n="Values" t="Hashtable" />
     </o>
-  </Data>
-  <TypeList>
-    <Type n="Boolean">System.Boolean</Type>
-    <Type n="Hashtable">System.Collections.Hashtable</Type>
-    <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
-    <Type n="String">System.String</Type>
-  </TypeList>
-</XmlArchive>
+        </Data>
+        <TypeList>
+          <Type n="Boolean">System.Boolean</Type>
+          <Type n="Hashtable">System.Collections.Hashtable</Type>
+          <Type n="OptionKey">{54dd0eac-a6d8-46f2-8c27-2f43c7e49861}</Type>
+          <Type n="String">System.String</Type>
+        </TypeList>
+      </XmlArchive>
     </PlcProjectOptions>
   </ProjectExtensions>
 </Project>

@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <POU Name="C_HTTPSTREAM" Id="{60f91825-763a-47ae-92e4-2306c3d57054}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK C_HTTPSTREAM IMPLEMENTS I_STREAM
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	_BASE_MEM : POINTER TO BYTE;
+	_BASE_SIZE: UDINT;
+	
+	_STREAM_POSITION : UDINT := 0;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="Methods" Id="{729a20d3-cfb4-4999-9424-e1f47fd1662f}" />
+    <Folder Name="Properties" Id="{24196728-f538-4a63-824a-61e753046204}" />
+    <Property Name="BufferSize" Id="{dcf112fc-2290-4f03-81fd-e0797dd1c536}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY BufferSize : UDINT]]></Declaration>
+      <Get Name="Get" Id="{46208aba-2fbe-459e-ac17-ad0df3e2c76c}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Close" Id="{7c44b1b5-1c79-4683-af1b-6f22a4dd7ab2}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD Close : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_BASE_MEM := 0;
+_BASE_SIZE:= 0;
+_STREAM_POSITION := 0;
+Close := -1;
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="EndOfStream" Id="{28bb4416-fc2a-42fb-8e1a-c4bf281661c6}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY EndOfStream : BOOL]]></Declaration>
+      <Get Name="Get" Id="{0a2a77ff-c247-4c90-87e2-957556706494}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[EndOfStream := _STREAM_POSITION >= _BASE_SIZE; ]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="IsValid" Id="{5c18e574-f6c3-4efa-901a-ad689c4f1e96}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY IsValid : BOOL]]></Declaration>
+      <Get Name="Get" Id="{23e44237-8493-481d-aa87-9d898e09bc4b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IsValid := _BASE_MEM <> 0;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="NEW" Id="{44cdb0df-6e4c-4ffc-a15d-ecd6e8eb792a}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD NEW : DINT
+VAR_INPUT
+	PTR_BASE	: PVOID;
+	BASE_SIZE	: UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF PTR_BASE = 0 OR BASE_SIZE = 0 OR IsValid THEN
+	NEW := 1;
+	RETURN;
+ELSE
+	_BASE_MEM := PTR_BASE;
+	_BASE_SIZE:= BASE_SIZE;
+	_STREAM_POSITION := 0;
+	NEW := -1;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Peek" Id="{e16edd05-f2c4-473e-ab91-2b575e73de6f}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD Peek : DINT
+VAR_INPUT
+	ptr_DataOut : POINTER TO BYTE;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT IsValid THEN
+	Peek := 1;
+	RETURN;
+END_IF
+
+ptr_DataOut^ := _BASE_MEM[_STREAM_POSITION];
+Peek := -1;
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Position" Id="{6d955390-abde-48c4-b867-2bf6eaa7ff00}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY Position : UDINT]]></Declaration>
+      <Get Name="Get" Id="{a43296ce-00a7-464b-9e99-aed0a73e4f2c}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Position := _STREAM_POSITION;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Read" Id="{0fd092b8-6a3f-4e32-a482-13b517200186}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD Read : DINT
+VAR_INPUT
+	ptr_DataOut : PVOID;
+	Length		: UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT IsValid THEN
+	Read := 1;
+	RETURN;
+END_IF
+
+IF _STREAM_POSITION + Length > _BASE_SIZE THEN
+	Read := 2;
+	RETURN;
+END_IF
+		
+MEMCPY(ptr_DataOut, _BASE_MEM + _STREAM_POSITION, Length);
+_STREAM_POSITION := _STREAM_POSITION + Length;
+READ := -1;
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Seek" Id="{88daf200-5ac7-40da-9e52-e8daa23386b3}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD Seek : DINT
+VAR_INPUT
+	Offset 		: UDINT;
+	SeekStyle 	: E_STREAMSEEKTYPE;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT IsValid THEN
+	Seek := 1;
+	RETURN;
+END_IF
+
+CASE SeekStyle OF
+	E_STREAMSEEKTYPE.Current_Reversed:
+		IF OFFSET > _STREAM_POSITION THEN
+			Seek := 2;
+			RETURN;
+		ELSE
+			_STREAM_POSITION := _STREAM_POSITION - OFFSET;
+			Seek := -1;
+			RETURN;
+		END_IF
+	E_STREAMSEEKTYPE.Current:
+		IF _STREAM_POSITION + OFFSET >= _BASE_SIZE THEN
+			Seek := 2;
+			RETURN;
+		ELSE
+			_STREAM_POSITION := _STREAM_POSITION + OFFSET;
+			Seek := -1;
+			RETURN;
+		END_IF
+	E_STREAMSEEKTYPE.End:
+		IF OFFSET >= _BASE_SIZE THEN
+			Seek := 2;
+			RETURN;
+		ELSE
+			_STREAM_POSITION := _BASE_SIZE - Offset - 1;
+			Seek := -1;
+			RETURN;
+		END_IF
+	E_STREAMSEEKTYPE.Origin:
+		IF OFFSET >= _BASE_SIZE THEN
+			Seek := 2;
+			RETURN;
+		ELSE
+			_STREAM_POSITION := Offset;
+			Seek := -1;
+			RETURN;
+		END_IF
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Write" Id="{7008c3e7-909a-4d23-9ec1-6df3be7e9a28}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD Write : DINT
+VAR_INPUT
+	ptr_DataIn	: PVOID;
+	Length		: UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT IsValid THEN
+	Write := 1;
+	RETURN;
+END_IF
+
+IF _STREAM_POSITION + Length > _BASE_SIZE THEN
+	Write := 2;
+	RETURN;
+END_IF
+		
+MEMCPY(_BASE_MEM + _STREAM_POSITION, ptr_DataIn, Length);
+_STREAM_POSITION := _STREAM_POSITION + Length;
+Write := -1;
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>
