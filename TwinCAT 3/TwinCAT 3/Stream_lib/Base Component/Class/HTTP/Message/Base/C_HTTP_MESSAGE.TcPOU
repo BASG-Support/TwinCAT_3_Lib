@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <POU Name="C_HTTP_MESSAGE" Id="{41b8d06b-2819-4709-a7b4-5394c4de4005}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK C_HTTP_MESSAGE
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	//General header
+		_CONNECTION 		: E_HTTP_CONNECTION;
+	(*
+		_CACHE_CONTROL		: STRING(255);
+		_DATE 				: STRING(255);
+		_PRAGMA				: STRING(255);
+		_TRAILER 			: STRING(255);
+		_TRANSFER_ENCODING	: STRING(255);
+		_UPGRADE 			: STRING(255);
+		_VIA 				: STRING(255);
+		_WARNING 			: STRING(255);
+	*)
+	//Entity header
+		_CONTENT_LENGTH		: UDINT;
+	(*
+		_ALLOW				: STRING(255);
+		_CONTENT_ENCODING 	: STRING(255);
+		_CONTENT_LANGUAGE 	: STRING(255);
+		_CONTENT_MD5		: STRING(255);
+		_CONTENT_TYPE		: STRING(255);
+		_EXPIRES			: STRING(255);
+		_LAST_MODIFIED		: STRING(255);
+	*)
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="METHODS" Id="{3c9717ac-be02-4da9-ab2f-e3775713d90f}" />
+    <Folder Name="PROPERTIES" Id="{f8941757-4a31-4cad-840f-11af230f21c5}" />
+    <Property Name="CONTENT_LENGTH" Id="{f0bef23a-9f5b-489d-965a-d50f8cb99346}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY CONTENT_LENGTH : UDINT]]></Declaration>
+      <Get Name="Get" Id="{f536a8f5-39cc-4860-b097-f2bb291afdfc}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CONTENT_LENGTH := _CONTENT_LENGTH;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{9852f395-107b-43ba-8a38-27388ff9306d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_CONTENT_LENGTH := CONTENT_LENGTH;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="GET_BYTE" Id="{1f42ea09-24a0-437d-8363-7f7a6825c45d}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD GET_BYTE : DINT
+VAR_INPUT
+	STREAM : I_STREAM;
+END_VAR
+VAR 
+	_TERMINATOR 	: STRING(2) := '$R$N';
+	HTTP_MESSAGE	: STRING(255);
+
+	LENGTH 			: DINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF STREAM = 0 THEN
+	GET_BYTE := 1;
+	RETURN;
+END_IF
+
+HTTP_MESSAGE := 'Connection: ';
+IF STREAM.WRITE(ADR(HTTP_MESSAGE), LEN(HTTP_MESSAGE)) > 0 THEN
+	GET_BYTE := 11;
+	RETURN;
+END_IF
+
+CASE _CONNECTION OF 
+E_HTTP_CONNECTION.E_CONNECTION_CLOSE:
+	HTTP_MESSAGE := 'close';
+E_HTTP_CONNECTION.E_CONNECTION_KEEP_ALIVE:
+	HTTP_MESSAGE := 'keep-alive';
+END_CASE
+IF STREAM.WRITE(ADR(HTTP_MESSAGE), LEN(HTTP_MESSAGE)) > 0 THEN
+	GET_BYTE := 12;
+	RETURN;
+END_IF
+
+IF STREAM.WRITE(ADR(_TERMINATOR), LEN(_TERMINATOR)) > 0 THEN
+	GET_BYTE := 13;
+	RETURN;
+END_IF
+
+HTTP_MESSAGE := 'Content-Length: ';
+IF STREAM.WRITE(ADR(HTTP_MESSAGE), LEN(HTTP_MESSAGE)) > 0 THEN
+	GET_BYTE := 21;
+	RETURN;
+END_IF
+HTTP_MESSAGE := UDINT_TO_STRING(_CONTENT_LENGTH);
+IF STREAM.WRITE(ADR(HTTP_MESSAGE), LEN(HTTP_MESSAGE)) > 0 THEN
+	GET_BYTE := 22;
+	RETURN;
+END_IF
+IF STREAM.WRITE(ADR(_TERMINATOR), LEN(_TERMINATOR)) > 0 THEN
+	GET_BYTE := 23;
+	RETURN;
+END_IF
+
+GET_BYTE := -1;
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="HTTP_CONNECTION" Id="{3e5f8b8b-eded-4f74-86ba-20fba61db1cb}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY HTTP_CONNECTION : E_HTTP_CONNECTION]]></Declaration>
+      <Get Name="Get" Id="{dc938173-09de-454b-8aca-1600d8873d65}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[HTTP_CONNECTION := _CONNECTION;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{90375753-94e8-46dd-a2e1-681999221f55}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_CONNECTION := HTTP_CONNECTION;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+  </POU>
+</TcPlcObject>

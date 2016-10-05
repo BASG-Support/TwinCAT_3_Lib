@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <DUT Name="T_HTTP_BODY" Id="{75527cd2-9d97-4bd1-a0f8-47422674154d}">
+    <Declaration><![CDATA[TYPE T_HTTP_BODY : ARRAY[0..GVL_HTTP_PARAMETERS.MAX_HTTP_BODY_LENGTH] OF BYTE; END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

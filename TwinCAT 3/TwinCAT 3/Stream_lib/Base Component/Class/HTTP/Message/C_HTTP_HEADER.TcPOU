@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <POU Name="C_HTTP_HEADER" Id="{03c22b2f-ec78-40b7-bce4-c5cec57a5c1b}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK C_HTTP_HEADER
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	_FIELD 	: STRING(255);
+	_NAME 	: STRING(255);
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="METHODS" Id="{a1854588-1f98-4356-a534-87105528e15c}" />
+    <Folder Name="PROPERTIES" Id="{12ffc960-6d27-4875-a2f8-0f6a396ae027}" />
+    <Property Name="FIELD" Id="{7345931e-8159-4203-8956-850568e4861e}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY FIELD : STRING(255)]]></Declaration>
+      <Get Name="Get" Id="{a011f767-35d1-4c5b-bc90-3895b7cb0397}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[FIELD := _FIELD;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{b2b1b58a-70e8-48f3-ac87-2c3f61ef1d9c}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_FIELD := FIELD;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="GET_STRING" Id="{39330ee6-beab-4619-8992-aa588ba0942e}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD GET_STRING : STRING(GVL_HTTP_PARAMETERS.MAX_HTTP_HEADER_LENGTH)
+VAR_INPUT
+	LENGTH : POINTER TO DINT;
+END_VAR
+VAR
+	_OFFSET 		: DINT	:= 0;
+	_BUFFER_STRING 	: ARRAY[0..GVL_HTTP_PARAMETERS.MAX_HTTP_HEADER_LENGTH] OF BYTE;
+	_DELIMITER 		: STRING(2) := ': ';
+	_TERMINATOR		: STRING(2) := '$R$N';
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[MEMCPY(ADR(_BUFFER_STRING[_OFFSET]), ADR(_NAME), LEN(NAME));
+_OFFSET := _OFFSET + LEN(NAME);
+MEMCPY(ADR(_BUFFER_STRING[_OFFSET]), ADR(_DELIMITER), LEN(_DELIMITER));
+_OFFSET := _OFFSET + LEN(_DELIMITER);
+MEMCPY(ADR(_BUFFER_STRING[_OFFSET]), ADR(_FIELD), LEN(_FIELD));
+_OFFSET := _OFFSET + LEN(_FIELD);
+MEMCPY(ADR(_BUFFER_STRING[_OFFSET]), ADR(_TERMINATOR), LEN(_TERMINATOR));
+_OFFSET := _OFFSET + LEN(_TERMINATOR);
+LENGTH^ := _OFFSET;
+MEMCPY(ADR(GET_STRING), ADR(_BUFFER_STRING), 515);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="NAME" Id="{9d1a836e-50fb-4bfe-8ca7-6244a94b8d84}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY NAME : STRING(255)]]></Declaration>
+      <Get Name="Get" Id="{fa35e85b-3a3d-4093-8bbb-e796d1c9356f}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[NAME := _NAME;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{a1fe27e2-9587-490b-8b30-e9dc904e9b19}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_NAME := NAME;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="PARSE" Id="{930dfb5a-3a04-439a-bf10-7fd3f482223d}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD PARSE : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

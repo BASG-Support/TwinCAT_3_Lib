@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <GVL Name="GVL_HTTP_PARAMETERS" Id="{fa0d35aa-5dcc-4507-964b-cdecc8beaba0}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL CONSTANT
+	MAX_HTTP_BODY_LENGTH 	: UDINT := 30000;
+	MAX_HTTP_URL_LENGTH 	: UDINT := 1000;
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>
