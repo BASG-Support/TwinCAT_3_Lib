@@ -135,6 +135,15 @@
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 				</Instance>
 			</Project>
+			<Project GUID="{5DD227A6-4693-4ECC-9D8B-5110DB2DBF11}" Name="CustomVisu_lib" PrjFilePath="CustomVisu_lib\CustomVisu_lib.plcproj" TmcFilePath="CustomVisu_lib\CustomVisu_lib.tmc" ReloadTmc="true" AmsPort="860" FileArchiveSettings="#x000e">
+				<Instance Id="#x010100a0" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2">
+					<Name>CustomVisu_lib Instance</Name>
+					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+					<TaskPouOids>
+						<TaskPouOid Prio="20" OTCID="#x010100a1"/>
+					</TaskPouOids>
+				</Instance>
+			</Project>
 		</Plc>
 	</Project>
 </TcSmProject>

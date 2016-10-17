@@ -1,0 +1,209 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
+  <POU Name="M_TRENDVIEW_OBJECT" Id="{018e3034-db4e-4765-b6e6-8d67b4c3decc}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK M_TRENDVIEW_OBJECT
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	AXIS_Y_MAX : LREAL := 100;
+	AXIS_Y_MIN : LREAL := -100;
+
+	_CURRENT_DATA	: LREAL;
+	_INTERNAL_DATA 	: ARRAY[0..BUFFER_WIDTH] OF LREAL;
+	
+	DISPLAY_Y_UNIT			: STRING(10);
+	DISPLAY_TITLE			: STRING(30);
+	DISPLAY_X_AXIS_LABEL	: STRING(25);
+	DISPLAY_Y_AXIS_LABEL	: STRING(25);
+	PLOT_WIDTH	: INT := 1;
+	PLOT_POINTS : ARRAY[0..BUFFER_WIDTH] OF VisuElems.VisuStructPoint;
+	
+	_PLC_CYCLE_TICKS : UDINT := 10;
+	_PLC_CYCLE_COUNT : UDINT;
+END_VAR
+VAR CONSTANT
+	BUFFER_WIDTH : INT := 200;
+	BUFFER_HEIGHT : INT := 200;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[_PLC_CYCLE_COUNT := _PLC_CYCLE_COUNT + 1;
+IF _PLC_CYCLE_COUNT >= _PLC_CYCLE_TICKS THEN
+	_PLC_CYCLE_COUNT := 0;
+	Tc2_System.MEMMOVE(ADR(_INTERNAL_DATA[1]), ADR(_INTERNAL_DATA[0]), BUFFER_WIDTH * 8);
+	_INTERNAL_DATA[0] := _CURRENT_DATA;
+	TRANSFORM_DATA();
+END_IF]]></ST>
+    </Implementation>
+    <Folder Name="METHODS" Id="{7b4c0589-7bbe-4452-a154-4e39bb7c49a3}" />
+    <Folder Name="PROPERTIES" Id="{b14f9300-0d0e-4319-a30c-dff715ca8c85}" />
+    <Property Name="DISPLAY_UNIT" Id="{36c51dc8-1ef2-440a-9e94-109b88c359ce}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY DISPLAY_UNIT : STRING(10)]]></Declaration>
+      <Get Name="Get" Id="{1c3a4393-2682-4c73-9f00-06752adbcaf2}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[DISPLAY_UNIT := DISPLAY_Y_UNIT;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{605e3606-000d-4e9e-a83d-1593a451cfff}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[DISPLAY_Y_UNIT := DISPLAY_UNIT;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="LINE_WIDTH" Id="{75fb97eb-d0c3-410f-b8ea-dfe83a122729}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY LINE_WIDTH : INT]]></Declaration>
+      <Get Name="Get" Id="{48aef33f-cfb0-46ff-8a8e-ee77eb75178a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[LINE_WIDTH := PLOT_WIDTH;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{85357aca-e5ee-43cc-8949-709bca3eecf9}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[PLOT_WIDTH := LINE_WIDTH;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="LOGGED_VALUE" Id="{5fb341a3-23ae-4cdf-aca1-ea1ed1ecaac1}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY LOGGED_VALUE : LREAL]]></Declaration>
+      <Get Name="Get" Id="{55e31710-de73-4496-9828-102b6cbfbe5d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[LOGGED_VALUE := _CURRENT_DATA;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{ab27dc13-0b6d-44de-acf9-abe7664c5a6c}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_CURRENT_DATA := LOGGED_VALUE;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="TICKS" Id="{97b7b47c-099b-4a96-b309-d500b605d5bd}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY TICKS : UDINT]]></Declaration>
+      <Get Name="Get" Id="{d71dfdd8-5380-472a-a8c6-c42d5b6d03bc}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[TICKS := _PLC_CYCLE_TICKS;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{fd18ff83-4308-4d8e-b0df-adf5f31b029b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_PLC_CYCLE_TICKS := TICKS;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="TRANSFORM_DATA" Id="{1ba970df-a922-4583-85e5-f20a1ff1891b}" FolderPath="METHODS\">
+      <Declaration><![CDATA[METHOD PROTECTED TRANSFORM_DATA
+VAR_INPUT
+END_VAR
+VAR
+	_I : INT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[FOR _I := 0 TO BUFFER_WIDTH BY 1 DO
+	PLOT_POINTS[_I].iX := _I;
+	PLOT_POINTS[_I].iY := LREAL_TO_INT(BUFFER_HEIGHT - ((_INTERNAL_DATA[_I] - AXIS_Y_MIN) / (AXIS_Y_MAX - AXIS_Y_MIN) * BUFFER_HEIGHT));
+END_FOR]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="X_AXIS_LABEL" Id="{851621f8-d062-4ae5-8d16-ab10a2a58e99}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY X_AXIS_LABEL : STRING(25)]]></Declaration>
+      <Get Name="Get" Id="{1932c01a-62a4-4acb-9874-480b2564fd95}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[X_AXIS_LABEL := DISPLAY_X_AXIS_LABEL;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{9085f2c3-8845-46ad-9f0e-909deb277d82}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[DISPLAY_X_AXIS_LABEL := X_AXIS_LABEL;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="Y_AXIS_LABEL" Id="{ad230d1b-d651-43d9-86d6-2d9eaa038ade}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY Y_AXIS_LABEL : STRING(25)]]></Declaration>
+      <Get Name="Get" Id="{52158504-daf6-47fd-8dcd-02b0d00dd5d0}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Y_AXIS_LABEL := DISPLAY_Y_AXIS_LABEL;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{8bcfd4c2-2e4c-4515-9a22-29e57f1292c7}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[DISPLAY_Y_AXIS_LABEL := Y_AXIS_LABEL;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="Y_MAX" Id="{5399ccb8-2cab-40b0-b8fa-875b9e9c05dd}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY Y_MAX : LREAL]]></Declaration>
+      <Get Name="Get" Id="{84c043c7-e7cf-4e5c-a174-d522fd4675a6}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Y_MAX := AXIS_Y_MAX; ]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{86c0a4e6-f1ec-42b6-8007-a0f5c1da7769}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AXIS_Y_MAX := Y_MAX; ]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="Y_MIN" Id="{279758e9-97b9-410e-98d9-315fe310abeb}" FolderPath="PROPERTIES\">
+      <Declaration><![CDATA[PROPERTY Y_MIN : LREAL]]></Declaration>
+      <Get Name="Get" Id="{a6ffd030-e570-43fd-b2dc-0534096520ea}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Y_MIN := AXIS_Y_MIN;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{5ba29e7a-4b7a-4bc1-8cc4-46326e0a9405}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AXIS_Y_MIN := Y_MIN;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+  </POU>
+</TcPlcObject>

@@ -9,7 +9,7 @@ VAR_INPUT
 	
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[F_GetTitle := "OpcUa_Lib";
+      <ST><![CDATA[F_GetTitle := "CustomVisu_Frames";
 ]]></ST>
     </Implementation>
   </POU>
