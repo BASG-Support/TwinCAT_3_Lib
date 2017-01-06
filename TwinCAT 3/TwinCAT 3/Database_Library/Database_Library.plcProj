@@ -43,7 +43,7 @@
     <Compile Include="Base Component\Class\C_DBADAPTOR.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Base Component\Class\C_SQLITE.TcPOU">
+    <Compile Include="Base Component\Class\C_SQLITECLIENT.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Base Component\Custom Datatypes\GVL_DATABASE_LIB.TcGVL">
