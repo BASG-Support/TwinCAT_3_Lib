@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.3">
-  <POU Name="C_SQLITE" Id="{a7ee5403-6d43-4885-8669-cfa9297b2c15}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK C_SQLCLIENT EXTENDS C_DBADAPTOR
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4020.12">
+  <POU Name="C_SQLITECLIENT" Id="{a7ee5403-6d43-4885-8669-cfa9297b2c15}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK C_SQLITECLIENT EXTENDS C_DBADAPTOR
 VAR_INPUT
 END_VAR
 VAR_OUTPUT
@@ -126,5 +126,20 @@ ELSE
 END_IF]]></ST>
       </Implementation>
     </Method>
+    <LineIds Name="C_SQLITECLIENT">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_SQLITECLIENT.SQL_EXECUTE_NONQUERY">
+      <LineId Id="3" Count="18" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_SQLITECLIENT.SQL_EXECUTE_QUERY">
+      <LineId Id="3" Count="22" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_SQLITECLIENT.CREATE_CONNECTION">
+      <LineId Id="3" Count="24" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
   </POU>
 </TcPlcObject>
