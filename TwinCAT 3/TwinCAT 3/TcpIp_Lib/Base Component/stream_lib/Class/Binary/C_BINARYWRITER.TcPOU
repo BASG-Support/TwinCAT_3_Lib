@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.3">
+  <POU Name="C_BINARYWRITER" Id="{83dc4f96-6fb3-4cf7-8f4e-6aaf82aeba95}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK C_BINARYWRITER
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	_BASESTREAM 	: I_STREAM;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="BASE_STREAM" Id="{31d23ef6-ce1e-4e1b-a3e1-0be2e4a06429}">
+      <Declaration><![CDATA[PROPERTY BASE_STREAM : I_STREAM]]></Declaration>
+      <Get Name="Get" Id="{76ec7413-6fbb-4ca4-98fc-f9571a729fcc}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Base_Stream := _BASESTREAM;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="CLOSE" Id="{fe522694-0553-4439-ad77-d78156c20f28}">
+      <Declaration><![CDATA[METHOD CLOSE : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Close := _BASESTREAM.Close();
+_BASESTREAM := 0;
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="NEW" Id="{fff9e23d-8345-4b89-bd03-8be19daae3ff}">
+      <Declaration><![CDATA[METHOD NEW : DINT
+VAR_INPUT
+	STREAM : I_STREAM;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF STREAM = 0 THEN
+	New := 1;
+	RETURN;
+ELSE
+	IF STREAM.IsValid THEN
+		_BASESTREAM := STREAM;
+		_BASESTREAM.Seek( 0, E_STREAMSEEKTYPE.Origin);
+		New := -1;
+		RETURN;
+	ELSE
+		New := 1;
+		RETURN;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="WRITE_BOOL" Id="{22302b77-69b2-4106-be1d-759d532fed07}">
+      <Declaration><![CDATA[METHOD WRITE_BOOL : DINT
+VAR_INPUT
+	in_data : BOOL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	Write_Bool := 1;
+	RETURN;
+END_IF
+
+Write_Bool := _BASESTREAM.Write(ADR(in_data), 1);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="WRITE_BYTES" Id="{07526ea4-166c-46ab-93f0-f6e9859e1a10}">
+      <Declaration><![CDATA[METHOD WRITE_BYTES : DINT
+VAR_INPUT
+	in_data 	: POINTER TO BYTE;
+	length		: UDINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	Write_Bytes := 1;
+	RETURN;
+END_IF
+
+Write_Bytes := _BASESTREAM.Write(in_data, length);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="WRITE_DOUBLE" Id="{65c53bd2-0404-42b3-8333-c0905f3530e6}">
+      <Declaration><![CDATA[METHOD WRITE_DOUBLE : DINT
+VAR_INPUT
+	in_data : LREAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	Write_Double := 1;
+	RETURN;
+END_IF
+
+Write_Double := _BASESTREAM.Write(ADR(in_data), 8);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="WRITE_FLOAT" Id="{335adcdd-ce62-4f95-9549-30797b322ed6}">
+      <Declaration><![CDATA[METHOD WRITE_FLOAT : DINT
+VAR_INPUT
+	in_data : REAL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	Write_Float := 1;
+	RETURN;
+END_IF
+
+Write_Float := _BASESTREAM.Write(ADR(in_data) , 4);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="WRITE_INT16" Id="{282f7df4-8d2c-43b0-a569-9e5fd84d8547}">
+      <Declaration><![CDATA[METHOD WRITE_INT16 : DINT
+VAR_INPUT
+	in_data : INT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	Write_Int16 := 1;
+	RETURN;
+END_IF
+
+Write_Int16 := _BASESTREAM.Write(ADR(in_data) , 2);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="WRITE_INT32" Id="{ce791e12-413d-467f-9243-4feedc34a7bd}">
+      <Declaration><![CDATA[METHOD WRITE_INT32 : DINT
+VAR_INPUT
+	in_data : DINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	Write_Int32 := 1;
+	RETURN;
+END_IF
+
+Write_Int32 := _BASESTREAM.Write(ADR(in_data) , 4);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="WRITE_STRING" Id="{d5726701-ad05-40b1-9729-604f33efe000}">
+      <Declaration><![CDATA[METHOD WRITE_STRING : DINT
+VAR_INPUT
+	in_data 	: PVOID;
+	length		: UDINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	Write_String := 1;
+	RETURN;
+END_IF
+
+Write_String := _BASESTREAM.Write(in_data, length);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="WRITE_UINT16" Id="{a70a3929-c49b-4ce9-bb37-715cdabfebb4}">
+      <Declaration><![CDATA[METHOD WRITE_UINT16 : DINT
+VAR_INPUT
+	in_data : UINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	Write_UInt16 := 1;
+	RETURN;
+END_IF
+
+Write_UInt16 := _BASESTREAM.Write(ADR(in_data) , 4);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="WRITE_UINT32" Id="{bc851619-75bc-4961-a5bf-eea7844e652b}">
+      <Declaration><![CDATA[METHOD WRITE_UINT32 : DINT
+VAR_INPUT
+	in_data : UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	Write_UInt32 := 1;
+	RETURN;
+END_IF
+
+Write_UInt32 := _BASESTREAM.Write(ADR(in_data) , 4);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="C_BINARYWRITER">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYWRITER.BASE_STREAM.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYWRITER.CLOSE">
+      <LineId Id="3" Count="1" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYWRITER.NEW">
+      <LineId Id="3" Count="12" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYWRITER.WRITE_BOOL">
+      <LineId Id="3" Count="5" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYWRITER.WRITE_BYTES">
+      <LineId Id="3" Count="5" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYWRITER.WRITE_DOUBLE">
+      <LineId Id="3" Count="5" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYWRITER.WRITE_FLOAT">
+      <LineId Id="3" Count="5" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYWRITER.WRITE_INT16">
+      <LineId Id="3" Count="5" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYWRITER.WRITE_INT32">
+      <LineId Id="3" Count="5" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYWRITER.WRITE_STRING">
+      <LineId Id="3" Count="5" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYWRITER.WRITE_UINT16">
+      <LineId Id="3" Count="5" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYWRITER.WRITE_UINT32">
+      <LineId Id="3" Count="5" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

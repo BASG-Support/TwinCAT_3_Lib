@@ -1,0 +1,255 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.3">
+  <POU Name="C_BINARYREADER" Id="{26d50fc3-a7d7-4aac-90e3-beef0b45fd3c}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK C_BINARYREADER
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	_BASESTREAM 	: I_STREAM;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="BASE_STREAM" Id="{cae1e64a-624a-421c-9265-d5478890aa63}">
+      <Declaration><![CDATA[PROPERTY BASE_STREAM : I_STREAM]]></Declaration>
+      <Get Name="Get" Id="{0bf80ca8-bdb9-4fb6-8779-8150704bb550}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Base_Stream := _BASESTREAM;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="CLOSE" Id="{c74bc442-0074-4363-b6c5-e4cba1c44986}">
+      <Declaration><![CDATA[METHOD CLOSE : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Close := _BASESTREAM.Close();
+_BASESTREAM := 0;
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="NEW" Id="{4fab25d8-83ce-4e9c-9cc9-0faf6df608eb}">
+      <Declaration><![CDATA[METHOD NEW : DINT
+VAR_INPUT
+	STREAM : I_STREAM;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF STREAM = 0 THEN
+	New := 1;
+	RETURN;
+ELSE
+	IF STREAM.IsValid THEN
+		_BASESTREAM := STREAM;
+		_BASESTREAM.Seek( 0, E_STREAMSEEKTYPE.Origin);
+		New := -1;
+		RETURN;
+	ELSE
+		New := 1;
+		RETURN;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="READ_BOOL" Id="{a87d9f12-f851-4142-baee-e60f10117a1c}">
+      <Declaration><![CDATA[METHOD READ_BOOL : DINT
+VAR_INPUT
+	out_data : POINTER TO BOOL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	Read_Bool := 1;
+	RETURN;
+END_IF
+
+Read_Bool := _BASESTREAM.Read(out_data , 1);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="READ_BYTES" Id="{0f808161-3081-4dd1-99ea-54e31e636a75}">
+      <Declaration><![CDATA[METHOD READ_BYTES : DINT
+VAR_INPUT
+	out_data 	: POINTER TO BYTE;
+	length		: UDINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	Read_Bytes := 1;
+	RETURN;
+END_IF
+
+Read_Bytes := _BASESTREAM.Read(out_data, length);
+RETURN;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="READ_DOUBLE" Id="{0930d98a-49cb-49a8-8b9a-c72cde6e8c27}">
+      <Declaration><![CDATA[METHOD READ_DOUBLE : DINT
+VAR_INPUT
+	out_data : POINTER TO LREAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	Read_Double := 1;
+	RETURN;
+END_IF
+
+Read_Double := _BASESTREAM.Read(out_data , 8);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="READ_FLOAT" Id="{e07b3f87-841b-4e43-8f63-a152b8522c0c}">
+      <Declaration><![CDATA[METHOD READ_FLOAT : DINT
+VAR_INPUT
+	out_data : POINTER TO REAL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	Read_Float := 1;
+	RETURN;
+END_IF
+
+Read_Float := _BASESTREAM.Read(out_data , 4);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="READ_INT16" Id="{d91f549d-f034-409b-9b66-ed3c2adf39bb}">
+      <Declaration><![CDATA[METHOD READ_INT16 : DINT
+VAR_INPUT
+	out_data : POINTER TO INT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	Read_Int16 := 1;
+	RETURN;
+END_IF
+
+Read_Int16 := _BASESTREAM.Read(out_data , 2);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="READ_INT32" Id="{69f6ce91-cdbb-4494-a298-67b14f02d373}">
+      <Declaration><![CDATA[METHOD READ_INT32 : DINT
+VAR_INPUT
+	out_data : POINTER TO DINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	Read_Int32 := 1;
+	RETURN;
+END_IF
+
+Read_Int32 := _BASESTREAM.Read(out_data , 4);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="READ_STRING" Id="{9d704eee-d7d1-438b-ba04-0a39350bcebd}">
+      <Declaration><![CDATA[METHOD READ_STRING : DINT
+VAR_INPUT
+	out_data 	: PVOID;
+	length		: UDINT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	Read_String := 1;
+	RETURN;
+END_IF
+
+Read_String := _BASESTREAM.Read(out_data, length);
+RETURN;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="READ_UINT16" Id="{7dea6d1b-2be9-4933-890b-f7a24a7f5e97}">
+      <Declaration><![CDATA[METHOD READ_UINT16 : DINT
+VAR_INPUT
+	out_data : POINTER TO UINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	Read_UInt16 := 1;
+	RETURN;
+END_IF
+
+Read_UInt16 := _BASESTREAM.Read(out_data , 4);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="READ_UINT32" Id="{c84d6b67-723e-4a02-a75a-a7d3c8267bd4}">
+      <Declaration><![CDATA[METHOD READ_UINT32 : DINT
+VAR_INPUT
+	out_data : POINTER TO UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _BASESTREAM = 0 THEN
+	Read_UInt32 := 1;
+	RETURN;
+END_IF
+
+Read_UInt32 := _BASESTREAM.Read(out_data , 4);
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="C_BINARYREADER">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYREADER.BASE_STREAM.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYREADER.CLOSE">
+      <LineId Id="3" Count="1" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYREADER.NEW">
+      <LineId Id="3" Count="12" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYREADER.READ_BOOL">
+      <LineId Id="3" Count="5" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYREADER.READ_BYTES">
+      <LineId Id="3" Count="6" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYREADER.READ_DOUBLE">
+      <LineId Id="3" Count="5" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYREADER.READ_FLOAT">
+      <LineId Id="3" Count="5" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYREADER.READ_INT16">
+      <LineId Id="3" Count="5" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYREADER.READ_INT32">
+      <LineId Id="3" Count="5" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYREADER.READ_STRING">
+      <LineId Id="3" Count="6" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYREADER.READ_UINT16">
+      <LineId Id="3" Count="5" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYREADER.READ_UINT32">
+      <LineId Id="3" Count="5" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

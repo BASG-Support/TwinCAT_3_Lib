@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <!-- <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>-->
+    <FileVersion>1.0.0.0</FileVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{3b0cc878-eeb6-4430-b834-0250e9d06dae}</ProjectGuid>
+    <SubObjectsSortedByName>True</SubObjectsSortedByName>
+    <Name>TcpIp_Lib</Name>
+    <ProgramVersion>3.1.4022.0</ProgramVersion>
+    <Application>{0b72dfc3-7f97-4d99-9fd6-d69fd06fa34a}</Application>
+    <TypeSystem>{7ba21fde-0711-4a05-a343-8d61157239c8}</TypeSystem>
+    <Implicit_Task_Info>{eccc9f75-3122-484d-af5b-5807b65048d2}</Implicit_Task_Info>
+    <Implicit_KindOfTask>{51cdd1a2-a263-454d-8c57-c2186279e2d4}</Implicit_KindOfTask>
+    <Implicit_Jitter_Distribution>{95319d15-88e1-49d3-91f9-5837224ae187}</Implicit_Jitter_Distribution>
+    <LibraryReferences>{3b498a7d-9aee-4cd3-b14f-eb0db5c7adc6}</LibraryReferences>
+    <!--    <OutputType>Exe</OutputType>
+    <RootNamespace>MyApplication</RootNamespace>
+    <AssemblyName>MyApplication</AssemblyName>-->
+  </PropertyGroup>
+  <!-- 
+   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Release\</OutputPath>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+-->
+</Project>

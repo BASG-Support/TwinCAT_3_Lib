@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.3">
+  <DUT Name="E_STREAMSEEKTYPE" Id="{9dcce5c6-f8f2-479f-94ee-16435a85a014}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE E_STREAMSEEKTYPE :
+(
+	Origin := 0,
+	Current,
+	Current_Reversed,
+	End
+);
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

@@ -1,0 +1,301 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.3">
+  <POU Name="cTcpIpClient" Id="{bd37583b-69fa-4526-b1c8-15cf642f6164}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK cTcpIpClient
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	fbSocketOpen 	: FB_SocketConnect;
+	fbSocketClose	: FB_SocketClose;
+	fbSnd			: FB_SocketSend;
+	fbRcv			: FB_SocketReceive;
+	
+	_socket_		: T_HSOCKET;
+	_timeout_		: TIME := T#3S;
+	_bufferSize_	: UDINT := 4096;
+	_clientbuffer 	: C_BINARYSTREAM;
+	
+	_fragment_		: ARRAY[0..511] OF BYTE;
+	_rcv_poll_		: Ton := (PT := T#100MS);
+END_VAR
+VAR CONSTANT
+	_RETURN_CODE_ERROR_ 		: DINT := 1;
+	_RETURN_CODE_ERROR_NO_DATA_ : DINT := 100;
+	_RETURN_CODE_ERROR_OVERRANGE_ : DINT := 101;
+	_RETURN_CODE_BUSY_ : DINT := 0;
+	_RETURN_CODE_SUCCESS_ : DINT := -1;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF (_socket_.handle <> 0) THEN
+	_rcv_poll_(IN:=TRUE);
+	fbRcv(
+		sSrvNetId:= , 
+		hSocket:= _socket_, 
+		cbLen:= 512, 
+		pDest:= ADR(_fragment_), 
+		bExecute:= TRUE, 
+		tTimeout:= _timeout_, 
+		bBusy=> , 
+		bError=> , 
+		nErrId=> , 
+		nRecBytes=> );
+	IF fbRcv.bError THEN
+		fbRcv(bExecute := FALSE);
+		_rcv_poll_(IN:=FALSE);
+	ELSIF NOT fbRcv.nRecBytes <> 0 THEN
+		fbRcv(bExecute := FALSE);
+		_rcv_poll_(IN:=FALSE);
+		_clientbuffer.WRITE(ADR(_fragment_), fbRcv.nRecBytes);
+	ELSIF _rcv_poll_.Q THEN
+		_rcv_poll_(IN:=FALSE);
+	END_IF
+ELSE
+	_rcv_poll_(IN:=FALSE);
+END_IF]]></ST>
+    </Implementation>
+    <Folder Name="constructor_destructor" Id="{ebe35b49-7bd9-4bc0-808e-efd486140866}" />
+    <Property Name="available" Id="{987f8420-d5d8-475d-bd61-37a2a48d3e98}">
+      <Declaration><![CDATA[PROPERTY available : bool]]></Declaration>
+      <Get Name="Get" Id="{c20be9a7-212a-41db-a456-c37537b712b7}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[available := _clientbuffer.Position <> 0;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="connect" Id="{408c1e13-af63-4254-8dc0-10e4300b1fab}">
+      <Declaration><![CDATA[METHOD connect : dint
+VAR_INPUT
+	host : STRING(15);
+	port : UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbSocketOpen(
+	sSrvNetId:= , 
+	sRemoteHost:= host, 
+	nRemotePort:= port, 
+	bExecute:= TRUE, 
+	tTimeout:= _timeout_, 
+	bBusy=> , 
+	bError=> , 
+	nErrId=> , 
+	hSocket=> );
+IF fbSocketOpen.bError THEN
+	fbSocketOpen (bExecute := FALSE);
+	connect := _RETURN_CODE_ERROR_;
+	RETURN;
+ELSIF NOT fbSocketOpen.bBusy THEN
+	_socket_ := fbSocketOpen.hSocket;
+	fbSocketOpen (bExecute := FALSE);
+	connect := _RETURN_CODE_SUCCESS_;
+	RETURN;
+ELSE
+	connect := _RETURN_CODE_BUSY_;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="destroy" Id="{62558da3-f81d-450d-86e9-1e4ac4b230b7}">
+      <Declaration><![CDATA[METHOD destroy : dint
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbSocketClose(
+	sSrvNetId:= , 
+	hSocket:= _socket_, 
+	bExecute:= TRUE, 
+	tTimeout:= , 
+	bBusy=> , 
+	bError=> , 
+	nErrId=> );
+IF fbSocketClose.bError THEN
+	fbSocketClose( bExecute:= FALSE );
+	destroy := _RETURN_CODE_ERROR_;
+	RETURN;
+ELSIF NOT fbSocketClose.bBusy THEN
+	memset(ADR(_socket_), 0, SIZEOF(_socket_));
+	fbSocketClose( bExecute:= FALSE );
+	destroy := _RETURN_CODE_SUCCESS_;
+	RETURN;
+END_IF
+destroy := _RETURN_CODE_BUSY_;
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="FB_exit" Id="{7e4a8eba-76ad-4d3e-872a-3b7e5d914aeb}" FolderPath="constructor_destructor\">
+      <Declaration><![CDATA[METHOD FB_exit : BOOL
+VAR_INPUT
+	bInCopyCode : BOOL; // if TRUE, the exit method is called for exiting an instance that is copied afterwards (online change).
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_clientbuffer.CLOSE();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="FB_init" Id="{32d310ed-b2d0-407d-8bb4-94eca8367239}" FolderPath="constructor_destructor\">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode : BOOL;  // if TRUE, the instance afterwards gets moved into the copy code (online change)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_clientbuffer.NEW(_bufferSize_);]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="read" Id="{ece53e5d-051c-4ed3-bc6d-680dd124757c}">
+      <Declaration><![CDATA[METHOD read : dint
+VAR_INPUT
+	pOut 	: PVOID;
+	length	: UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT available THEN
+	read := _RETURN_CODE_ERROR_NO_DATA_;
+ELSE
+	IF _clientbuffer.SEEK(length, E_STREAMSEEKTYPE.Current_Reversed) > 0 THEN
+		read := _RETURN_CODE_ERROR_OVERRANGE_;
+		RETURN;
+	ELSE
+		CASE _clientbuffer.READ(pOut, length) OF 
+			1,2:
+				read := _RETURN_CODE_ERROR_OVERRANGE_;
+				RETURN;
+			-1:
+				_clientbuffer.SEEK(length, E_STREAMSEEKTYPE.Current_Reversed);
+				read := _RETURN_CODE_SUCCESS_;
+				RETURN;
+		END_CASE
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="send" Id="{7896d9cd-49be-4be5-a401-647e7152de74}">
+      <Declaration><![CDATA[METHOD send : DINT
+VAR_INPUT
+	pData : PVOID;
+	length: udint;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF pData = 0 OR length = 0 THEN
+	send := _RETURN_CODE_ERROR_;
+	RETURN;
+END_IF
+
+fbSnd(
+	sSrvNetId:= , 
+	hSocket:= _socket_, 
+	cbLen:= length, 
+	pSrc:= pData, 
+	bExecute:= TRUE, 
+	tTimeout:= _timeout_, 
+	bBusy=> , 
+	bError=> , 
+	nErrId=> );
+IF fbSnd.bError THEN
+	fbSnd(bExecute := FALSE);
+	send := _RETURN_CODE_ERROR_;
+	RETURN;
+ELSIF NOT fbSnd.bBusy THEN 
+	fbSnd(bExecute := FALSE);
+	send := _RETURN_CODE_SUCCESS_;
+	RETURN;
+END_IF
+send := _RETURN_CODE_BUSY_;
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="cTcpIpClient">
+      <LineId Id="9" Count="0" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="28" Count="9" />
+      <LineId Id="26" Count="0" />
+      <LineId Id="41" Count="1" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="43" Count="0" />
+      <LineId Id="48" Count="1" />
+      <LineId Id="27" Count="0" />
+    </LineIds>
+    <LineIds Name="cTcpIpClient.available.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="cTcpIpClient.connect">
+      <LineId Id="6" Count="8" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="20" Count="1" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="25" Count="1" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="28" Count="1" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="19" Count="0" />
+    </LineIds>
+    <LineIds Name="cTcpIpClient.destroy">
+      <LineId Id="6" Count="6" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="13" Count="0" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="19" Count="1" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="25" Count="1" />
+      <LineId Id="16" Count="0" />
+    </LineIds>
+    <LineIds Name="cTcpIpClient.FB_exit">
+      <LineId Id="6" Count="0" />
+    </LineIds>
+    <LineIds Name="cTcpIpClient.FB_init">
+      <LineId Id="7" Count="0" />
+    </LineIds>
+    <LineIds Name="cTcpIpClient.read">
+      <LineId Id="5" Count="1" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="40" Count="1" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="29" Count="1" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="35" Count="2" />
+      <LineId Id="42" Count="0" />
+      <LineId Id="38" Count="1" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="7" Count="0" />
+    </LineIds>
+    <LineIds Name="cTcpIpClient.send">
+      <LineId Id="17" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="19" Count="1" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="8" Count="8" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="26" Count="0" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="30" Count="2" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="33" Count="1" />
+      <LineId Id="24" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

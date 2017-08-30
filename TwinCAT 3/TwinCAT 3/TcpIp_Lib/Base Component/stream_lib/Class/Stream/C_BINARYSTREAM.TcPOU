@@ -1,0 +1,282 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4022.3">
+  <POU Name="C_BINARYSTREAM" Id="{2b84d926-aeae-444a-9edc-dc5bd2d7ac53}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK C_BINARYSTREAM IMPLEMENTS I_STREAM
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	_MEMBUFFER 	: POINTER TO BYTE;
+	_POSITION	: UDINT;
+	//_PERMISSIBLE_LIMIT 		: UDINT;
+	_MEMSIZE	: UDINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="Methods" Id="{67466075-2040-450c-a569-6481fbab3b31}">
+      <Folder Name="internal" Id="{921a4986-4128-4520-a3b7-d26674faea6b}" />
+    </Folder>
+    <Folder Name="Properties" Id="{ef584b95-cc1b-49a3-a470-9368ffba48ea}" />
+    <Property Name="BUFFER_SIZE" Id="{616b6a6e-e1d2-4e2f-bf10-6f3baf1ca617}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY BUFFER_SIZE : UDINT]]></Declaration>
+      <Get Name="Get" Id="{e5f7f783-392b-4dfa-a138-a4fe87aa83d0}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Buffer_Size := _MEMSIZE;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="CLOSE" Id="{93df5ed4-8648-4989-8a53-93b72247a346}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD CLOSE : DINT
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _MEMBUFFER <> 0 THEN
+	__DELETE(_MEMBUFFER);
+	_MEMBUFFER := 0;
+END_IF
+_POSITION := 0;
+_PERMISSIBLE_LIMIT := 0;
+_MEMSIZE := 0;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="END_OF_STREAM" Id="{2ef7cfca-8add-43ac-802c-607aa770a11e}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY END_OF_STREAM : BOOL]]></Declaration>
+      <Get Name="Get" Id="{5a081288-d4ab-4bf4-ab8c-5b56d5caf35e}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IF _MEMBUFFER <> 0 THEN
+	End_Of_Stream := _POSITION >= _MEMSIZE;
+ELSE
+	End_Of_Stream := TRUE;
+END_IF]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="FB_exit" Id="{079ace87-ce46-4369-a7ee-2dbd3169a46c}" FolderPath="Methods\internal\">
+      <Declaration><![CDATA[METHOD FB_exit : BOOL
+VAR_INPUT
+	bInCopyCode : BOOL; // if TRUE, the exit method is called for exiting an instance that is copied afterwards (online change).
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT bInCopyCode THEN
+    CLOSE();
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="IS_VALID" Id="{5c4c4e81-c8e3-438b-8ba3-02731bca4877}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY IS_VALID : BOOL]]></Declaration>
+      <Get Name="Get" Id="{5c02bad1-9a55-4696-b563-607c6085bdc8}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Is_Valid := _MEMBUFFER <> 0;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="NEW" Id="{ce7b5d99-7021-47b1-9766-a78e1f2455a0}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD NEW : DINT
+VAR_INPUT
+	StreamSize	: UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _MEMBUFFER <> 0 THEN
+	__DELETE(_MEMBUFFER);
+END_IF
+_MEMSIZE 				:= StreamSize;
+//_PERMISSIBLE_LIMIT	 	:= _MEMSIZE - 1;
+_POSITION 				:= 0;
+_MEMBUFFER 				:= __NEW(BYTE, _MEMSIZE);
+
+New := -1;
+RETURN;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="PEEK" Id="{648918a1-5095-403b-be3c-fa884ea7e580}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD PEEK : DINT
+VAR_INPUT
+	ptr_DataOut	: POINTER TO BYTE;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF EndOfStream THEN
+	Peek := 1; 
+	RETURN;
+ELSE
+	ptr_DataOut^ := _MEMBUFFER[_POSITION];
+	Peek := -1;
+	RETURN;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="POSITION" Id="{accd4918-674a-4579-9cfc-b2d9bfbf3204}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY POSITION : UDINT
+]]></Declaration>
+      <Get Name="Get" Id="{17542293-08c7-4a8a-9871-1b958b160058}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[POSITION := _POSITION;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="READ" Id="{1d14fa05-7025-4b61-b3d7-17a2bf9c66ab}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD READ : DINT
+VAR_INPUT
+	ptr_DataOut	: PVOID;
+	Length		: UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF End_Of_Stream THEN
+	Read := 1;
+	RETURN;
+ELSE
+	IF _POSITION + Length > _MEMSIZE THEN
+		Read := 2;
+		RETURN;
+	ELSE
+		MEMCPY(ptr_DataOut, _MEMBUFFER + _POSITION, Length);
+		_POSITION := _POSITION + Length;
+		Read := -1;
+		RETURN;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="SEEK" Id="{e06ad184-0241-4c69-b342-3ba6e0dd40bb}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD SEEK : DINT
+VAR_INPUT
+	Offset		: UDINT;	//Permissible range is 0 upto the total buffer size - 1;
+	SeekStyle	: E_STREAMSEEKTYPE;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE SeekStyle OF 
+	//Offsets from the beginning of the stream
+	E_STREAMSEEKTYPE.Origin:
+		IF Offset > _MEMSIZE THEN
+			Seek := 1;
+			RETURN;
+		ELSE
+			_POSITION := Offset;
+			Seek := -1;
+			RETURN;
+		END_IF
+	//Offsets from the end of the stream
+	E_STREAMSEEKTYPE.End:
+		IF Offset > _MEMSIZE THEN
+			Seek := 1;
+			RETURN;
+		ELSE
+			_POSITION := (_MEMSIZE) - Offset;
+			Seek := -1;
+			RETURN;
+		END_IF
+	//Offsets from the current position of the stream
+	E_STREAMSEEKTYPE.Current:
+		IF _POSITION + Offset > _MEMSIZE THEN
+			Seek := 1;
+			RETURN;
+		ELSE
+			_POSITION := _POSITION + Offset;
+			Seek := -1;
+			RETURN;
+		END_IF
+	//Offsets from the current position of the stream
+	E_STREAMSEEKTYPE.Current_Reversed:
+		IF Offset > _POSITION  THEN
+			Seek := 1;
+			RETURN;
+		ELSE
+			_POSITION := _POSITION - Offset;
+			Seek := -1;
+			RETURN;
+		END_IF
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="WRITE" Id="{a91d8690-9bc6-45a1-b644-1e54fc650032}" FolderPath="Methods\">
+      <Declaration><![CDATA[METHOD WRITE : DINT
+VAR_INPUT
+	ptr_DataIn	: PVOID;
+	Length		: UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF End_Of_Stream THEN
+	Write := 1;
+	RETURN;
+ELSE
+	IF _POSITION + Length > _MEMSIZE THEN
+		Write := 2;
+		RETURN;
+	ELSE
+		MEMCPY(_MEMBUFFER + _POSITION, ptr_DataIn, Length);
+		_POSITION := _POSITION + Length;
+		Write := -1;
+		RETURN;
+	END_IF
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="C_BINARYSTREAM">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYSTREAM.BUFFER_SIZE.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYSTREAM.CLOSE">
+      <LineId Id="3" Count="5" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYSTREAM.END_OF_STREAM.Get">
+      <LineId Id="3" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYSTREAM.FB_exit">
+      <LineId Id="3" Count="1" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYSTREAM.IS_VALID.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYSTREAM.NEW">
+      <LineId Id="3" Count="8" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYSTREAM.PEEK">
+      <LineId Id="3" Count="6" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYSTREAM.POSITION.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYSTREAM.READ">
+      <LineId Id="3" Count="12" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYSTREAM.SEEK">
+      <LineId Id="3" Count="19" />
+      <LineId Id="39" Count="19" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="C_BINARYSTREAM.WRITE">
+      <LineId Id="3" Count="12" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
